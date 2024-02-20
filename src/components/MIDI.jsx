@@ -6,7 +6,45 @@ import { useAtom } from 'jotai';
 import { midiAccessAtom } from '../lib/midi';
 
 
-async function setupMidiAccess(getMidiAccess, setMIDIAccess){
+const NOTE_ON = 9;
+const NOTE_OFF = 8;
+
+const notesOn = new Map();
+
+function onMidiMessage(event) {
+    console.log( event.data );
+    const cmd = event.data[0] >> 4;
+    const pitch = event.data[1];
+    const velocity = ( event.data.length > 2 ) ? event.data[ 2 ] : 1;
+    const timestamp = Date.now();
+
+    if (cmd === NOTE_OFF || (cmd === NOTE_ON && velocity === 0)) {
+        console.log(`... from ${event.srcElement.name} note off: pitch:${pitch}, velocity: ${velocity}`);
+      
+        // Complete the note!
+        const note = notesOn.get(pitch);
+        if (note) {
+          console.log(`🎵 pitch:${pitch}, duration:${timestamp - note} ms.`);
+          notesOn.delete(pitch);
+        }
+      } else if (cmd === NOTE_ON) {
+        console.log(`🎧 from ${event.srcElement.name} note off: pitch:${pitch}, velocity: {velocity}`);
+        
+        // One note can only be on at once.
+        notesOn.set(pitch, timestamp);
+    }
+}
+
+
+function watchMidi ( getMidiAccess ) {
+    if ( getMidiAccess ) {
+        getMidiAccess.inputs.forEach( ( inputPort ) => {
+            inputPort.onmidimessage = onMidiMessage;
+        } );
+    }
+}
+
+async function setupMidiAccess ( getMidiAccess, setMIDIAccess ) {
     if ( !getMidiAccess ) {
         try {
             const midiAccess = await navigator.requestMIDIAccess();
@@ -29,22 +67,6 @@ function cleanup (getMidiAccess) {
     }
 }
 
-function watchMidi ( getMidiAccess ) {
-    if ( getMidiAccess ) {
-        getMidiAccess.inputs.forEach( ( inputPort ) => {
-            inputPort.onmidimessage = onMidiMessage;
-        } );
-    }
-}
-
-function onMidiMessage(event) {
-    let str = `MIDI message received at timestamp ${event.timeStamp}[${event.data.length} bytes]: `;
-    for (const character of event.data) {
-      str += `0x${character.toString(16)} `;
-    }
-    console.log(str);
-}
-  
 export function MIDIComponent () {
     const [ getMidiAccess, setMIDIAccess ] = useAtom( midiAccessAtom );
 
