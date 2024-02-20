@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { useAtom } from 'jotai';
-import { midiAccessAtom } from './lib/midi';
+import { midiAccessAtom } from '../lib/midi';
 
 
 async function setupMidiAccess(getMidiAccess, setMIDIAccess){
@@ -26,7 +26,7 @@ function cleanup (getMidiAccess) {
     }
 }
 
-function MIDIComponent () {
+export function MIDIComponent () {
     const [ getMidiAccess, setMIDIAccess ] = useAtom( midiAccessAtom );
 
     // onMount
@@ -43,4 +43,3 @@ function MIDIComponent () {
     );
 }
 
-export default MIDIComponent;
