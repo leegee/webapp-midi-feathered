@@ -3,7 +3,7 @@ import { useAtom } from 'jotai';
 import { midiAccessAtom } from './lib/midi';
 
 
-async function accessMidi(getMidiAccess, setMIDIAccess){
+async function setupMidiAccess(getMidiAccess, setMIDIAccess){
     if ( !getMidiAccess ) {
         try {
             const midiAccess = await navigator.requestMIDIAccess();
@@ -31,7 +31,7 @@ function MIDIComponent () {
 
     // onMount
     useEffect( () => {
-        accessMidi(getMidiAccess, setMIDIAccess);
+        setupMidiAccess(getMidiAccess, setMIDIAccess);
         return cleanup( getMidiAccess );
     }, [ getMidiAccess, setMIDIAccess ] );
 
