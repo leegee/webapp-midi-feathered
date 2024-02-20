@@ -18,20 +18,17 @@ function onMidiMessage(event) {
     const velocity = ( event.data.length > 2 ) ? event.data[ 2 ] : 1;
     const timestamp = Date.now();
 
-    if (cmd === NOTE_OFF || (cmd === NOTE_ON && velocity === 0)) {
-        console.log(`... from ${event.srcElement.name} note off: pitch:${pitch}, velocity: ${velocity}`);
-      
-        // Complete the note!
+    if ( cmd === NOTE_ON ) {
+        console.log(`ON pitch:${pitch}, velocity: {velocity}`);
+        notesOn.set(pitch, timestamp);
+    }
+    else if ( cmd === NOTE_OFF || ( cmd === NOTE_ON && velocity === 0 ) ) {
+        console.log(`OFF pitch:${pitch}, velocity: ${velocity}`);
         const note = notesOn.get(pitch);
         if (note) {
-          console.log(`🎵 pitch:${pitch}, duration:${timestamp - note} ms.`);
+          console.log(`OFF pitch:${pitch}, duration:${timestamp - note} ms.`);
           notesOn.delete(pitch);
         }
-      } else if (cmd === NOTE_ON) {
-        console.log(`🎧 from ${event.srcElement.name} note off: pitch:${pitch}, velocity: {velocity}`);
-        
-        // One note can only be on at once.
-        notesOn.set(pitch, timestamp);
     }
 }
 
