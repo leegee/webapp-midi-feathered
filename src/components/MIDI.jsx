@@ -26,12 +26,29 @@ function cleanup (getMidiAccess) {
     }
 }
 
+function watchMidi ( getMidiAccess ) {
+    if ( getMidiAccess ) {
+        getMidiAccess.inputs.forEach( ( inputPort ) => {
+            inputPort.onmidimessage = onMidiMessage;
+        } );
+    }
+}
+
+function onMidiMessage(event) {
+    let str = `MIDI message received at timestamp ${event.timeStamp}[${event.data.length} bytes]: `;
+    for (const character of event.data) {
+      str += `0x${character.toString(16)} `;
+    }
+    console.log(str);
+}
+  
 export function MIDIComponent () {
     const [ getMidiAccess, setMIDIAccess ] = useAtom( midiAccessAtom );
 
     // onMount
     useEffect( () => {
-        setupMidiAccess(getMidiAccess, setMIDIAccess);
+        setupMidiAccess( getMidiAccess, setMIDIAccess );
+        watchMidi(getMidiAccess);
         return cleanup( getMidiAccess );
     }, [ getMidiAccess, setMIDIAccess ] );
 
