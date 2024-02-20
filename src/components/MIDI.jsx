@@ -3,7 +3,7 @@
 
 import { useEffect } from 'react';
 import { useAtom } from 'jotai';
-import { midiAccessAtom } from '../lib/midi';
+import { midiAccessAtom, midiOutputsAtom } from '../lib/midi';
 
 
 const NOTE_ON = 9;
@@ -52,6 +52,15 @@ async function setupMidiAccess ( getMidiAccess, setMIDIAccess ) {
     }
 }
 
+function setupMidiDevices ( getMidiAccess, getMidiOutputs, setMidiOutputs ) {
+    if ( getMidiAccess ) {
+        const outputs = getMidiAccess.outputs.values();
+        for ( let output = outputs.next(); output && !output.done; output = outputs.next() ) {
+            setMidiOutputs( [...getMidiOutputs, output.value] );
+        }
+    }
+}
+
 // Closes open connections
 function cleanup (getMidiAccess) {
     if ( getMidiAccess ) {
@@ -65,14 +74,20 @@ function cleanup (getMidiAccess) {
 }
 
 export function MIDIComponent () {
-    const [ getMidiAccess, setMIDIAccess ] = useAtom( midiAccessAtom );
+    const [ getMidiAccess, setMidiAccess ] = useAtom( midiAccessAtom );
+    const [ getMidiOutputs, setMidiOutputs ] = useAtom( midiOutputsAtom );
 
     // onMount
-    useEffect( () => {
-        setupMidiAccess( getMidiAccess, setMIDIAccess );
-        watchMidi(getMidiAccess);
-        return cleanup( getMidiAccess );
-    }, [ getMidiAccess, setMIDIAccess ] );
+    useEffect(
+        () => {
+            setupMidiAccess( getMidiAccess, setMidiAccess );
+            setupMidiDevices( getMidiAccess, getMidiOutputs, setMidiOutputs );
+            watchMidi( getMidiAccess );
+            return cleanup( getMidiAccess );
+        },
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+        [ getMidiAccess ]
+    );
 
     return (
         <div>
