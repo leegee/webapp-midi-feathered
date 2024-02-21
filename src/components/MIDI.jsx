@@ -1,17 +1,17 @@
 /** https://developer.mozilla.org/en-US/docs/Web/API/Web_MIDI_API  */
 
-
-import { useEffect } from 'react';
+// eslint-disable-next-line no-unused-vars
+import React, { useEffect } from 'react';
 import { useAtom } from 'jotai';
 import { midiAccessAtom, midiOutputsAtom, selectedOutputAtom, notesOnAtom } from '../lib/midi';
-
+import OutputSelect from './OutputSelect';
 
 const NOTE_ON = 9;
 const NOTE_OFF = 8;
 
 let watchMidiInitialized = false;
 
-export function onMidiMessage ( event, notesOn, setNotesOn ) {
+function onMidiMessage ( event, setNotesOn ) {
     const cmd = event.data[0] >> 4;
     const pitch = event.data[1];
     const velocity = ( event.data.length > 2 ) ? event.data[ 2 ] : 1;
@@ -39,11 +39,6 @@ export function onMidiMessage ( event, notesOn, setNotesOn ) {
     });
 }
 
-
-function handleOutputChange ( event, setSelectedOutput ) {
-    setSelectedOutput( event.target.value );
-}
-
 export function MIDIComponent () {
     const [ midiAccess, setMidiAccess ] = useAtom( midiAccessAtom );
     const [ midiOutputs, setMidiOutputs ] = useAtom( midiOutputsAtom );
@@ -64,7 +59,7 @@ export function MIDIComponent () {
             if ( !watchMidiInitialized ) {
                 console.log( "INIT MIDI LISTENERS" );
                 midiAccess.inputs.forEach(inputPort => {
-                    inputPort.onmidimessage = e => onMidiMessage(e, notesOn, setNotesOn);
+                    inputPort.onmidimessage = e => onMidiMessage(e, setNotesOn);
                 });
                 watchMidiInitialized = true;
             }
@@ -75,11 +70,11 @@ export function MIDIComponent () {
         <div>
             <h1>MIDI Test</h1>
 
-            <select onChange={(e) => handleOutputChange(e, setSelectedOutput)} value={selectedOutput}>
-                {midiOutputs.map(output => (
-                    <option key={output.id} value={output.id}>{output.name}</option>
-                ))}
-            </select>
+            <OutputSelect
+                midiOutputs={midiOutputs}
+                selectedOutput={Number(selectedOutput)}
+                setSelectedOutput={setSelectedOutput}
+            />
 
             <ul>
                 {Object.entries(notesOn).map(([key, value]) => ( <li key={key}>{key}: {value}</li> ))}
