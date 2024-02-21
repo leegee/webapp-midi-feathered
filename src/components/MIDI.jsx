@@ -5,6 +5,7 @@ import React, { useEffect } from 'react';
 import { useAtom } from 'jotai';
 import { midiAccessAtom, midiOutputsAtom, selectedOutputAtom, notesOnAtom } from '../lib/midi';
 import OutputSelect from './OutputSelect';
+import NotesOnDisplay from './NotesOnDisplay';
 
 const NOTE_ON = 9;
 const NOTE_OFF = 8;
@@ -76,9 +77,11 @@ export function MIDIComponent () {
                 setSelectedOutput={setSelectedOutput}
             />
 
-            <ul>
+            {/* <ul>
                 {Object.entries(notesOn).map(([key, value]) => ( <li key={key}>{key}: {value}</li> ))}
-            </ul>
+            </ul> */}
+
+            <NotesOnDisplay notesOn={notesOn}/>
         </div>
     );
 }
