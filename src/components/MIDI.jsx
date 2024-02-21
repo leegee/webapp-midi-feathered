@@ -11,7 +11,7 @@ const NOTE_OFF = 8;
 
 let watchMidiInitialized = false;
 
-function onMidiMessage ( event, notesOn, setNotesOn ) {
+export function onMidiMessage ( event, notesOn, setNotesOn ) {
     const cmd = event.data[0] >> 4;
     const pitch = event.data[1];
     const velocity = ( event.data.length > 2 ) ? event.data[ 2 ] : 1;
