@@ -3,9 +3,10 @@
 // eslint-disable-next-line no-unused-vars
 import React, { useEffect } from 'react';
 import { useAtom } from 'jotai';
-import { midiAccessAtom, midiOutputsAtom, selectedOutputAtom, notesOnAtom } from '../lib/midi';
+import { midiAccessAtom, midiOutputsAtom, selectedOutputAtom, notesOnAtom, scaleNameAtom } from '../lib/midi';
 import OutputSelect from './OutputSelect';
 import NotesOnDisplay from './NotesOnDisplay';
+import ScaleSelector from './ScaleSelector';
 
 const NOTE_ON = 9;
 const NOTE_OFF = 8;
@@ -19,7 +20,7 @@ function onMidiMessage ( event, setNotesOn ) {
     const timestamp = Date.now();
 
     setNotesOn((prevNotesOn) => {
-        const newNotesOn = { ...prevNotesOn }; // Create a copy of the previous notes
+        const newNotesOn = { ...prevNotesOn }; 
 
         if (cmd === NOTE_ON && velocity > 0 && !newNotesOn[pitch]) {
             console.log(`NOTE ON pitch:${pitch}, velocity: ${velocity}`);
@@ -45,6 +46,7 @@ export function MIDIComponent () {
     const [ midiOutputs, setMidiOutputs ] = useAtom( midiOutputsAtom );
     const [ selectedOutput, setSelectedOutput ] = useAtom( selectedOutputAtom );
     const [ notesOn, setNotesOn ] = useAtom( notesOnAtom );
+    const [ scaleName, setScaleName ] = useAtom( scaleNameAtom );
     
     useEffect(() => {
         if (!midiAccess) {
@@ -65,7 +67,7 @@ export function MIDIComponent () {
                 watchMidiInitialized = true;
             }
         }
-    }, [midiAccess, notesOn]);
+    }, [midiAccess, notesOn, scaleName]);
 
     return (
         <div>
@@ -76,6 +78,8 @@ export function MIDIComponent () {
                 selectedOutput={Number(selectedOutput)}
                 setSelectedOutput={setSelectedOutput}
             />
+
+            <ScaleSelector setScaleName={setScaleName} scaleName={scaleName} />
 
             {/* <ul>
                 {Object.entries(notesOn).map(([key, value]) => ( <li key={key}>{key}: {value}</li> ))}
