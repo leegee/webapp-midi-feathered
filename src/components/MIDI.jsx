@@ -16,11 +16,15 @@ const NOTE_OFF = 8;
 
 let watchMidiInitialized = false;
 
-function playNote ( midiPitch, scaleNotes ) {
-    const noteName = Note.fromMidi(midiPitch);
-    const rootNote = scaleNotes[ 0 ];
-    const thirdIndex = ( rootNote === noteName ) ? 2 : 2; 
-    const fifthIndex = ( thirdIndex + 2 ) % scaleNotes.length; 
+function getTriadAndOctave(midiPitch, scaleNotes) {
+    const [rootNote, octaveNumber] = Note.fromMidi( midiPitch ).split('');
+    const rootIndex = scaleNotes.indexOf(rootNote);
+    if (rootIndex === -1) {
+        throw new Error(`The MIDI pitch ${rootNote} does not correspond to any note in the scale: ${scaleNotes.join(' ')}`);
+    }
+
+    const thirdIndex = (rootIndex + 2) % scaleNotes.length; 
+    const fifthIndex = (rootIndex + 4) % scaleNotes.length; 
 
     const triadNotes = [
         rootNote,
@@ -28,9 +32,7 @@ function playNote ( midiPitch, scaleNotes ) {
         scaleNotes[fifthIndex]
     ];
 
-    console.info( rootNote,'=', triadNotes );
-
-    return triadNotes;
+    return [triadNotes, octaveNumber];
 }
 
 function onMidiMessage ( event, setNotesOn, scaleNotes ) {
@@ -45,7 +47,7 @@ function onMidiMessage ( event, setNotesOn, scaleNotes ) {
         if (cmd === NOTE_ON && velocity > 0 && !newNotesOn[pitch]) {
             console.log(`NOTE ON pitch:${pitch}, velocity: ${velocity}`);
             newNotesOn[ pitch ] = { timestamp, velocity };
-            playNote( pitch, scaleNotes );
+            getTriadAndOctave( pitch, scaleNotes );
         }
         else if ( cmd === NOTE_OFF || velocity === 0) {
             if (newNotesOn[pitch]) {
