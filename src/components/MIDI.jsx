@@ -18,22 +18,17 @@ let watchMidiInitialized = false;
 
 function playNote ( midiPitch, scaleNotes ) {
     const noteName = Note.fromMidi(midiPitch);
-    console.log('xxx', scaleNotes)
     const rootNote = scaleNotes[ 0 ];
-    // Calculate the index of the third and fifth notes in the scale:
-    // For the first note, the third is the second note in the scale
-    const thirdIndex = ( rootNote === noteName ) ? 2 : 3; 
-    // Add 2 to get the fifth note, modulo the length of the scale
+    const thirdIndex = ( rootNote === noteName ) ? 2 : 2; 
     const fifthIndex = ( thirdIndex + 2 ) % scaleNotes.length; 
 
-    // Construct the triad using the first, third, and fifth notes of the scale
     const triadNotes = [
         rootNote,
         scaleNotes[thirdIndex],
         scaleNotes[fifthIndex]
     ];
 
-    console.info( rootNote, triadNotes );
+    console.info( rootNote,'=', triadNotes );
 
     return triadNotes;
 }
@@ -56,8 +51,6 @@ function onMidiMessage ( event, setNotesOn, scaleNotes ) {
             if (newNotesOn[pitch]) {
                 console.log(`NOTE OFF pitch:${pitch}: duration:${timestamp - newNotesOn[pitch][0]} ms.`);
                 delete newNotesOn[pitch];
-            } else {
-                console.warn(`NOTE OFF pitch:${pitch} BUT NOT IN notesOn?!`);
             }
         }
 
