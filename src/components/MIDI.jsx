@@ -32,10 +32,8 @@ function onMidiMessage ( event, setNotesOn ) {
                 console.log(`NOTE OFF pitch:${pitch}: duration:${timestamp - newNotesOn[pitch][0]} ms.`);
                 delete newNotesOn[pitch];
             } else {
-                console.log(`NOTE OFF pitch:${pitch} BUT NOT IN notesOn?!`);
+                console.warn(`NOTE OFF pitch:${pitch} BUT NOT IN notesOn?!`);
             }
-        } else {
-            console.warn('NOTE - WHAT?', pitch, velocity);
         }
 
         return newNotesOn; 
@@ -54,21 +52,22 @@ export function MIDIComponent () {
             try {
                 navigator.requestMIDIAccess().then(midiAccess => setMidiAccess(midiAccess));
             } catch (error) {
-                console.error('Failed to access MIDI devices:', error);
+                console.error( 'Failed to access MIDI devices:', error );
+                return ( <div>Failed to access MIDI devices: ${error}</div> );
             }
-        } else {
+        }
+        else {
             const newOutputs = Array.from(midiAccess.outputs.values());
             setMidiOutputs(newOutputs);
-        
             if ( !watchMidiInitialized ) {
-                console.log( "INIT MIDI LISTENERS" );
+                console.log( "Init midi listeners" );
                 midiAccess.inputs.forEach(inputPort => {
                     inputPort.onmidimessage = e => onMidiMessage(e, setNotesOn);
                 });
                 watchMidiInitialized = true;
             }
         }
-    }, [midiAccess, notesOn, scaleName]);
+    }, [ midiAccess, setMidiAccess, setMidiOutputs, setNotesOn ]);
 
     return (
         <div>
@@ -82,13 +81,10 @@ export function MIDIComponent () {
 
             <ScaleSelector setScaleName={setScaleName} scaleName={scaleName} />
 
-            {/* <ul>
-                {Object.entries(notesOn).map(([key, value]) => ( <li key={key}>{key}: {value}</li> ))}
-            </ul> */}
+            <PianoKeyboard notesOn={ notesOn } />
 
             <NotesOnDisplay notesOn={ notesOn } />
-            
-            <PianoKeyboard notesOn={ notesOn } />
+
         </div>
     );
 }
