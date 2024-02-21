@@ -2,21 +2,22 @@
 import React, { useEffect } from 'react';
 import { useAtom } from 'jotai';
 import { ScaleType, Scale } from "tonal";
-import { scaleNameAtom, scaleNotesAtom } from '../lib/midi';
+import { scaleRootNoteAtom, scaleNameAtom, scaleNotesAtom } from '../lib/midi';
 
 function ScaleSelector () {
     const handleScaleChange = (event) => {
         setScaleName(event.target.value);
     };
 
+    const [ scaleRootNote ] = useAtom( scaleRootNoteAtom );
     const [ scaleName, setScaleName ] = useAtom( scaleNameAtom );
     const [ , setScaleNotes ] = useAtom( scaleNotesAtom );
 
     useEffect(() => {
         setScaleNotes( 
-            Scale.get(scaleName).notes
+            Scale.get(scaleRootNote + ' '+ scaleName).notes
          );
-    }, [ scaleName, setScaleNotes ] );
+    }, [ scaleRootNote, scaleName, setScaleNotes ] );
     
     return (
         <select className='padded' onChange={handleScaleChange} value={scaleName}>
