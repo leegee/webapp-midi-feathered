@@ -23,7 +23,7 @@ function onMidiMessage ( event, setNotesOn ) {
 
         if (cmd === NOTE_ON && velocity > 0 && !newNotesOn[pitch]) {
             console.log(`NOTE ON pitch:${pitch}, velocity: ${velocity}`);
-            newNotesOn[pitch] = [timestamp, velocity];
+            newNotesOn[ pitch ] = { timestamp, velocity };
         }
         else if ( cmd === NOTE_OFF || velocity === 0) {
             if (newNotesOn[pitch]) {

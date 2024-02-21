@@ -7,7 +7,7 @@ function NoteList ( { notesOn } ) {
         <ul>
             { Object.entries( notesOn ).map( ( [ key, value ] ) => (
                 <li key={ key }>
-                    { key }: { value }
+                    { key }: { value.velocity } { value.timestamp } 
                 </li>
             ) ) }
         </ul>
