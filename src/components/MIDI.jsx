@@ -3,7 +3,7 @@
 
 import { useEffect } from 'react';
 import { useAtom } from 'jotai';
-import { midiAccessAtom, midiOutputsAtom } from '../lib/midi';
+import { midiAccessAtom, midiOutputsAtom, selectedOutputAtom } from '../lib/midi';
 
 
 const NOTE_ON = 9;
@@ -52,13 +52,12 @@ async function setupMidiAccess ( getMidiAccess, setMIDIAccess ) {
     }
 }
 
-function setupMidiDevices ( getMidiAccess, getMidiOutputs, setMidiOutputs ) {
-    if ( getMidiAccess ) {
-        const outputs = getMidiAccess.outputs.values();
-        for ( let output = outputs.next(); output && !output.done; output = outputs.next() ) {
-            setMidiOutputs( [...getMidiOutputs, output.value] );
-        }
+function setupMidiOutputs ( outputs, getMidiOutputs, setMidiOutputs ) {
+    const newOutputs = [];
+    for (const output of outputs) {
+        newOutputs.push( output );
     }
+    setMidiOutputs( newOutputs );
 }
 
 // Closes open connections
@@ -73,16 +72,25 @@ function cleanup (getMidiAccess) {
     }
 }
 
+function handleOutputChange ( event, setSelectedOutputAtom ) {
+    setSelectedOutputAtom( event.target.value );
+}
+
 export function MIDIComponent () {
     const [ getMidiAccess, setMidiAccess ] = useAtom( midiAccessAtom );
     const [ getMidiOutputs, setMidiOutputs ] = useAtom( midiOutputsAtom );
+    const [ getSelectedOutputAtom, setSelectedOutputAtom ] = useAtom( selectedOutputAtom );
 
-    // onMount
     useEffect(
         () => {
             setupMidiAccess( getMidiAccess, setMidiAccess );
-            setupMidiDevices( getMidiAccess, getMidiOutputs, setMidiOutputs );
-            watchMidi( getMidiAccess );
+            if ( getMidiAccess ) {
+                setupMidiOutputs(
+                    Array.from( getMidiAccess.outputs.values() ),
+                    getMidiOutputs, setMidiOutputs
+                );
+                watchMidi( getMidiAccess );
+            }
             return cleanup( getMidiAccess );
         },
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -93,6 +101,12 @@ export function MIDIComponent () {
         <div>
             <h1>MIDI Access Status</h1>
             <p>{ getMidiAccess ? 'MIDI Access Granted' : 'MIDI Access Denied' }</p>
+
+            <select onChange={(e) => handleOutputChange(e, setSelectedOutputAtom)} value={getSelectedOutputAtom}>
+                {getMidiOutputs.map(output => (
+                    <option key={output.id} value={output.id}>{output.name}</option>
+                ))}
+            </select>
         </div>
     );
 }
