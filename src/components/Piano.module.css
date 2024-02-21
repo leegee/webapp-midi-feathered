@@ -1,9 +1,10 @@
 /* Piano.module.css */
 
 :root {
+    font-size: 10pt;
     --key-width: 1rem;
-    --key-white-height: 7rem;
-    --key-black-height: 4rem;
+    --key-white-height: 5rem;
+    --key-black-height: 3rem;
 }
 
 aside {
