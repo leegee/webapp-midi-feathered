@@ -4,11 +4,16 @@ import PropTypes from 'prop-types';
 
 import styles from './Piano.module.css';
 
+const blackKeys = [1, 3, 6, 8, 10];
+
 // Piano Key Component
 const PianoKey = ( { pitch, isHighlighted } ) => {
+    const isBlackKey = blackKeys.includes(pitch % 12);
+
     return (
-        <div className={`${styles['piano-key']} ${isHighlighted ? styles['piano-key-highlighted'] : ''}`}>
-            { pitch }
+        <div
+            alt={ `${ pitch }` }
+            className={ `${ styles[ 'piano-key' ] } ${ isHighlighted ? styles[ 'piano-key-highlighted' ] : '' } ${ isBlackKey ? styles[ 'piano-key-black' ] : '' }` }>
         </div>
     );
 };
@@ -23,7 +28,7 @@ const PianoKeyboard = ( { notesOn } ) => {
     const midiPitches = Array.from( { length: 88 }, ( _, index ) => index + 21 ); 
 
     return (
-        <div className="piano-keyboard">
+        <aside className="piano-keyboard">
             { midiPitches.map( ( pitch ) => (
                 <PianoKey
                     key={ pitch }
@@ -31,7 +36,7 @@ const PianoKeyboard = ( { notesOn } ) => {
                     isHighlighted={ notesOn[ pitch ] }
                 />
             ) ) }
-        </div>
+        </aside>
     );
 };
 

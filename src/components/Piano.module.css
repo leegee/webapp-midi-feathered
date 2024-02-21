@@ -1,13 +1,37 @@
 /* Piano.module.css */
+:root {
+    --key-width: 1rem;
+    --key-white-height: 7rem;
+    --key-black-height: 4rem;
+}
+
+aside {
+    display: flex;
+    background: orange;
+}
 
 .piano-key {
+    position: relative;
+    flex: 1;
     display: inline-block;
-    border: 1pt solid black;
+    border: 1pt solid grey;
     background: white;
-    width: 1rem;
-    height: 5rem;
+    width: var(--key-width);
+    height: var(--key-white-height);
+    z-index: 1;
 }
 
 .piano-key-highlighted {
-    background: yellow !important;
+    background: orange;
+}
+
+.piano-key-black {
+    z-index: 2;
+    background-color: black;
+    border-color: white;
+    border-top-color: black;
+    width: calc(var(--key-width) * 0.7);
+    height: var(--key-black-height);
+    margin-left: calc(var(--key-width) / -2);
+    margin-right: calc(var(--key-width) / -2);
 }
