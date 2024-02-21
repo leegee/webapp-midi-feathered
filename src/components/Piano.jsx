@@ -1,5 +1,5 @@
 // eslint-disable-next-line no-unused-vars
-import React, { useState } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 
 import styles from './Piano.module.css';
@@ -13,7 +13,7 @@ const PianoKey = ( { pitch, isHighlighted } ) => {
     return (
         <div
             alt={ `${ pitch }` }
-            className={ `${ styles[ 'piano-key' ] } ${ isHighlighted ? styles[ 'piano-key-highlighted' ] : '' } ${ isBlackKey ? styles[ 'piano-key-black' ] : '' }` }>
+            className={ `${ styles[ 'piano-key' ] } ${ isHighlighted ? styles[ 'piano-key-highlighted' ] : '' } ${ isBlackKey ? styles[ 'piano-key-black' ] : 'piano-key-white' }` }>
         </div>
     );
 };
@@ -28,12 +28,12 @@ const PianoKeyboard = ( { notesOn } ) => {
     const midiPitches = Array.from( { length: 88 }, ( _, index ) => index + 21 ); 
 
     return (
-        <aside className="piano-keyboard">
+        <aside className="piano-keyboard padded">
             { midiPitches.map( ( pitch ) => (
                 <PianoKey
                     key={ pitch }
                     pitch={ pitch }
-                    isHighlighted={ notesOn[ pitch ] }
+                    isHighlighted={ notesOn[ pitch ] ? true : false }
                 />
             ) ) }
         </aside>

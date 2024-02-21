@@ -8,7 +8,7 @@ function OutputSelect({ midiOutputs, selectedOutput, setSelectedOutput }) {
     };
 
     return (
-        <select onChange={handleOutputChange} value={selectedOutput}>
+        <select className='padded' onChange={handleOutputChange} value={selectedOutput}>
             {midiOutputs.map(output => (
                 <option key={output.id} value={output.id}>{output.name}</option>
             ))}

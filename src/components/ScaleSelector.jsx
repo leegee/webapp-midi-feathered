@@ -1,26 +1,30 @@
 // eslint-disable-next-line no-unused-vars
-import React from 'react';
-import PropTypes from 'prop-types';
+import React, { useEffect } from 'react';
+import { useAtom } from 'jotai';
+import { ScaleType, Scale } from "tonal";
+import { scaleNameAtom, scaleNotesAtom } from '../lib/midi';
 
-import { ScaleType } from "tonal";
-
-function ScaleSelector ({ scaleName, setScaleName }) {
+function ScaleSelector () {
     const handleScaleChange = (event) => {
         setScaleName(event.target.value);
     };
 
+    const [ scaleName, setScaleName ] = useAtom( scaleNameAtom );
+    const [ , setScaleNotes ] = useAtom( scaleNotesAtom );
+
+    useEffect(() => {
+        setScaleNotes( 
+            Scale.get(scaleName).notes
+         );
+    }, [ scaleName, setScaleNotes ] );
+    
     return (
-        <select onChange={handleScaleChange} value={scaleName}>
+        <select className='padded' onChange={handleScaleChange} value={scaleName}>
             {ScaleType.names().sort().map(scaleName => (
                 <option key={scaleName} value={scaleName}>{scaleName}</option>
             ))}
         </select>
     );
 }
-
-ScaleSelector.propTypes = {
-    scaleName: PropTypes.string.isRequired, 
-    setScaleName: PropTypes.func.isRequired,
-};
 
 export default ScaleSelector;
