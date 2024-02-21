@@ -13,6 +13,10 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+* {
+  box-sizing: border-box;
+}
+
 body {
   margin: 0;
   padding: 2em;
@@ -20,4 +24,10 @@ body {
   place-items: top;
   min-width: 320px;
   min-height: 100vh;
+}
+
+.padded {
+  margin: 1rem;
+  padding: 1rem;
+  border: 1pt solid grey;
 }
