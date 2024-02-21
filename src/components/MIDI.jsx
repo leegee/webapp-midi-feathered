@@ -3,110 +3,87 @@
 
 import { useEffect } from 'react';
 import { useAtom } from 'jotai';
-import { midiAccessAtom, midiOutputsAtom, selectedOutputAtom } from '../lib/midi';
+import { midiAccessAtom, midiOutputsAtom, selectedOutputAtom, notesOnAtom } from '../lib/midi';
 
 
 const NOTE_ON = 9;
 const NOTE_OFF = 8;
 
-const notesOn = new Map();
+let watchMidiInitialized = false;
 
-function onMidiMessage(event) {
-    console.log( event.data );
+function onMidiMessage ( event, notesOn, setNotesOn ) {
     const cmd = event.data[0] >> 4;
     const pitch = event.data[1];
     const velocity = ( event.data.length > 2 ) ? event.data[ 2 ] : 1;
     const timestamp = Date.now();
 
-    if ( cmd === NOTE_ON ) {
-        console.log(`ON pitch:${pitch}, velocity: {velocity}`);
-        notesOn.set(pitch, timestamp);
-    }
-    else if ( cmd === NOTE_OFF || ( cmd === NOTE_ON && velocity === 0 ) ) {
-        console.log(`OFF pitch:${pitch}, velocity: ${velocity}`);
-        const note = notesOn.get(pitch);
-        if (note) {
-          console.log(`OFF pitch:${pitch}, duration:${timestamp - note} ms.`);
-          notesOn.delete(pitch);
+    setNotesOn((prevNotesOn) => {
+        const newNotesOn = { ...prevNotesOn }; // Create a copy of the previous notes
+
+        if (cmd === NOTE_ON && velocity > 0 && !newNotesOn[pitch]) {
+            console.log(`NOTE ON pitch:${pitch}, velocity: ${velocity}`);
+            newNotesOn[pitch] = [timestamp, velocity];
         }
-    }
-}
-
-
-function watchMidi ( getMidiAccess ) {
-    if ( getMidiAccess ) {
-        getMidiAccess.inputs.forEach( ( inputPort ) => {
-            inputPort.onmidimessage = onMidiMessage;
-        } );
-    }
-}
-
-async function setupMidiAccess ( getMidiAccess, setMIDIAccess ) {
-    if ( !getMidiAccess ) {
-        try {
-            const midiAccess = await navigator.requestMIDIAccess();
-            setMIDIAccess( midiAccess );
-        } catch ( e ) {
-            console.error( 'Failed to access MIDI devices:', e );
+        else if ( cmd === NOTE_OFF || velocity === 0) {
+            if (newNotesOn[pitch]) {
+                console.log(`NOTE OFF pitch:${pitch}: duration:${timestamp - newNotesOn[pitch][0]} ms.`);
+                delete newNotesOn[pitch];
+            } else {
+                console.log(`NOTE OFF pitch:${pitch} BUT NOT IN notesOn?!`);
+            }
+        } else {
+            console.warn('NOTE - WHAT?', pitch, velocity);
         }
-    }
+
+        return newNotesOn; 
+    });
 }
 
-function setupMidiOutputs ( outputs, getMidiOutputs, setMidiOutputs ) {
-    const newOutputs = [];
-    for (const output of outputs) {
-        newOutputs.push( output );
-    }
-    setMidiOutputs( newOutputs );
-}
 
-// Closes open connections
-function cleanup (getMidiAccess) {
-    if ( getMidiAccess ) {
-        getMidiAccess.inputs.forEach( ( input ) => {
-            input.close();
-        } );
-        getMidiAccess.outputs.forEach( ( output ) => {
-            output.close();
-        } );
-    }
-}
-
-function handleOutputChange ( event, setSelectedOutputAtom ) {
-    setSelectedOutputAtom( event.target.value );
+function handleOutputChange ( event, setSelectedOutput ) {
+    setSelectedOutput( event.target.value );
 }
 
 export function MIDIComponent () {
-    const [ getMidiAccess, setMidiAccess ] = useAtom( midiAccessAtom );
-    const [ getMidiOutputs, setMidiOutputs ] = useAtom( midiOutputsAtom );
-    const [ getSelectedOutputAtom, setSelectedOutputAtom ] = useAtom( selectedOutputAtom );
-
-    useEffect(
-        () => {
-            setupMidiAccess( getMidiAccess, setMidiAccess );
-            if ( getMidiAccess ) {
-                setupMidiOutputs(
-                    Array.from( getMidiAccess.outputs.values() ),
-                    getMidiOutputs, setMidiOutputs
-                );
-                watchMidi( getMidiAccess );
+    const [ midiAccess, setMidiAccess ] = useAtom( midiAccessAtom );
+    const [ midiOutputs, setMidiOutputs ] = useAtom( midiOutputsAtom );
+    const [ selectedOutput, setSelectedOutput ] = useAtom( selectedOutputAtom );
+    const [ notesOn, setNotesOn ] = useAtom( notesOnAtom );
+    
+    useEffect(() => {
+        if (!midiAccess) {
+            try {
+                navigator.requestMIDIAccess().then(midiAccess => setMidiAccess(midiAccess));
+            } catch (error) {
+                console.error('Failed to access MIDI devices:', error);
             }
-            return cleanup( getMidiAccess );
-        },
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-        [ getMidiAccess ]
-    );
+        } else {
+            const newOutputs = Array.from(midiAccess.outputs.values());
+            setMidiOutputs(newOutputs);
+        
+            if ( !watchMidiInitialized ) {
+                console.log( "INIT MIDI LISTENERS" );
+                midiAccess.inputs.forEach(inputPort => {
+                    inputPort.onmidimessage = e => onMidiMessage(e, notesOn, setNotesOn);
+                });
+                watchMidiInitialized = true;
+            }
+        }
+    }, [midiAccess, notesOn]);
 
     return (
         <div>
-            <h1>MIDI Access Status</h1>
-            <p>{ getMidiAccess ? 'MIDI Access Granted' : 'MIDI Access Denied' }</p>
+            <h1>MIDI Test</h1>
 
-            <select onChange={(e) => handleOutputChange(e, setSelectedOutputAtom)} value={getSelectedOutputAtom}>
-                {getMidiOutputs.map(output => (
+            <select onChange={(e) => handleOutputChange(e, setSelectedOutput)} value={selectedOutput}>
+                {midiOutputs.map(output => (
                     <option key={output.id} value={output.id}>{output.name}</option>
                 ))}
             </select>
+
+            <ul>
+                {Object.entries(notesOn).map(([key, value]) => ( <li key={key}>{key}: {value}</li> ))}
+            </ul>
         </div>
     );
 }
