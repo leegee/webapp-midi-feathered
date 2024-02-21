@@ -7,6 +7,7 @@ import { midiAccessAtom, midiOutputsAtom, selectedOutputAtom, notesOnAtom, scale
 import OutputSelect from './OutputSelect';
 import NotesOnDisplay from './NotesOnDisplay';
 import ScaleSelector from './ScaleSelector';
+import PianoKeyboard from './Piano';
 
 const NOTE_ON = 9;
 const NOTE_OFF = 8;
@@ -85,7 +86,9 @@ export function MIDIComponent () {
                 {Object.entries(notesOn).map(([key, value]) => ( <li key={key}>{key}: {value}</li> ))}
             </ul> */}
 
-            <NotesOnDisplay notesOn={notesOn}/>
+            <NotesOnDisplay notesOn={ notesOn } />
+            
+            <PianoKeyboard notesOn={ notesOn } />
         </div>
     );
 }

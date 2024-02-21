@@ -1,0 +1,13 @@
+/* Piano.module.css */
+
+.piano-key {
+    display: inline-block;
+    border: 1pt solid black;
+    background: white;
+    width: 1rem;
+    height: 5rem;
+}
+
+.piano-key-highlighted {
+    background: yellow !important;
+}
