@@ -1,8 +1,11 @@
 // eslint-disable-next-line no-unused-vars
 import React from 'react';
-import PropTypes from 'prop-types';
+import { useAtom } from 'jotai';
 
-function NoteList ( { notesOn } ) {
+import {  notesOnAtom } from '../lib/midi';
+
+function NoteList ( ) {
+    const [ notesOn] = useAtom( notesOnAtom );
     return (
         <ul>
             { Object.entries( notesOn ).map( ( [ key, value ] ) => (
@@ -13,9 +16,5 @@ function NoteList ( { notesOn } ) {
         </ul>
     );
 }
-
-NoteList.propTypes = {
-    notesOn: PropTypes.object.isRequired,
-};
 
 export default NoteList;

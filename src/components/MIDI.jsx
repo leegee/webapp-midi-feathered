@@ -18,7 +18,7 @@ export function MIDIComponent () {
     const [ midiAccess, setMidiAccess ] = useAtom( midiAccessAtom );
     const [ midiOutputs, setMidiOutputs ] = useAtom( midiOutputsAtom );
     const [ selectedOutput ] = useAtom( selectedOutputAtom );
-    const [ notesOn, setNotesOn ] = useAtom( notesOnAtom );
+    const [, setNotesOn ] = useAtom( notesOnAtom );
     const [ scaleNotes, ] = useAtom( scaleNotesAtom );
 
     const selectedOutputRef = useRef(null); 
@@ -68,7 +68,7 @@ export function MIDIComponent () {
 
             <PianoKeyboard/>
 
-            <NotesOnDisplay notesOn={ notesOn } />
+            <NotesOnDisplay/>
 
         </div>
     );
