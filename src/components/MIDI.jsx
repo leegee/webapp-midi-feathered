@@ -16,7 +16,7 @@ const NOTE_OFF = 8;
 
 let watchMidiInitialized = false;
 
-function getTriadAndOctave(midiPitch, scaleNotes) {
+function getTriadNoteNames(midiPitch, scaleNotes) {
     const [rootNote, octaveNumber] = Note.fromMidi( midiPitch ).split('');
     const rootIndex = scaleNotes.indexOf(rootNote);
     if (rootIndex === -1) {
@@ -26,16 +26,24 @@ function getTriadAndOctave(midiPitch, scaleNotes) {
     const thirdIndex = (rootIndex + 2) % scaleNotes.length; 
     const fifthIndex = (rootIndex + 4) % scaleNotes.length; 
 
-    const triadNotes = [
-        rootNote,
-        scaleNotes[thirdIndex],
-        scaleNotes[fifthIndex]
+    const triad = [
+        Note.get( rootNote + octaveNumber).midi,
+        Note.get( scaleNotes[thirdIndex] + octaveNumber).midi,
+        Note.get( scaleNotes[fifthIndex] + octaveNumber).midi,
     ];
 
-    return [triadNotes, octaveNumber];
+    return triad;
 }
 
-function onMidiMessage ( event, setNotesOn, scaleNotes ) {
+function playNotes ( {notes, velocity, midiOutputs, selectedOutput} ) {
+    for ( const note of notes ) {
+        console.log( 'note', note, '..', notes );
+    }
+    console.info('>>', midiOutputs, selectedOutput, )
+    // midiOutputs[selectedOutput].send([MIDI_CHANNEL, 60, velocity]); // Note On message (channel 1, note 60, velocity 100)
+}
+
+function onMidiMessage ( event, setNotesOn, scaleNotes, midiOutputs, selectedOutput ) {
     const cmd = event.data[0] >> 4;
     const pitch = event.data[1];
     const velocity = ( event.data.length > 2 ) ? event.data[ 2 ] : 1;
@@ -47,11 +55,12 @@ function onMidiMessage ( event, setNotesOn, scaleNotes ) {
         if (cmd === NOTE_ON && velocity > 0 && !newNotesOn[pitch]) {
             console.log(`NOTE ON pitch:${pitch}, velocity: ${velocity}`);
             newNotesOn[ pitch ] = { timestamp, velocity };
-            getTriadAndOctave( pitch, scaleNotes );
+            const triad = getTriadNoteNames( pitch, scaleNotes );
+            playNotes( {notes: triad, velocity, midiOutputs, selectedOutput} );
         }
         else if ( cmd === NOTE_OFF || velocity === 0) {
             if (newNotesOn[pitch]) {
-                console.log(`NOTE OFF pitch:${pitch}: duration:${timestamp - newNotesOn[pitch][0]} ms.`);
+                console.log(`NOTE OFF pitch:${pitch}: duration:${timestamp - newNotesOn[pitch].timestamp} ms.`);
                 delete newNotesOn[pitch];
             }
         }
