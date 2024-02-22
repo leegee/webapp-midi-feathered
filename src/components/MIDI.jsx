@@ -36,10 +36,12 @@ function getTriadNoteNames(midiPitch, scaleNotes) {
 }
 
 function playNotes ( {notes, velocity, midiOutputs, selectedOutput} ) {
-    for ( const note of notes ) {
-        console.log( 'note', note, '..', notes, velocity );
-    }
-    console.info('>>', midiOutputs, selectedOutput, )
+    // for ( const note of notes ) {
+        // console.log( 'note', note, '..', notes, velocity );
+    // }
+    console.info( '>> midiOutputs', midiOutputs);
+    console.info( '>> selectedOutput', selectedOutput);
+    console.info( '>> and ', midiOutputs[selectedOutput] );
     // midiOutputs[selectedOutput].send([MIDI_CHANNEL, 60, velocity]); // Note On message (channel 1, note 60, velocity 100)
 }
 
@@ -48,8 +50,6 @@ function onMidiMessage ( event, setNotesOn, scaleNotes, midiOutputs, selectedOut
     const pitch = event.data[1];
     const velocity = ( event.data.length > 2 ) ? event.data[ 2 ] : 1;
     const timestamp = Date.now();
-
-    console.log('xxxxxxxxxxxx ', midiOutputs)
 
     setNotesOn((prevNotesOn) => {
         const newNotesOn = { ...prevNotesOn }; 

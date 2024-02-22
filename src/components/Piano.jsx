@@ -9,7 +9,6 @@ import styles from './Piano.module.css';
 
 const blackKeys = [1, 3, 6, 8, 10];
 
-// Piano Key Component
 const PianoKey = ( { pitch, isHighlighted } ) => {
     const isBlackKey = blackKeys.includes(pitch % 12);
 
@@ -29,7 +28,7 @@ PianoKey.propTypes = {
 const PianoKeyboard = () => {
     const [ notesOn ] = useAtom( notesOnAtom );
     
-    // MIDI note numbers typically start at 21
+    // 88 keys from A0 @ MIDI pitch 21
     const midiPitches = Array.from( { length: 88 }, ( _, index ) => index + 21 ); 
 
     return (
