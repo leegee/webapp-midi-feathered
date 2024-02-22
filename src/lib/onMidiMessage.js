@@ -31,7 +31,7 @@ function playNotes({ notes, velocity, selectedOutput }) {
     }
 }
 
-export function onMidiMessage(event, setNotesOn, scaleNotes, selectedOutputRef) {
+export function onMidiMessage(event, setNotesOn, scaleNotesRef, selectedOutputRef) {
     const timestamp = Date.now();
     const cmd = event.data[0] >> 4;
     const pitch = event.data[1];
@@ -43,9 +43,10 @@ export function onMidiMessage(event, setNotesOn, scaleNotes, selectedOutputRef) 
         if (cmd === NOTE_ON && velocity > 0 && !newNotesOn[pitch]) {
             console.log(`NOTE ON pitch:${pitch}, velocity: ${velocity}`);
             newNotesOn[pitch] = { timestamp, velocity };
-            const triad = getTriadNoteNames(pitch, scaleNotes);
+            const triad = getTriadNoteNames(pitch, scaleNotesRef.current);
             playNotes({ notes: triad, velocity, selectedOutput: selectedOutputRef.current });
         }
+        
         else if (cmd === NOTE_OFF || velocity === 0) {
             if (newNotesOn[pitch]) {
                 console.log(`NOTE OFF pitch:${pitch}: duration:${timestamp - newNotesOn[pitch].timestamp} ms.`);

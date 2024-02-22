@@ -39,14 +39,19 @@ export function MIDIComponent () {
                     map[output.name] = output;
                     return map;
                 }, {} );
-                
                 console.log( "Initialised MIDI outputs", newOutputs );
     
                 midiAccess.inputs.forEach(inputPort => {
-                    inputPort.onmidimessage = e => onMidiMessage(e, setNotesOn, scaleNotes,  selectedOutputRef);
+                    inputPort.onmidimessage = e => onMidiMessage(e, setNotesOn, scaleNotesRef,  selectedOutputRef);
                 });
                 console.log("Initialised MIDI inputs");
-    
+
+                scaleNotesRef.current = scaleNotes;
+
+                window.document.addEventListener( 'play',
+                    e => onMidiMessage( e, setNotesOn, scaleNotesRef, selectedOutputRef )
+                );
+
                 return newOutputs;
             });
     
