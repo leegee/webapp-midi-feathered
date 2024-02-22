@@ -93,13 +93,12 @@ export function MIDIComponent () {
                     map[output.name] = output;
                     return map;
                 }, {});
-                
-                console.log( "Init MIDI outputs", newOutputs );
+                console.log( "Initialised MIDI outputs", newOutputs );
     
                 midiAccess.inputs.forEach(inputPort => {
                     inputPort.onmidimessage = e => onMidiMessage(e, setNotesOn, scaleNotes, newOutputs, selectedOutput);
                 });
-                console.log("Init MIDI inputs");
+                console.log("Initialised MIDI inputs");
     
                 return newOutputs;
             });
