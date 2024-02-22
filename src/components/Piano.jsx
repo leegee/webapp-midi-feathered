@@ -1,6 +1,9 @@
 // eslint-disable-next-line no-unused-vars
 import React from 'react';
 import PropTypes from 'prop-types';
+import { useAtom } from 'jotai';
+
+import {  notesOnAtom } from '../lib/midi';
 
 import styles from './Piano.module.css';
 
@@ -23,7 +26,9 @@ PianoKey.propTypes = {
     isHighlighted: PropTypes.bool.isRequired,
 };
   
-const PianoKeyboard = ( { notesOn } ) => {
+const PianoKeyboard = () => {
+    const [ notesOn ] = useAtom( notesOnAtom );
+    
     // MIDI note numbers typically start at 21
     const midiPitches = Array.from( { length: 88 }, ( _, index ) => index + 21 ); 
 
@@ -38,10 +43,6 @@ const PianoKeyboard = ( { notesOn } ) => {
             ) ) }
         </aside>
     );
-};
-
-PianoKeyboard.propTypes = {
-    notesOn: PropTypes.object.isRequired,
 };
 
 export default PianoKeyboard;

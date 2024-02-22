@@ -112,7 +112,7 @@ export function MIDIComponent () {
 
             <ScaleSelector />
 
-            <PianoKeyboard notesOn={ notesOn } />
+            <PianoKeyboard/>
 
             <NotesOnDisplay notesOn={ notesOn } />
 
