@@ -21,7 +21,8 @@ export function MIDIComponent () {
     const [, setNotesOn ] = useAtom( notesOnAtom );
     const [ scaleNotes, ] = useAtom( scaleNotesAtom );
 
-    const selectedOutputRef = useRef(null); 
+    const selectedOutputRef = useRef( null ); 
+    const scaleNotesRef = useRef(null); 
 
     useEffect( () => {
         if (!midiAccess) {
@@ -54,6 +55,10 @@ export function MIDIComponent () {
     }, [ midiAccess, setMidiAccess, midiOutputs, setMidiOutputs, setNotesOn, scaleNotes, selectedOutput ] );
     
     useEffect(() => {
+        scaleNotesRef.current = scaleNotesRef;
+    }, [scaleNotes]);
+
+    useEffect( () => {
         if (midiOutputs[selectedOutput]) {
             selectedOutputRef.current = midiOutputs[selectedOutput];
         }
