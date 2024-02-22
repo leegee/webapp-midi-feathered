@@ -22,8 +22,15 @@ body {
   padding: 2em;
   display: flex;
   place-items: top;
+  justify-content: space-between;
   min-width: 320px;
   min-height: 100vh;
+}
+
+h1 {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .padded {
