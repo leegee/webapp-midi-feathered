@@ -37,7 +37,7 @@ function getTriadNoteNames(midiPitch, scaleNotes) {
 
 function playNotes ( {notes, velocity, midiOutputs, selectedOutput} ) {
     for ( const note of notes ) {
-        console.log( 'note', note, '..', notes );
+        console.log( 'note', note, '..', notes, velocity );
     }
     console.info('>>', midiOutputs, selectedOutput, )
     // midiOutputs[selectedOutput].send([MIDI_CHANNEL, 60, velocity]); // Note On message (channel 1, note 60, velocity 100)
@@ -48,6 +48,8 @@ function onMidiMessage ( event, setNotesOn, scaleNotes, midiOutputs, selectedOut
     const pitch = event.data[1];
     const velocity = ( event.data.length > 2 ) ? event.data[ 2 ] : 1;
     const timestamp = Date.now();
+
+    console.log('xxxxxxxxxxxx ', midiOutputs)
 
     setNotesOn((prevNotesOn) => {
         const newNotesOn = { ...prevNotesOn }; 
@@ -81,32 +83,32 @@ export function MIDIComponent () {
             try {
                 navigator.requestMIDIAccess().then(midiAccess => setMidiAccess(midiAccess));
             } catch (error) {
-                console.error( 'Failed to access MIDI devices:', error );
-                return ( <div>Failed to access MIDI devices: ${error}</div> );
+                console.error('Failed to access MIDI devices:', error);
+                return (<div>Failed to access MIDI devices: ${error}</div>);
             }
         }
-        else {
-            const newOutputs = Array.from(midiAccess.outputs.values());
-            setMidiOutputs(newOutputs);
-            if ( !watchMidiInitialized ) {
-                console.log( "Init midi listeners" );
+        else if ( !watchMidiInitialized ) {
+            setMidiOutputs((currentOutputs) => {
+                const newOutputs = Array.from(midiAccess.outputs.values());
+                console.log("Init MIDI outputs", newOutputs);
+    
                 midiAccess.inputs.forEach(inputPort => {
-                    inputPort.onmidimessage = e => onMidiMessage(e, setNotesOn, scaleNotes);
+                    inputPort.onmidimessage = e => onMidiMessage(e, setNotesOn, scaleNotes, currentOutputs, selectedOutput);
                 });
-                watchMidiInitialized = true;
-            }
+                console.log("Init MIDI inputs");
+    
+                return newOutputs;
+            });
+    
+            watchMidiInitialized = true;
         }
-    }, [ midiAccess, setMidiAccess, setMidiOutputs, setNotesOn, scaleNotes ]);
-
+    }, [midiAccess, setMidiAccess, setMidiOutputs, setNotesOn, scaleNotes, selectedOutput]);
+        
     return (
         <div>
             <h1>MIDI Test</h1>
 
-            <OutputSelect
-                midiOutputs={midiOutputs}
-                selectedOutput={Number(selectedOutput)}
-                setSelectedOutput={setSelectedOutput}
-            />
+            <OutputSelect />
 
             <ScaleSelector />
 
