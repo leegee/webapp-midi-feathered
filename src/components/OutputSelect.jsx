@@ -15,8 +15,8 @@ function OutputSelect () {
 
     return (
         <select className='padded' onChange={handleOutputChange} value={selectedOutput}>
-            {midiOutputs.map(output => (
-                <option key={output.id} value={output.id}>{output.id +' '+ output.name}</option>
+            {Object.entries(midiOutputs).map(([id, output]) => (
+                <option key={id} value={id}>{id} {output.name}</option>
             ))}
         </select>
     );

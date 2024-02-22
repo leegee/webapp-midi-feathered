@@ -84,16 +84,20 @@ export function MIDIComponent () {
                 navigator.requestMIDIAccess().then(midiAccess => setMidiAccess(midiAccess));
             } catch (error) {
                 console.error('Failed to access MIDI devices:', error);
-                return (<div>Failed to access MIDI devices: ${error}</div>);
+                return (<div className='error'>Failed to access MIDI devices: ${error}</div>);
             }
         }
         else if ( !watchMidiInitialized ) {
-            setMidiOutputs((currentOutputs) => {
-                const newOutputs = Array.from(midiAccess.outputs.values());
-                console.log("Init MIDI outputs", newOutputs);
+            setMidiOutputs(() => {
+                const newOutputs = Array.from(midiAccess.outputs.values()).reduce((map, output) => {
+                    map[output.name] = output;
+                    return map;
+                }, {});
+                
+                console.log( "Init MIDI outputs", newOutputs );
     
                 midiAccess.inputs.forEach(inputPort => {
-                    inputPort.onmidimessage = e => onMidiMessage(e, setNotesOn, scaleNotes, currentOutputs, selectedOutput);
+                    inputPort.onmidimessage = e => onMidiMessage(e, setNotesOn, scaleNotes, newOutputs, selectedOutput);
                 });
                 console.log("Init MIDI inputs");
     
