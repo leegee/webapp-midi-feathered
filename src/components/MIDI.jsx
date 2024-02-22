@@ -1,7 +1,7 @@
 /** https://developer.mozilla.org/en-US/docs/Web/API/Web_MIDI_API  */
 
 // eslint-disable-next-line no-unused-vars
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { useAtom } from 'jotai';
 import { Note } from "tonal";
 
@@ -11,6 +11,7 @@ import NotesOnDisplay from './NotesOnDisplay';
 import ScaleSelector from './ScaleSelector';
 import PianoKeyboard from './Piano';
 
+const MIDI_CHANNEL = 0x90;
 const NOTE_ON = 9;
 const NOTE_OFF = 8;
 
@@ -35,21 +36,18 @@ function getTriadNoteNames(midiPitch, scaleNotes) {
     return triad;
 }
 
-function playNotes ( {notes, velocity, midiOutputs, selectedOutput} ) {
-    // for ( const note of notes ) {
-        // console.log( 'note', note, '..', notes, velocity );
-    // }
-    console.info( '>> midiOutputs', midiOutputs);
-    console.info( '>> selectedOutput', selectedOutput);
-    console.info( '>> and ', midiOutputs[selectedOutput] );
-    // midiOutputs[selectedOutput].send([MIDI_CHANNEL, 60, velocity]); // Note On message (channel 1, note 60, velocity 100)
+function playNotes ( {notes, velocity, selectedOutput} ) {
+    for ( const note of notes ) {
+        console.log( 'note', note, ' @ ', velocity );
+        selectedOutput.send([MIDI_CHANNEL, note, velocity]); // Note On message (channel 1, note 60, velocity 100)
+    }
 }
 
-function onMidiMessage ( event, setNotesOn, scaleNotes, midiOutputs, selectedOutput ) {
+function onMidiMessage ( event, setNotesOn, scaleNotes,  selectedOutputRef ) {
+    const timestamp = Date.now();
     const cmd = event.data[0] >> 4;
     const pitch = event.data[1];
     const velocity = ( event.data.length > 2 ) ? event.data[ 2 ] : 1;
-    const timestamp = Date.now();
 
     setNotesOn((prevNotesOn) => {
         const newNotesOn = { ...prevNotesOn }; 
@@ -58,7 +56,7 @@ function onMidiMessage ( event, setNotesOn, scaleNotes, midiOutputs, selectedOut
             console.log(`NOTE ON pitch:${pitch}, velocity: ${velocity}`);
             newNotesOn[ pitch ] = { timestamp, velocity };
             const triad = getTriadNoteNames( pitch, scaleNotes );
-            playNotes( {notes: triad, velocity, midiOutputs, selectedOutput} );
+            playNotes( {notes: triad, velocity, selectedOutput: selectedOutputRef.current} );
         }
         else if ( cmd === NOTE_OFF || velocity === 0) {
             if (newNotesOn[pitch]) {
@@ -74,11 +72,13 @@ function onMidiMessage ( event, setNotesOn, scaleNotes, midiOutputs, selectedOut
 export function MIDIComponent () {
     const [ midiAccess, setMidiAccess ] = useAtom( midiAccessAtom );
     const [ midiOutputs, setMidiOutputs ] = useAtom( midiOutputsAtom );
-    const [ selectedOutput, setSelectedOutput ] = useAtom( selectedOutputAtom );
+    const [ selectedOutput ] = useAtom( selectedOutputAtom );
     const [ notesOn, setNotesOn ] = useAtom( notesOnAtom );
     const [ scaleNotes, ] = useAtom( scaleNotesAtom );
-    
-    useEffect(() => {
+
+    const selectedOutputRef = useRef(null); 
+
+    useEffect( () => {
         if (!midiAccess) {
             try {
                 navigator.requestMIDIAccess().then(midiAccess => setMidiAccess(midiAccess));
@@ -92,11 +92,12 @@ export function MIDIComponent () {
                 const newOutputs = Array.from(midiAccess.outputs.values()).reduce((map, output) => {
                     map[output.name] = output;
                     return map;
-                }, {});
+                }, {} );
+                
                 console.log( "Initialised MIDI outputs", newOutputs );
     
                 midiAccess.inputs.forEach(inputPort => {
-                    inputPort.onmidimessage = e => onMidiMessage(e, setNotesOn, scaleNotes, newOutputs, selectedOutput);
+                    inputPort.onmidimessage = e => onMidiMessage(e, setNotesOn, scaleNotes,  selectedOutputRef);
                 });
                 console.log("Initialised MIDI inputs");
     
@@ -105,7 +106,13 @@ export function MIDIComponent () {
     
             watchMidiInitialized = true;
         }
-    }, [midiAccess, setMidiAccess, setMidiOutputs, setNotesOn, scaleNotes, selectedOutput]);
+    }, [ midiAccess, setMidiAccess, midiOutputs, setMidiOutputs, setNotesOn, scaleNotes, selectedOutput ] );
+    
+    useEffect(() => {
+        if (midiOutputs[selectedOutput]) {
+            selectedOutputRef.current = midiOutputs[selectedOutput];
+        }
+    }, [selectedOutput, midiOutputs]);
         
     return (
         <div>
