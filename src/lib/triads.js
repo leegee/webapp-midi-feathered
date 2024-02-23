@@ -3,7 +3,7 @@ import { Note } from "tonal";
 
 import { MIDI_CHANNEL } from './constants';
 
-export function getTriadNoteNames ( midiPitch, scaleNotes ) {
+function getTriadNoteNames ( midiPitch, scaleNotes ) {
     const [ rootNote, octaveNumber ] = Note.fromMidi( midiPitch ).split( '' );
     const rootIndex = scaleNotes.indexOf( rootNote );
     if ( rootIndex === -1 ) {
@@ -22,7 +22,7 @@ export function getTriadNoteNames ( midiPitch, scaleNotes ) {
     return triad;
 }
 
-export  function sendMidiNotes ( { notes, velocity, selectedOutput } ) {
+function sendMidiNotes ( { notes, velocity, selectedOutput } ) {
     let t = 0;
     for ( const note of notes ) {
         setTimeout(
@@ -36,4 +36,9 @@ export  function sendMidiNotes ( { notes, velocity, selectedOutput } ) {
             t += 100
         );
     }
+}
+
+export function addTriad (midiPitch, velocity, scaleNotes, selectedOutput) {
+    const triad = getTriadNoteNames(midiPitch, scaleNotes);
+    sendMidiNotes({ notes: triad, velocity, selectedOutput });
 }

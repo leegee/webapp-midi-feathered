@@ -5,7 +5,7 @@ import React, { useEffect, useRef } from 'react';
 import { useAtom } from 'jotai';
 
 import { midiAccessAtom, midiOutputsAtom, selectedOutputAtom, notesOnAtom, scaleNotesAtom } from '../lib/midi';
-import { onMidiMessage, startMidiNote, stopMidiNote } from '../lib/onMidiMessage';
+import { onMidiMessage } from '../lib/onMidiMessage';
 
 import OutputSelect from './OutputSelect';
 import NotesOnDisplay from './NotesOnDisplay';
@@ -42,26 +42,15 @@ export function MIDIComponent () {
                 console.log( "Initialised MIDI outputs", newOutputs );
     
                 midiAccess.inputs.forEach(inputPort => {
-                    inputPort.onmidimessage = e => onMidiMessage(e, setNotesOn, scaleNotesRef,  selectedOutputRef);
+                    inputPort.onmidimessage = e => onMidiMessage(e, setNotesOn, selectedOutputRef.current);
                 });
                 console.log("Initialised MIDI inputs");
-
-                scaleNotesRef.current = scaleNotes;
-
-                window.document.addEventListener( 'note-start',
-                    e => startMidiNote( e.data.pitch, e.data.velocity, selectedOutputRef.current )
-                );
-
-                window.document.addEventListener( 'note-start',
-                    e => stopMidiNote(e.data.pitch, selectedOutputRef.current )
-                );
-
                 return newOutputs;
             });
     
             watchMidiInitialized = true;
         }
-    }, [ midiAccess, setMidiAccess, midiOutputs, setMidiOutputs, setNotesOn, scaleNotes, selectedOutput ] );
+    }, [ midiAccess, setMidiAccess, midiOutputs, setMidiOutputs, setNotesOn, selectedOutput ] );
     
     useEffect(() => {
         scaleNotesRef.current = scaleNotesRef;
@@ -77,7 +66,7 @@ export function MIDIComponent () {
         <div>
             <h1>MIDI Test
                 <OutputSelect />
-                <ScaleSelector />
+                { selectedOutputRef.current !== null && <ScaleSelector selectedOutput={ selectedOutputRef.current } /> }
             </h1>
 
             <PianoKeyboard/>

@@ -1,33 +1,46 @@
 // onMidiMessage
-import { MIDI_CHANNEL, NOTE_OFF, NOTE_ON } from './constants';
+import { MIDI_CHANNEL, NOTE_OFF, NOTE_ON, EVENT_NOTE_START, EVENT_NOTE_STOP } from './constants';
 
-export function startMidiNote ( pitch , velocity, selectedOutput ) {
-    console.log( "START MIDI NOTE", pitch, velocity )
+export function startMidiNote ( pitch , velocity, selectedOutput, midiChannel = MIDI_CHANNEL ) {
+    console.log( "START MIDI NOTE", pitch, velocity );
     setTimeout(
         () => {
             selectedOutput.send( [
-                0x90 + ( MIDI_CHANNEL - 1 ),
+                0x90 + ( midiChannel - 1 ),
                 pitch, velocity
             ] );
+            window.document.dispatchEvent( new CustomEvent( EVENT_NOTE_START, {
+                detail: {
+                    pitch,
+                    velocity,
+                    midiChannel
+                }
+            } ) );
         },
         0
     );
 }
 
-export function stopMidiNote ( pitch, selectedOutput ) {
-    console.log( "STOP MIDI NOTE", pitch )
+export function stopMidiNote ( pitch, selectedOutput, midiChannel = MIDI_CHANNEL) {
+    console.log( "STOP MIDI NOTE", pitch );
     setTimeout(
         () => {
             selectedOutput.send( [
-                0x80 + ( MIDI_CHANNEL - 1 ),
+                0x80 + ( midiChannel - 1 ),
                 pitch, 0
             ] );
+            window.document.dispatchEvent( new CustomEvent( EVENT_NOTE_STOP, {
+                detail: {
+                    pitch,
+                    midiChannel: MIDI_CHANNEL
+                }
+            } ) )
         },
         0
     );
 }
 
-export function onMidiMessage ( event, setNotesOn, scaleNotesRef, selectedOutputRef ) {
+export function onMidiMessage ( event, setNotesOn, selectedOutput ) {
     const timestamp = Date.now();
     const cmd = event.data[0] >> 4;
     const pitch = event.data[1];
@@ -39,15 +52,13 @@ export function onMidiMessage ( event, setNotesOn, scaleNotesRef, selectedOutput
         if (cmd === NOTE_ON && velocity > 0 && !newNotesOn[pitch]) {
             console.log(`NOTE ON ${cmd} pitch:${pitch}, velocity: ${velocity}`);
             newNotesOn[pitch] = { timestamp, velocity };
-            // const triad = getTriadNoteNames(pitch, scaleNotesRef.current);
-            // sendMidiNotes({ notes: triad, velocity, selectedOutput: selectedOutputRef.current });
-            startMidiNote( pitch, velocity, selectedOutputRef.current );
+            startMidiNote( pitch, velocity, selectedOutput );
         }
         
         else if (cmd === NOTE_OFF || velocity === 0) {
             if ( newNotesOn[ pitch ] ) {
                 console.log( `NOTE OFF ${ cmd } pitch:${ pitch }: duration:${ timestamp - newNotesOn[ pitch ].timestamp } ms.` );
-                stopMidiNote(newNotesOn[pitch], selectedOutputRef.current );
+                stopMidiNote(newNotesOn[pitch], selectedOutput );
                 delete newNotesOn[ pitch ];
             }
         }
