@@ -5,7 +5,7 @@ import React, { useEffect, useRef } from 'react';
 import { useAtom } from 'jotai';
 
 import { midiAccessAtom, midiOutputsAtom, selectedOutputAtom, notesOnAtom, scaleNotesAtom } from '../lib/midi';
-import { onMidiMessage } from '../lib/onMidiMessage';
+import { onMidiMessage, startMidiNote, stopMidiNote } from '../lib/onMidiMessage';
 
 import OutputSelect from './OutputSelect';
 import NotesOnDisplay from './NotesOnDisplay';
@@ -48,8 +48,12 @@ export function MIDIComponent () {
 
                 scaleNotesRef.current = scaleNotes;
 
-                window.document.addEventListener( 'play',
-                    e => onMidiMessage( e, setNotesOn, scaleNotesRef, selectedOutputRef )
+                window.document.addEventListener( 'note-start',
+                    e => startMidiNote( e.data.pitch, e.data.velocity, selectedOutputRef.current )
+                );
+
+                window.document.addEventListener( 'note-start',
+                    e => stopMidiNote(e.data.pitch, selectedOutputRef.current )
                 );
 
                 return newOutputs;
