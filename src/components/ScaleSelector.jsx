@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import { useAtom } from 'jotai';
 import { ScaleType, Scale } from "tonal";
 import { scaleRootNoteAtom, scaleNameAtom, scaleNotesAtom } from '../lib/midi';
-import { startMidiNote, stopMidiNote } from '../lib/onMidiMessage';
+import { startMidiNote, stopMidiNote } from '../lib/midi-messages';
 import { EVENT_NOTE_START, EVENT_NOTE_STOP } from '../lib/constants';
 
 let addedListeners = false;
@@ -14,26 +14,23 @@ function ScaleSelector ({selectedOutput}) {
     const [ scaleName, setScaleName ] = useAtom( scaleNameAtom );
     const [ , setScaleNotes ] = useAtom( scaleNotesAtom );
 
-    const handleScaleChange = ( event ) => {
-        setScaleName( event.target.value );
-    };
+    const handleScaleChange = ( event ) => setScaleName( event.target.value ) ;
 
     useEffect(
         () => {
             const startTriad = (e) => { 
-                console.log( 'START TRAID', e );
-                console.log( '-----------', selectedOutput );
-                // startMidiNote( e.detail.pitch, e.detail.velocity, selectedOutput, e.detail.midiChannel );
+                console.log( '----------- START TRAID', e );
+                startMidiNote( e.detail.pitch, e.detail.velocity, selectedOutput, e.detail.midiChannel );
             };
         
             const stopTriad = (e) => { 
-                console.log( 'STOP TRAID', e );
-                // stopMidiNote( e.detail.pitch, selectedOutput, e.detail.midiChannel );
+                console.log( '-----------STOP TRAID', e );
+                stopMidiNote( e.detail.pitch, selectedOutput, e.detail.midiChannel );
             };
         
             setScaleNotes( Scale.get( scaleRootNote + ' ' + scaleName ).notes );
 
-            if ( addedListeners ) {
+            if ( ! addedListeners ) {
                 window.document.addEventListener( EVENT_NOTE_START, startTriad );
                 window.document.addEventListener( EVENT_NOTE_STOP, stopTriad );
             } else {

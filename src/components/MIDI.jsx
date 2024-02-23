@@ -5,7 +5,7 @@ import React, { useEffect, useRef } from 'react';
 import { useAtom } from 'jotai';
 
 import { midiAccessAtom, midiOutputsAtom, selectedOutputAtom, notesOnAtom, scaleNotesAtom } from '../lib/midi';
-import { onMidiMessage } from '../lib/onMidiMessage';
+import { onMidiMessage } from '../lib/midi-messages';
 
 import OutputSelect from './OutputSelect';
 import NotesOnDisplay from './NotesOnDisplay';
