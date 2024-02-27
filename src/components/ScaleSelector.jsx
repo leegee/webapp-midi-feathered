@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import { useAtom } from 'jotai';
 import { ScaleType, Scale } from "tonal";
 
-import { EVENT_NOTE_START, EVENT_NOTE_STOP } from '../lib/constants';
+import { MIDI_CHANNEL_IN, EVENT_NOTE_START, EVENT_NOTE_STOP } from '../lib/constants';
 import { scaleRootNoteAtom, scaleNameAtom, scaleNotesAtom } from '../lib/store';
 import { startMidiNote, stopMidiNote } from '../lib/midi-messages';
 // import { notesOnAtom } from '../lib/store';
@@ -21,15 +21,22 @@ function ScaleSelector ({selectedOutput}) {
 
     useEffect(
         () => {
-            const startTriadLocal = (e) => { 
-                console.log( '----------- START TRAID', e.detail.pitch );
-                startMidiNote( e.detail.pitch, e.detail.velocity, selectedOutput, e.detail.midiChannel );
+            const startTriadLocal = ( event ) => { 
+                if ( event.detail.midiChannel !== MIDI_CHANNEL_IN ) {
+                    return;
+                }
+           
+                console.log( '- START TRAID', event.detail.pitch );
+                startMidiNote( event.detail.pitch + 3, event.detail.velocity, selectedOutput );
                 // startTriad(e.detail.pitch, e.detail.velocity, scaleNotes, selectedOutput)
             };
         
-            const stopTriadLocal = (e) => { 
-                console.log( '-----------STOP TRAID', e.detail.pitch );
-                stopMidiNote( e.detail.pitch, selectedOutput, e.detail.midiChannel );
+            const stopTriadLocal = (event) => { 
+                if ( event.detail.midiChannel !== MIDI_CHANNEL_IN ) {
+                    return;
+                }
+                console.log( '- STOP TRAID', event.detail.pitch );
+                stopMidiNote( event.detail.pitch + 3, selectedOutput );
                 // stopTriad(e.detail.pitch, e.detail.velocity, scaleNotes, selectedOutput)
             };
         
