@@ -1,7 +1,7 @@
 // triads
 import { Note } from "tonal";
 
-import { MIDI_CHANNEL } from './constants';
+import { MIDI_CHANNEL, NOTE_ON, NOTE_OFF } from './constants';
 
 function getTriadNoteNames ( midiPitch, scaleNotes ) {
     const [ rootNote, octaveNumber ] = Note.fromMidi( midiPitch ).split( '' );
@@ -22,23 +22,18 @@ function getTriadNoteNames ( midiPitch, scaleNotes ) {
     return triad;
 }
 
-function sendMidiNotes ( { notes, velocity, selectedOutput } ) {
-    let t = 0;
+export function startTriad (midiPitch, velocity, scaleNotes, selectedOutput) {
+    const notes = getTriadNoteNames(midiPitch, scaleNotes);
     for ( const note of notes ) {
-        setTimeout(
-            () => {
-                selectedOutput.send( [
-                    0x90 + ( MIDI_CHANNEL - 1 ),
-                    note, velocity
-                ] );
-                console.log( 'SEND NOTE ON', note, '@', velocity, 'to', selectedOutput.name );
-            },
-            t += 100
-        );
+        selectedOutput.send( [ NOTE_ON + MIDI_CHANNEL - 1, note, velocity ] );
+        console.log( 'SEND NOTE ON', note, '@', velocity, 'to', selectedOutput.name );
     }
 }
 
-export function addTriad (midiPitch, velocity, scaleNotes, selectedOutput) {
-    const triad = getTriadNoteNames(midiPitch, scaleNotes);
-    sendMidiNotes({ notes: triad, velocity, selectedOutput });
+export function stopTriad (midiPitch, velocity, scaleNotes, selectedOutput) {
+    const notes = getTriadNoteNames( midiPitch, scaleNotes );
+    for ( const note of notes ) {
+        selectedOutput.send( [ NOTE_OFF + MIDI_CHANNEL - 1, note, velocity ] );
+        console.log( 'SEND NOTE OFF', note, '@', velocity, 'to', selectedOutput.name );
+    }
 }

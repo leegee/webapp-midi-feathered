@@ -1,4 +1,4 @@
-// onMidiMessage
+// midi-messages.js
 import { MIDI_CHANNEL, NOTE_OFF, NOTE_ON, EVENT_NOTE_START, EVENT_NOTE_STOP } from './constants';
 
 export function startMidiNote ( pitch , velocity, selectedOutput, midiChannel = MIDI_CHANNEL ) {
