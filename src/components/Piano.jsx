@@ -3,7 +3,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { useAtom } from 'jotai';
 
-import {  notesOnAtom } from '../lib/midi';
+import {  notesOnAtom } from '../lib/store';
 
 import styles from './Piano.module.css';
 

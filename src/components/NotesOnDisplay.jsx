@@ -2,7 +2,7 @@
 import React from 'react';
 import { useAtom } from 'jotai';
 
-import {  notesOnAtom } from '../lib/midi';
+import {  notesOnAtom } from '../lib/store';
 
 function NoteList ( ) {
     const [ notesOn] = useAtom( notesOnAtom );

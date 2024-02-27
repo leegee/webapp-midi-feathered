@@ -4,7 +4,7 @@
 import React, { useEffect, useRef } from 'react';
 import { useAtom } from 'jotai';
 
-import { midiAccessAtom, midiOutputsAtom, selectedOutputAtom, notesOnAtom, scaleNotesAtom } from '../lib/midi';
+import { midiAccessAtom, midiOutputsAtom, selectedOutputAtom, notesOnAtom, scaleNotesAtom } from '../lib/store';
 import { onMidiMessage } from '../lib/midi-messages';
 
 import OutputSelect from './OutputSelect';

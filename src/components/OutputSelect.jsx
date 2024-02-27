@@ -2,7 +2,7 @@
 import React, { useEffect } from 'react';
 import { useAtom } from 'jotai';
 
-import {  midiOutputsAtom, selectedOutputAtom } from '../lib/midi';
+import {  midiOutputsAtom, selectedOutputAtom } from '../lib/store';
 
 function OutputSelect () {
     const [ midiOutputs ] = useAtom( midiOutputsAtom );
