@@ -5,7 +5,7 @@ import { useAtom } from 'jotai';
 import { ScaleType, Scale } from "tonal";
 
 import { EVENT_NOTE_START, EVENT_NOTE_STOP } from '../lib/constants';
-import { scaleRootNoteAtom, scaleNameAtom, scaleNotesAtom } from '../lib/midi';
+import { scaleRootNoteAtom, scaleNameAtom, scaleNotesAtom } from '../lib/store';
 import { startMidiNote, stopMidiNote } from '../lib/midi-messages';
 // import { notesOnAtom } from '../lib/midi';
 
