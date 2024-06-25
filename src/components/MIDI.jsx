@@ -44,7 +44,8 @@ export default function MIDIComponent () {
     
                 midiAccess.inputs.forEach(inputPort => {
                     inputPort.onmidimessage = e => onMidiMessage(e, setNotesOn, selectedOutputRef.current);
-                });
+                } );
+                
                 console.log("Initialised MIDI inputs");
                 return newOutputs;
             });
@@ -59,7 +60,8 @@ export default function MIDIComponent () {
 
     useEffect( () => {
         if (midiOutputs[selectedOutput]) {
-            selectedOutputRef.current = midiOutputs[selectedOutput];
+            selectedOutputRef.current = midiOutputs[ selectedOutput ];
+            window.selectedOutput = midiOutputs[ selectedOutput ];
         }
     }, [selectedOutput, midiOutputs]);
         

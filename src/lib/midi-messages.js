@@ -1,6 +1,8 @@
 // midi-messages.js
 import { MIDI_CHANNEL_IN, MIDI_CHANNEL_OUT, NOTE_OFF, NOTE_ON, EVENT_NOTE_START, EVENT_NOTE_STOP } from './constants';
 
+const timersForPitches = {};
+
 export function startMidiNote ( pitch, velocity, selectedOutput, midiChannel = MIDI_CHANNEL_OUT ) {
     console.log( `START MIDI NOTE on ${midiChannel} @ ${pitch}, ${velocity}` );
     selectedOutput.send( [ 0x90 + ( midiChannel - 1 ), pitch, velocity ] );
@@ -9,6 +11,25 @@ export function startMidiNote ( pitch, velocity, selectedOutput, midiChannel = M
 export function stopMidiNote ( pitch, selectedOutput, midiChannel = MIDI_CHANNEL_OUT ) {
     console.log( `STOP MIDI NOTE on ${midiChannel} @ ${pitch}` );
     selectedOutput.send( [ 0x80 + ( midiChannel - 1 ), pitch, 0 ] );
+}
+
+export function sendNoteWithDuration ( pitch, velocity, durationMs, selectedOutput, midiChannel = MIDI_CHANNEL_OUT ) {
+    console.log( 'sendNoteWithDuration' );
+    
+    // If the note is playing already, stop it
+    if ( Object.hasOwn( timersForPitches, pitch ) ) {
+        clearTimeout( timersForPitches[ pitch ] );
+        stopMidiNote( pitch, selectedOutput, midiChannel );
+    }
+
+    startMidiNote( pitch, velocity, selectedOutput, midiChannel );
+    
+    const timer = setTimeout(
+        () => stopMidiNote( pitch, selectedOutput, midiChannel ),
+        durationMs
+    );
+
+    timersForPitches[ pitch ] = timer;
 }
 
 /**
