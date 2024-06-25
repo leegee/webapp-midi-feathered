@@ -1,18 +1,21 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 // eslint-disable-next-line no-unused-vars
 import React, { useEffect, useState } from 'react';
+import PropTypes from 'prop-types'; 
 import { useAtom } from 'jotai';
 
-import { notesOnAtom, selectedOutputAtom } from '../lib/store';
+import { notesOnAtom } from '../lib/store';
 import { sendNoteWithDuration } from '../lib/midi-messages';
 
 let durationMs = 100;
 
-export default function NoteModifier() {
+NoteModifierComponent.propTypes = {
+    selectedOutput: PropTypes.object 
+};
+
+export default function NoteModifierComponent ( { selectedOutput } ) {
     const [notesOn] = useAtom(notesOnAtom);
     const [bps, setbps] = useState(120);
-    const [ selectedOutput ] = useAtom( selectedOutputAtom );
-    console.log('INIT', selectedOutput)
 
     const handleChangebps = (event) => {
         setbps(event.target.value);
@@ -32,7 +35,7 @@ export default function NoteModifier() {
             pitch,
             notesOn[pitch].velocity,
             durationMs,
-            window.selectedOutput // Jotai can't store?! 
+            selectedOutput
         );
     }
     

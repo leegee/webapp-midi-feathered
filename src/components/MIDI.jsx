@@ -61,7 +61,6 @@ export default function MIDIComponent () {
     useEffect( () => {
         if (midiOutputs[selectedOutput]) {
             selectedOutputRef.current = midiOutputs[ selectedOutput ];
-            window.selectedOutput = midiOutputs[ selectedOutput ];
         }
     }, [selectedOutput, midiOutputs]);
         
@@ -74,7 +73,7 @@ export default function MIDIComponent () {
 
             <PianoKeyboard/>
 
-            { selectedOutputRef.current !== null && <NoteModifierComponent /> }
+            { selectedOutputRef.current !== null && <NoteModifierComponent selectedOutput={selectedOutputRef.current}/> }
 
             <NotesOnDisplay />
         </main>
