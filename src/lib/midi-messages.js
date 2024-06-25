@@ -15,7 +15,7 @@ export function stopMidiNote ( pitch, selectedOutput, midiChannel = MIDI_CHANNEL
  * @fires EVENT_NOTE_START
  * @fires EVENT_NOTE_STOP
 */
-export function onMidiMessage ( event, setNotesOn, selectedOutput ) {
+export function onMidiMessage ( event, setNotesOn, /*selectedOutput*/ ) {
     const timestamp = Date.now();
     const midiChannel = event.data[ 0 ] & 0x0F;
 

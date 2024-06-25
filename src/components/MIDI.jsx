@@ -4,25 +4,26 @@
 import React, { useEffect, useRef } from 'react';
 import { useAtom } from 'jotai';
 
-import { midiAccessAtom, midiOutputsAtom, selectedOutputAtom, notesOnAtom, scaleNotesAtom } from '../lib/store';
+import { midiAccessAtom, midiOutputsAtom, selectedOutputAtom, notesOnAtom, /*scaleNotesAtom*/ } from '../lib/store';
 import { onMidiMessage } from '../lib/midi-messages';
 
 import OutputSelect from './OutputSelect';
 import NotesOnDisplay from './NotesOnDisplay';
-import ScaleSelector from './ScaleSelector';
+// import ScaleSelector from './ScaleSelector';
 import PianoKeyboard from './Piano';
+import NoteModifierComponent from './NoteModifier';
 
 let watchMidiInitialized = false;
 
-export function MIDIComponent () {
+export default function MIDIComponent () {
     const [ midiAccess, setMidiAccess ] = useAtom( midiAccessAtom );
     const [ midiOutputs, setMidiOutputs ] = useAtom( midiOutputsAtom );
     const [ selectedOutput ] = useAtom( selectedOutputAtom );
     const [, setNotesOn ] = useAtom( notesOnAtom );
-    const [ scaleNotes, ] = useAtom( scaleNotesAtom );
+    // const [ scaleNotes, ] = useAtom( scaleNotesAtom );
 
     const selectedOutputRef = useRef( null ); 
-    const scaleNotesRef = useRef(null); 
+    // const scaleNotesRef = useRef(null); 
 
     useEffect( () => {
         if (!midiAccess) {
@@ -52,9 +53,9 @@ export function MIDIComponent () {
         }
     }, [ midiAccess, setMidiAccess, midiOutputs, setMidiOutputs, setNotesOn, selectedOutput ] );
     
-    useEffect(() => {
-        scaleNotesRef.current = scaleNotesRef;
-    }, [scaleNotes]);
+    // useEffect(() => {
+    //     scaleNotesRef.current = scaleNotesRef;
+    // }, [scaleNotes]);
 
     useEffect( () => {
         if (midiOutputs[selectedOutput]) {
@@ -63,17 +64,18 @@ export function MIDIComponent () {
     }, [selectedOutput, midiOutputs]);
         
     return (
-        <div>
+        <main>
             <h1>MIDI Test
                 <OutputSelect />
-                { selectedOutputRef.current !== null && <ScaleSelector selectedOutput={ selectedOutputRef.current } /> }
+                {/* { selectedOutputRef.current !== null && <ScaleSelector selectedOutput={ selectedOutputRef.current } /> } */}
             </h1>
 
             <PianoKeyboard/>
 
-            <NotesOnDisplay/>
+            { selectedOutputRef.current !== null && <NoteModifierComponent /> }
 
-        </div>
+            <NotesOnDisplay />
+        </main>
     );
 }
 

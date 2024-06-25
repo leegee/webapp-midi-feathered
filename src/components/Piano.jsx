@@ -25,7 +25,7 @@ PianoKey.propTypes = {
     isHighlighted: PropTypes.bool.isRequired,
 };
   
-const PianoKeyboard = () => {
+export default function PianoKeyboard ()  {
     const [ notesOn ] = useAtom( notesOnAtom );
     
     // 88 keys from A0 @ MIDI pitch 21
@@ -42,6 +42,4 @@ const PianoKeyboard = () => {
             ) ) }
         </aside>
     );
-};
-
-export default PianoKeyboard;
+}

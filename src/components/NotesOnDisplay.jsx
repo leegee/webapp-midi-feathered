@@ -4,7 +4,7 @@ import { useAtom } from 'jotai';
 
 import {  notesOnAtom } from '../lib/store';
 
-function NoteList ( ) {
+export default function NoteList ( ) {
     const [ notesOn] = useAtom( notesOnAtom );
     return (
         <ul>
@@ -16,5 +16,3 @@ function NoteList ( ) {
         </ul>
     );
 }
-
-export default NoteList;

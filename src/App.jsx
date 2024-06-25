@@ -1,6 +1,6 @@
 import { Provider } from 'jotai';
 
-import { MIDIComponent } from './components/MIDI';
+import MIDIComponent from './components/MIDI';
 
 function App() {
   return (

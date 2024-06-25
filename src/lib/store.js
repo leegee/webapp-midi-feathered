@@ -8,4 +8,3 @@ export const scaleRootNoteAtom = atom('C');
 export const scaleNameAtom = atom('major');
 export const scaleNotesAtom = atom([]);
 
-
