@@ -20,10 +20,8 @@ export default function MIDIComponent () {
     const [ midiOutputs, setMidiOutputs ] = useAtom( midiOutputsAtom );
     const [ selectedOutput ] = useAtom( selectedOutputAtom );
     const [, setNotesOn ] = useAtom( notesOnAtom );
-    // const [ scaleNotes, ] = useAtom( scaleNotesAtom );
 
     const selectedOutputRef = useRef( null ); 
-    // const scaleNotesRef = useRef(null); 
 
     useEffect( () => {
         if (!midiAccess) {
@@ -54,10 +52,6 @@ export default function MIDIComponent () {
         }
     }, [ midiAccess, setMidiAccess, midiOutputs, setMidiOutputs, setNotesOn, selectedOutput ] );
     
-    // useEffect(() => {
-    //     scaleNotesRef.current = scaleNotesRef;
-    // }, [scaleNotes]);
-
     useEffect( () => {
         if (midiOutputs[selectedOutput]) {
             selectedOutputRef.current = midiOutputs[ selectedOutput ];
@@ -68,7 +62,6 @@ export default function MIDIComponent () {
         <main>
             <h1>MIDI Test
                 <OutputSelect />
-                {/* { selectedOutputRef.current !== null && <ScaleSelector selectedOutput={ selectedOutputRef.current } /> } */}
             </h1>
 
             <PianoKeyboard/>
