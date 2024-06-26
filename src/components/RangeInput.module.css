@@ -1,7 +1,7 @@
 .custom-range-input {
     position: relative;
-    min-height: 2em;
-    max-height: 2em;
+    min-height: 4em;
+    max-height: 4em;
     min-width: 10em;
     width: 100%;
     background-color: #ddd;
@@ -18,10 +18,9 @@
     position: absolute;
     top: 0;
     bottom: 0;
-    width: 10pt;
+    width: 4em;
     height: 100%;
-    background-color: hsl(39, 100%, 45%);
-    border: 2pt solid hsla(39, 100%, 42%);
+    background-color: hsl(39, 100%, 42%);
     cursor: ew-resize;
     transition: position 30ms;
 }
