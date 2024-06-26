@@ -80,12 +80,6 @@ export default function MIDIComponent () {
 
     return (
         <main className={ styles.main }>
-            <h1>
-                MIDI
-                <OutputSelect />
-            </h1>
-
-
             { selectedOutputRef.current && (
                 <ChordNoteRandomiserComponent selectedOutput={ selectedOutputRef.current } />
             ) }
@@ -94,6 +88,10 @@ export default function MIDIComponent () {
                 <section className={ `padded ${ styles[ 'midi-channel-settings' ] }` }>
                     <InputChannelSelect />
                     <OutputChannelSelect />
+                </section>
+
+                <section className={ `padded ${ styles[ 'midi-channel-settings' ] }` }>
+                    <OutputSelect />
                 </section>
                 <PianoKeyboard />
             </footer>

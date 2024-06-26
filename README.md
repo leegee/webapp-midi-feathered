@@ -1,6 +1,8 @@
 # MIDI Feathered Chords
 
-A web app to randomise the repetition of notes played over a selected MIDI input.
+A web app to feather notes played over any and all MIDI inputs, outputting to a device of your choice.
+
+To help with loopback, input and output channels can be different.
 
 ## NB
 
