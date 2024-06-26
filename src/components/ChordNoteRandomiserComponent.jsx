@@ -74,7 +74,7 @@ export default function ChordNoteRandomiserComponent ( { selectedOutput } ) {
         <section className="padded">
             <h2>Chord-note Randomiser</h2>
 
-            <div>
+            <div className={ styles.row }>
                 <input
                     type="radio"
                     value="oneNote"
@@ -91,10 +91,10 @@ export default function ChordNoteRandomiserComponent ( { selectedOutput } ) {
                     max="10"
                     disabled={playMode !== 'oneNote'}
                 />
-                { bps } notes per second
+                { bps } notes/sec
             </div>
 
-            <div>
+            <div className={ styles.row }>
                 <input
                     type="radio"
                     value="probability"
