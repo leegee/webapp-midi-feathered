@@ -1,7 +1,8 @@
 {
-  "name": "midi-test",
+  "name": "webapp-midi-feathered",
+  "description": "Web MIDI API to feather MIDI loopback",
   "private": true,
-  "version": "0.0.0",
+  "version": "0.0.2",
   "type": "module",
   "scripts": {
     "dev": "vite",
