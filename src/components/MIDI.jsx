@@ -9,72 +9,70 @@ import {
 } from '../lib/store';
 import { onMidiMessage } from '../lib/midi-messages';
 
-// import NotesOnDisplay from './NotesOnDisplay';
 import OutputSelect from './OutputSelect';
 import PianoKeyboard from './Piano';
 import ChordNoteRandomiserComponent from './ChordNoteRandomiserComponent';
 
 let watchMidiInitialized = false;
 
-export default function MIDIComponent() {
-    const [midiAccess, setMidiAccess] = useAtom(midiAccessAtom);
-    const [midiOutputs, setMidiOutputs] = useAtom(midiOutputsAtom);
-    const [selectedOutput, setSelectedOutput] = useAtom(selectedOutputAtom);
-    const [, setNotesOn] = useAtom(notesOnAtom);
+export default function MIDIComponent () {
+    const [ midiAccess, setMidiAccess ] = useAtom( midiAccessAtom );
+    const [ midiOutputs, setMidiOutputs ] = useAtom( midiOutputsAtom );
+    const [ selectedOutput, setSelectedOutput ] = useAtom( selectedOutputAtom );
+    const [ , setNotesOn ] = useAtom( notesOnAtom );
 
-    const selectedOutputRef = useRef(null);
+    const selectedOutputRef = useRef( null );
 
-    useEffect(() => {
-        if (!midiAccess) {
+    useEffect( () => {
+        if ( !midiAccess ) {
             try {
-                navigator.requestMIDIAccess().then((midiAccess) =>
-                    setMidiAccess(midiAccess)
+                navigator.requestMIDIAccess().then( ( midiAccess ) =>
+                    setMidiAccess( midiAccess )
                 );
-            } catch (error) {
-                console.error('Failed to access MIDI devices:', error);
+            } catch ( error ) {
+                console.error( 'Failed to access MIDI devices:', error );
                 return (
                     <div className='error'>
-                        Failed to access MIDI devices: ${error}
+                        Failed to access MIDI devices: ${ error }
                     </div>
                 );
             }
-        } else if (!watchMidiInitialized) {
-            setMidiOutputs(() => {
-                const newOutputs = Array.from(midiAccess.outputs.values()).reduce(
-                    (map, output) => {
-                        map[output.name] = output;
+        } else if ( !watchMidiInitialized ) {
+            setMidiOutputs( () => {
+                const newOutputs = Array.from( midiAccess.outputs.values() ).reduce(
+                    ( map, output ) => {
+                        map[ output.name ] = output;
                         return map;
                     },
                     {}
                 );
-                console.log('Initialized MIDI outputs', newOutputs);
+                console.log( 'Initialized MIDI outputs', newOutputs );
 
                 // Initialize the first MIDI output as the default selectedOutput
-                const firstOutputName = Object.keys(newOutputs)[0];
+                const firstOutputName = Object.keys( newOutputs )[ 0 ];
                 setSelectedOutput( firstOutputName );
                 selectedOutputRef.current = midiOutputs[ selectedOutput ];
-                
-                midiAccess.inputs.forEach((inputPort) => {
-                    inputPort.onmidimessage = (e) =>
-                        onMidiMessage(e, setNotesOn, selectedOutputRef.current);
-                });
 
-                console.log('Initialized MIDI inputs');
+                midiAccess.inputs.forEach( ( inputPort ) => {
+                    inputPort.onmidimessage = ( e ) =>
+                        onMidiMessage( e, setNotesOn, selectedOutputRef.current );
+                } );
+
+                console.log( 'Initialized MIDI inputs' );
                 return newOutputs;
-            });
+            } );
 
             watchMidiInitialized = true;
         }
-    }, [midiAccess, setMidiAccess, midiOutputs, setMidiOutputs, setNotesOn, setSelectedOutput, selectedOutput]);
+    }, [ midiAccess, setMidiAccess, midiOutputs, setMidiOutputs, setNotesOn, setSelectedOutput, selectedOutput ] );
 
-    useEffect(() => {
+    useEffect( () => {
         if ( midiOutputs[ selectedOutput ] ) {
-            selectedOutputRef.current = midiOutputs[selectedOutput];
-            console.log('Selected MIDI output:', selectedOutputRef.current);
+            selectedOutputRef.current = midiOutputs[ selectedOutput ];
+            console.log( 'Selected MIDI output:', selectedOutputRef.current );
         }
-    }, [selectedOutput, midiOutputs]);
+    }, [ selectedOutput, midiOutputs ] );
 
-    // Render the component with conditional rendering based on selectedOutputRef.current
     return (
         <main>
             <h1>
@@ -84,11 +82,10 @@ export default function MIDIComponent() {
 
             <PianoKeyboard />
 
-            {selectedOutputRef.current && (
-                <ChordNoteRandomiserComponent selectedOutput={selectedOutputRef.current} />
-            )}
+            { selectedOutputRef.current && (
+                <ChordNoteRandomiserComponent selectedOutput={ selectedOutputRef.current } />
+            ) }
 
-            {/* <NotesOnDisplay /> */}
         </main>
     );
 }
