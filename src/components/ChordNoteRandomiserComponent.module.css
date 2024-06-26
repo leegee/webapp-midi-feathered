@@ -4,7 +4,8 @@
     display: inline-flex;
 }
 
-.bpsInput {
+.bpsInput,
+.probabilityInput {
     margin-left: var(--midi-app-padding);
     width: 10em;
 }
