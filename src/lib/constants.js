@@ -1,5 +1,5 @@
-export const MIDI_CHANNEL_IN = 0;
-export const MIDI_CHANNEL_OUT = 1;
+export const MIDI_CHANNEL_IN = 1; // API value is zero-based, so is the standard spec + 1
+export const MIDI_CHANNEL_OUT = 10;
 export const NOTE_ON = 9;
 export const NOTE_OFF = 8;
 

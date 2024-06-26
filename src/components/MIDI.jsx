@@ -4,12 +4,11 @@
 import React, { useEffect, useRef } from 'react';
 import { useAtom } from 'jotai';
 
-import { midiAccessAtom, midiOutputsAtom, selectedOutputAtom, notesOnAtom, /*scaleNotesAtom*/ } from '../lib/store';
+import { midiAccessAtom, midiOutputsAtom, selectedOutputAtom, notesOnAtom } from '../lib/store';
 import { onMidiMessage } from '../lib/midi-messages';
 
 import OutputSelect from './OutputSelect';
 import NotesOnDisplay from './NotesOnDisplay';
-// import ScaleSelector from './ScaleSelector';
 import PianoKeyboard from './Piano';
 import NoteModifierComponent from './NoteModifier';
 
@@ -60,7 +59,7 @@ export default function MIDIComponent () {
         
     return (
         <main>
-            <h1>MIDI Test
+            <h1>MIDI 
                 <OutputSelect />
             </h1>
 

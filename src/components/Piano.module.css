@@ -16,8 +16,8 @@ aside {
     position: relative;
     flex: 1;
     display: inline-block;
-    border: 1pt solid grey;
-    background: white;
+    border: var(--midi-app-border);
+    background: #f6f6f6;
     width: var(--key-width);
     height: var(--key-white-height);
     z-index: 1;

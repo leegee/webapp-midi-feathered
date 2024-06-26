@@ -1,0 +1,12 @@
+/* NoteModifier.module.css */
+
+.bpsInputContainer {
+    display: inline-flex;
+    padding: var(--midi-app-padding);
+    border: var(--midi-app-border);
+}
+
+.bpsInput {
+    margin-left: var(--midi-app-padding);
+    width: 10em;
+}
