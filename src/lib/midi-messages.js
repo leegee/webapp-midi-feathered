@@ -5,18 +5,14 @@ const timersForPitches = {};
 const  USE_EVENTS = false;
 
 export function startMidiNote ( pitch, velocity, selectedOutput, midiChannel = MIDI_CHANNEL_OUT ) {
-    // console.log( `START MIDI NOTE on ${midiChannel} @ ${pitch}, ${velocity}` );
     selectedOutput.send( [ 0x90 +  midiChannel, pitch, velocity ] );
 }
 
 export function stopMidiNote ( pitch, selectedOutput, midiChannel = MIDI_CHANNEL_OUT ) {
-    // console.log( `STOP MIDI NOTE on ${midiChannel} @ ${pitch}` );
     selectedOutput.send( [ 0x80 +  midiChannel, pitch, 0 ] );
 }
 
 export function sendNoteWithDuration (  pitch, velocity, durationMs, selectedOutput, midiChannel = MIDI_CHANNEL_OUT ) {
-    // console.log( 'sendNoteWithDuration on channel', midiChannel );
-
     // If the note is playing already
     if ( Object.hasOwn( timersForPitches, pitch ) ) {
         clearTimeout( timersForPitches[ pitch ] );
