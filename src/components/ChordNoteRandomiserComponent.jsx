@@ -7,35 +7,40 @@ import RangeInput from './RangeInput';
 import { notesOnAtom } from '../lib/store';
 import { sendNoteWithDuration } from '../lib/midi-messages';
 
-const INITIAL_BPS = 6;
-const durationMs = 1000;
-
 const playModeTypes = {
     PROBABILITY: 1,
     ONE_NOTE: 2,
 };
 
-ChordNoteRandomiserComponent.propTypes = {
-    selectedOutput: PropTypes.object.isRequired,
-};
+const INITIAL_BPS = 6;
+const MIN_BPS = 1;
+const MAX_BPS = 30;
+const MIN_DURATION_MS = 10;
+const MAX_DURATION_MS = 10000;
+const INITIAL_DURATION_MS = 1000;
 
 export default function ChordNoteRandomiserComponent ( { selectedOutput } ) {
     const [ notesOn ] = useAtom( notesOnAtom );
     const [ bps, setBps ] = useState( INITIAL_BPS );
-    const [ playMode, setPlayMode ] = useState( playModeTypes.PROBABILITY ); 
+    const [ playMode, setPlayMode ] = useState( playModeTypes.PROBABILITY );
     const [ probabilityThreshold, setProbabilityThreshold ] = useState( 0.5 );
+    const [ durationMs, setDurationMs ] = useState( INITIAL_DURATION_MS );
 
     const handleChangeBps = ( event ) => {
-        setBps( Number( event.target.value ) );
+        setBps( Math.floor( Number( event.target.value ) ) );
     };
 
     const handlePlayModeChange = ( event ) => {
-        const newValue = event.target.checked ? playModeTypes.ONE_NOTE : playModeTypes.PROBABILITY;
+        const newValue = event.target.checked ? playModeTypes.PROBABILITY : playModeTypes.ONE_NOTE;
         setPlayMode( newValue );
     };
 
     const handleProbabilityChange = ( event ) => {
         setProbabilityThreshold( Number( event.target.value ) );
+    };
+
+    const handleDurationChange = ( event ) => {
+        setDurationMs( Number( event.target.value ) );
     };
 
     useEffect( () => {
@@ -44,7 +49,7 @@ export default function ChordNoteRandomiserComponent ( { selectedOutput } ) {
             if ( !pitches.length ) {
                 return;
             }
-    
+
             if ( playMode === playModeTypes.ONE_NOTE ) {
                 // Always play one random note
                 const pitch = pitches[ Math.floor( Math.random() * pitches.length ) ];
@@ -57,7 +62,7 @@ export default function ChordNoteRandomiserComponent ( { selectedOutput } ) {
             } else if ( playMode === playModeTypes.PROBABILITY ) {
                 // Iterate through all notes based on the probability threshold
                 Object.keys( notesOn ).forEach( ( pitch ) => {
-                    const probability = Math.random(); 
+                    const probability = Math.random();
                     if ( probability < probabilityThreshold ) {
                         sendNoteWithDuration(
                             pitch,
@@ -69,51 +74,68 @@ export default function ChordNoteRandomiserComponent ( { selectedOutput } ) {
                 } );
             }
         }
-    
+
         const bpsInterval = 1000 / bps;
         const bpsTimer = setInterval( bpsListener, bpsInterval );
         return () => clearInterval( bpsTimer );
-    }, [bps, notesOn, playMode, probabilityThreshold, selectedOutput] );
+    }, [ bps, notesOn, playMode, probabilityThreshold, durationMs, selectedOutput ] );
 
     return (
         <section className="padded">
-            <h2>Chord-note Randomiser</h2>
+            <h2>Feathered Chords</h2>
 
             <div className={ styles.row }>
-                <label htmlFor="bps-input">
-                    Notes per second:
-                </label>
+                <label htmlFor="bps-input">{ bps } notes per second:</label>
                 <RangeInput
-                    min={ 1 }
-                    max={ 10 }
+                    min={ MIN_BPS }
+                    max={ MAX_BPS }
                     value={ bps }
                     onChange={ handleChangeBps }
                 />
             </div>
 
             <div className={ styles.row }>
-                <label>
-                    <input
-                        type="checkbox"
-                        checked={ playMode === playModeTypes.ONE_NOTE }
-                        onChange={ handlePlayModeChange }
-                    />
-                    Monophonic
+                <label htmlFor="duration-input">
+                    Duration: { Math.floor( durationMs ) } ms
                 </label>
+                <RangeInput
+                    min={ MIN_DURATION_MS }
+                    max={ MAX_DURATION_MS }
+                    value={ durationMs }
+                    onChange={ handleDurationChange }
+                />
             </div>
 
-            { playMode === playModeTypes.PROBABILITY && (
-                <div className={ styles.row }>
-                    <label htmlFor="probability-input" title="Probability threshold">Probability Threshold</label>
+            <div className={ styles.row }>
+                <label htmlFor="probability-input" title="Probability threshold">
+                    <input
+                        type="checkbox"
+                        checked={ playMode === playModeTypes.PROBABILITY }
+                        onChange={ handlePlayModeChange }
+                    />
+                    Probability Threshold
+
+                    { playMode === playModeTypes.PROBABILITY && (
+                        <> &nbsp;
+                            { Math.floor( probabilityThreshold * 100 ) }%
+                        </>
+                    ) }
+                </label>
+
+                { playMode === playModeTypes.PROBABILITY && (
                     <RangeInput
                         min={ 0 }
                         max={ 1 }
                         value={ probabilityThreshold }
                         onChange={ handleProbabilityChange }
                     />
-                </div>
-            ) }
+                ) }
+            </div>
 
         </section>
     );
 }
+
+ChordNoteRandomiserComponent.propTypes = {
+    selectedOutput: PropTypes.object.isRequired,
+};
