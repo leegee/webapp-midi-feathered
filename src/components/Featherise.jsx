@@ -2,9 +2,7 @@ import { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { useAtom } from 'jotai';
 
-// import RangeTest from './RangeTest';
 import styles from './Featherise.module.css';
-import Slider from './SliderInput';
 import RangeInput from './RangeInput';
 import { notesOnAtom } from '../lib/store';
 import { sendNoteWithDuration } from '../lib/midi-messages';
@@ -14,7 +12,6 @@ const playModeTypes = {
     ONE_NOTE: 2,
 };
 
-const INITIAL_DURATION_MS = 1000;
 const MIN_BPS = 1;
 const MAX_BPS = 30;
 const MIN_DURATION_MS = 10;
@@ -25,36 +22,35 @@ const useMinDurationMs = 10;
 
 export default function Featherise ( { selectedOutput } ) {
     const [ notesOn ] = useAtom( notesOnAtom );
-    const [ probabilityThreshold, setProbabilityThreshold ] = useState( 0.5 );
+    const [ probabilityThresholdRange, setProbabilityThresholdRange ] = useState( { minValue: 0, maxValue: 1 } );
     const [ playMode, setPlayMode ] = useState( playModeTypes.PROBABILITY );
-    const [ durationMs, setDurationMs ] = useState( INITIAL_DURATION_MS );
-
     const [ bpsRange, setBpsRange ] = useState( { minValue: MIN_BPS, maxValue: MAX_BPS } );
+    const [ durationRange, setDurationRange ] = useState( { minValue: MIN_DURATION_MS, maxValue: MAX_DURATION_MS } );
 
-    const handleBpsRangeChange = ( e ) => {
+    const handleBpsRangeChange = ( event ) => {
         const newRange = {
-            minValue: Math.floor( Number( e.target.minValue !== undefined ? e.target.minValue : bpsRange.minValue ) ),
-            maxValue: Math.floor( Number( e.target.maxValue !== undefined ? e.target.maxValue : bpsRange.maxValue ) ),
+            minValue: Math.floor( Number( event.target.minValue !== undefined ? event.target.minValue : bpsRange.minValue ) ),
+            maxValue: Math.floor( Number( event.target.maxValue !== undefined ? event.target.maxValue : bpsRange.maxValue ) ),
         };
         setBpsRange( newRange );
-        console.log( `Selected Range: Min = ${ newRange.minValue }, Max = ${ newRange.maxValue }` );
     };
 
-    // const handleChangeBps = ( event ) => {
-    //     setBps( Math.floor( Number( event.target.value ) ) );
-    // };
+    const handleDurationRangeChange = ( event ) => {
+        setDurationRange( {
+            minValue: Math.floor( Number( event.target.minValue ) ),
+            maxValue: Math.floor( Number( event.target.maxValue ) ),
+        } );
+    };
+
+    const handleProbabilityThresholdRangeChange = ( event ) => {
+        setProbabilityThresholdRange( {
+            minValue: Number( event.target.minValue ),
+            maxValue: Number( event.target.maxValue ),
+        } );
+    };
 
     const handlePlayModeChange = ( event ) => {
-        const newValue = event.target.checked ? playModeTypes.PROBABILITY : playModeTypes.ONE_NOTE;
-        setPlayMode( newValue );
-    };
-
-    const handleProbabilityChange = ( event ) => {
-        setProbabilityThreshold( Number( event.target.value ) );
-    };
-
-    const handleDurationChange = ( event ) => {
-        setDurationMs( Number( event.target.value ) );
+        setPlayMode( event.target.checked ? playModeTypes.PROBABILITY : playModeTypes.ONE_NOTE );
     };
 
     useEffect( () => {
@@ -66,7 +62,7 @@ export default function Featherise ( { selectedOutput } ) {
                 return;
             }
 
-            const useDurationMs = useMinDurationMs + Math.random() * ( durationMs - MIN_DURATION_MS );
+            const useDurationMs = useMinDurationMs + Math.random() * ( durationRange.maxValue - durationRange.minValue );
 
             if ( playMode === playModeTypes.ONE_NOTE ) {
                 // Always play one random note
@@ -81,7 +77,7 @@ export default function Featherise ( { selectedOutput } ) {
                 // Iterate through all notes based on the probability threshold
                 Object.keys( notesOn ).forEach( ( pitch ) => {
                     const probability = userMinProb + ( 1 - userMinProb ) * Math.random();
-                    if ( probability < probabilityThreshold ) {
+                    if ( probability < probabilityThresholdRange.maxValue && probability > probabilityThresholdRange.minValue ) {
                         sendNoteWithDuration(
                             pitch,
                             notesOn[ pitch ].velocity,
@@ -103,7 +99,7 @@ export default function Featherise ( { selectedOutput } ) {
         bpsListener();
 
         return () => clearTimeout( bpsTimer );
-    }, [ notesOn, playMode, probabilityThreshold, durationMs, selectedOutput, bpsRange.minValue, bpsRange.maxValue ] );
+    }, [ notesOn, playMode, probabilityThresholdRange, durationRange, selectedOutput, bpsRange.minValue, bpsRange.maxValue ] );
 
     return (
         <section className="padded">
@@ -123,44 +119,37 @@ export default function Featherise ( { selectedOutput } ) {
 
             <div className={ styles.row }>
                 <label htmlFor="duration-input">
-                    Duration: { Math.floor( durationMs ) } ms
+                    Duration Range: { Math.floor( durationRange.minValue ) } ms - { Math.floor( durationRange.maxValue ) } ms
                 </label>
-                <Slider
+                <RangeInput
+                    id='duration-input'
                     min={ MIN_DURATION_MS }
                     max={ MAX_DURATION_MS }
-                    value={ durationMs }
-                    onChange={ handleDurationChange }
+                    minValue={ durationRange.minValue }
+                    maxValue={ durationRange.maxValue }
+                    onChange={ handleDurationRangeChange }
                 />
             </div>
 
             <div className={ styles.row }>
-                <label htmlFor="probability-input" title="Probability threshold">
+                <label htmlFor="probability-input" title="Probability threshold range">
                     <input
                         type="checkbox"
                         checked={ playMode === playModeTypes.PROBABILITY }
                         onChange={ handlePlayModeChange }
                     />
-                    Probability Threshold
-
-                    { playMode === playModeTypes.PROBABILITY && (
-                        <> &nbsp;
-                            { Math.floor( probabilityThreshold * 100 ) }%
-                        </>
-                    ) }
+                    Probability Threshold Range
                 </label>
-
                 { playMode === playModeTypes.PROBABILITY && (
-                    <Slider
+                    <RangeInput
                         min={ 0 }
                         max={ 1 }
-                        value={ probabilityThreshold }
-                        onChange={ handleProbabilityChange }
+                        minValue={ probabilityThresholdRange.minValue }
+                        maxValue={ probabilityThresholdRange.maxValue }
+                        onChange={ handleProbabilityThresholdRangeChange }
                     />
                 ) }
             </div>
-
-            {/* <RangeTest /> */ }
-
         </section>
     );
 }

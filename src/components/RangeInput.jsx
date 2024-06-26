@@ -25,7 +25,7 @@ const RangeInput = ( { min, max, minValue, maxValue, onChange } ) => {
     };
 
     const handleMouseDown = ( e, isMin ) => {
-        e.preventDefault();
+        e.preventDefault( { passive: false } );
         const rect = e.currentTarget.parentElement.getBoundingClientRect();
         const clickX = e.clientX - rect.left;
         const newPercentage = ( clickX / rect.width ) * 100;
@@ -47,7 +47,7 @@ const RangeInput = ( { min, max, minValue, maxValue, onChange } ) => {
     };
 
     const handleTouchStart = ( e, isMin ) => {
-        e.preventDefault();
+        e.preventDefault( { passive: false } );
         const rect = e.currentTarget.parentElement.getBoundingClientRect();
         const touchX = e.touches[ 0 ].clientX - rect.left;
         const newPercentage = ( touchX / rect.width ) * 100;
