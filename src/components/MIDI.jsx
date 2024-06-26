@@ -78,7 +78,8 @@ export default function MIDIComponent() {
     return (
         <main>
             <h1>
-                MIDI <OutputSelect />
+                MIDI
+                <OutputSelect />
             </h1>
 
             <PianoKeyboard />

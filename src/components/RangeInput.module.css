@@ -23,4 +23,5 @@
     background-color: hsl(39, 100%, 45%);
     border: 2pt solid hsla(39, 100%, 42%);
     cursor: ew-resize;
+    transition: position 30ms;
 }
