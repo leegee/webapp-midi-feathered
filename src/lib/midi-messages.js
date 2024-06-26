@@ -42,7 +42,6 @@ export function onMidiMessage ( event, setNotesOn, /*selectedOutput*/ ) {
     const midiChannel = event.data[ 0 ] & 0x0F;
 
     if ( midiChannel !== MIDI_CHANNEL_IN ) {
-        console.log( 'IGNORING CHANNEL', midiChannel, 'as not', MIDI_CHANNEL_IN );
         return;
     }
 

@@ -9,8 +9,8 @@ import {
 } from '../lib/store';
 import { onMidiMessage } from '../lib/midi-messages';
 
+// import NotesOnDisplay from './NotesOnDisplay';
 import OutputSelect from './OutputSelect';
-import NotesOnDisplay from './NotesOnDisplay';
 import PianoKeyboard from './Piano';
 import ChordNoteRandomiserComponent from './ChordNoteRandomiserComponent';
 
@@ -87,7 +87,7 @@ export default function MIDIComponent() {
                 <ChordNoteRandomiserComponent selectedOutput={selectedOutputRef.current} />
             )}
 
-            <NotesOnDisplay />
+            {/* <NotesOnDisplay /> */}
         </main>
     );
 }
