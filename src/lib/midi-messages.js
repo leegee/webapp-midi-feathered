@@ -2,19 +2,20 @@
 import { MIDI_CHANNEL_IN, MIDI_CHANNEL_OUT, NOTE_OFF, NOTE_ON, EVENT_NOTE_START, EVENT_NOTE_STOP } from './constants';
 
 const timersForPitches = {};
+const  USE_EVENTS = false;
 
 export function startMidiNote ( pitch, velocity, selectedOutput, midiChannel = MIDI_CHANNEL_OUT ) {
-    console.log( `START MIDI NOTE on ${midiChannel} @ ${pitch}, ${velocity}` );
+    // console.log( `START MIDI NOTE on ${midiChannel} @ ${pitch}, ${velocity}` );
     selectedOutput.send( [ 0x90 +  midiChannel, pitch, velocity ] );
 }
 
 export function stopMidiNote ( pitch, selectedOutput, midiChannel = MIDI_CHANNEL_OUT ) {
-    console.log( `STOP MIDI NOTE on ${midiChannel} @ ${pitch}` );
+    // console.log( `STOP MIDI NOTE on ${midiChannel} @ ${pitch}` );
     selectedOutput.send( [ 0x80 +  midiChannel, pitch, 0 ] );
 }
 
 export function sendNoteWithDuration (  pitch, velocity, durationMs, selectedOutput, midiChannel = MIDI_CHANNEL_OUT ) {
-    console.log( 'sendNoteWithDuration on channel', midiChannel );
+    // console.log( 'sendNoteWithDuration on channel', midiChannel );
 
     // If the note is playing already
     if ( Object.hasOwn( timersForPitches, pitch ) ) {
@@ -54,17 +55,21 @@ export function onMidiMessage ( event, setNotesOn, /*selectedOutput*/ ) {
 
         if ( cmd === NOTE_ON && velocity > 0 && !newNotesOn[ pitch ] ) {
             newNotesOn[ pitch ] = { timestamp, velocity };
-            window.document.dispatchEvent(
-                new CustomEvent( EVENT_NOTE_START, { detail: { pitch, velocity, midiChannel } } )
-            );
+            if ( USE_EVENTS ) {
+                window.document.dispatchEvent(
+                    new CustomEvent( EVENT_NOTE_START, { detail: { pitch, velocity, midiChannel } } )
+                );
+            }
         }
 
         else if ( cmd === NOTE_OFF || velocity === 0 ) {
             if ( newNotesOn[ pitch ] ) {
                 delete newNotesOn[ pitch ];
-                window.document.dispatchEvent(
-                    new CustomEvent( EVENT_NOTE_STOP, { detail: { pitch, midiChannel } } ) 
-                );
+                if ( USE_EVENTS ) {
+                    window.document.dispatchEvent(
+                        new CustomEvent( EVENT_NOTE_STOP, { detail: { pitch, midiChannel } } )
+                    );
+                }
             }
         }
 

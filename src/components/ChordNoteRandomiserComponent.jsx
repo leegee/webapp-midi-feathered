@@ -25,7 +25,6 @@ export default function ChordNoteRandomiserComponent({ selectedOutput }) {
 
     function bpsListener() {
         const pitches = Object.keys(notesOn);
-        console.log(notesOn, pitches);
         if (!pitches.length) {
             return;
         }
@@ -41,26 +40,26 @@ export default function ChordNoteRandomiserComponent({ selectedOutput }) {
     }
 
     useEffect(() => {
-        console.log('bps', bps);
         const bpsInterval = 1000 / bps; 
-
-        console.info('Add bps listener at', bps);
         const bpsTimer = setInterval(bpsListener, bpsInterval);
-
         return () => clearInterval(bpsTimer);
     }, [bps, notesOn]);
 
     return (
-        <label className="padded">
-            Notes per second
-            <input
-                className={styles.bpsInput}
-            type="range"
-            value={bps}
-            onChange={handleChangeBps}
-            min="1" 
-            max="10"
-        />
-        </label>
+        <section className="padded">
+            <h2> Chord-note Randomiser </h2>
+
+            <label>
+                Notes per second
+                <input
+                    className={styles.bpsInput}
+                    type="range"
+                    value={bps}
+                    onChange={handleChangeBps}
+                    min="1" 
+                    max="10"
+                    />
+            </label>
+        </section>
     );
 }

@@ -38,6 +38,10 @@ h1 {
   align-items: center;
 }
 
+h2 {
+  margin-top: 0;
+}
+
 .padded {
   margin: var(--midi-app-padding);
   padding: var(--midi-app-padding);
