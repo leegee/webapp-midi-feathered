@@ -11,11 +11,11 @@ import { sendNoteWithDuration } from '../lib/midi-messages';
 const INITAL_BPS = 6;
 let durationMs = 1000;
 
-NoteModifierComponent.propTypes = {
+ChordNoteRandomiserComponent.propTypes = {
     selectedOutput: PropTypes.object.isRequired 
 };
 
-export default function NoteModifierComponent({ selectedOutput }) {
+export default function ChordNoteRandomiserComponent({ selectedOutput }) {
     const [notesOn] = useAtom(notesOnAtom);
     const [bps, setBps] = useState(INITAL_BPS);
 
@@ -51,7 +51,7 @@ export default function NoteModifierComponent({ selectedOutput }) {
     }, [bps, notesOn]);
 
     return (
-        <label  className={styles.bpsInputContainer}>
+        <label className="padded">
             Notes per second
             <input
                 className={styles.bpsInput}

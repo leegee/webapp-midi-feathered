@@ -39,7 +39,7 @@ h1 {
 }
 
 .padded {
-  margin: 1rem;
-  padding: 1rem;
-  border: 1pt solid grey;
+  margin: var(--midi-app-padding);
+  padding: var(--midi-app-padding);
+  border: var(--midi-app-border);
 }

@@ -2,8 +2,6 @@
 
 .bpsInputContainer {
     display: inline-flex;
-    padding: var(--midi-app-padding);
-    border: var(--midi-app-border);
 }
 
 .bpsInput {
