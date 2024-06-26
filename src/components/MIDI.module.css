@@ -1,0 +1,11 @@
+.midi-channel-settings {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.bottom {
+    position: absolute;
+    bottom: 0;
+    width: calc(100vw - (2 * var(--midi-app-padding)));
+}
