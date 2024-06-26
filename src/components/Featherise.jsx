@@ -40,7 +40,6 @@ export default function Featherise ( { selectedOutput } ) {
             minValue: Math.floor( Number( newRange.minValue ) ),
             maxValue: Math.floor( Number( newRange.maxValue ) ),
         } );
-        console.log( newRange );
         console.log( `Selected Duration Range: Min = ${ newRange.minValue }, Max = ${ newRange.maxValue }` );
     };
 
@@ -53,8 +52,9 @@ export default function Featherise ( { selectedOutput } ) {
     };
 
     const handlePlayModeChange = ( event ) => {
-        const newValue = event.target.checked ? playModeTypes.PROBABILITY : playModeTypes.ONE_NOTE;
-        setPlayMode( newValue );
+        setPlayMode(
+            event.target.checked ? playModeTypes.PROBABILITY : playModeTypes.ONE_NOTE
+        );
     };
 
     useEffect( () => {
