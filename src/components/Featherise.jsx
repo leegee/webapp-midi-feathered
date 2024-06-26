@@ -13,17 +13,20 @@ const playModeTypes = {
 };
 
 const INITIAL_BPS = 6;
-const MIN_BPS = 1;
+const INITIAL_DURATION_MS = 1000;
 const MAX_BPS = 30;
 const MIN_DURATION_MS = 10;
 const MAX_DURATION_MS = 10000;
-const INITIAL_DURATION_MS = 1000;
+
+const userMinBps = 1;
+const userMinProb = 0;
+const useMinDurationMs = 10;
 
 export default function Featherise ( { selectedOutput } ) {
     const [ notesOn ] = useAtom( notesOnAtom );
     const [ bps, setBps ] = useState( INITIAL_BPS );
-    const [ playMode, setPlayMode ] = useState( playModeTypes.PROBABILITY );
     const [ probabilityThreshold, setProbabilityThreshold ] = useState( 0.5 );
+    const [ playMode, setPlayMode ] = useState( playModeTypes.PROBABILITY );
     const [ durationMs, setDurationMs ] = useState( INITIAL_DURATION_MS );
 
     const handleChangeBps = ( event ) => {
@@ -44,11 +47,15 @@ export default function Featherise ( { selectedOutput } ) {
     };
 
     useEffect( () => {
+        let bpsTimer;
+
         function bpsListener () {
             const pitches = Object.keys( notesOn );
             if ( !pitches.length ) {
                 return;
             }
+
+            const useDurationMs = useMinDurationMs + Math.random() * ( durationMs - MIN_DURATION_MS );
 
             if ( playMode === playModeTypes.ONE_NOTE ) {
                 // Always play one random note
@@ -56,28 +63,35 @@ export default function Featherise ( { selectedOutput } ) {
                 sendNoteWithDuration(
                     pitch,
                     notesOn[ pitch ].velocity,
-                    durationMs,
+                    useDurationMs,
                     selectedOutput
                 );
             } else if ( playMode === playModeTypes.PROBABILITY ) {
                 // Iterate through all notes based on the probability threshold
                 Object.keys( notesOn ).forEach( ( pitch ) => {
-                    const probability = Math.random();
+                    const probability = userMinProb + ( 1 - userMinProb ) * Math.random();
                     if ( probability < probabilityThreshold ) {
                         sendNoteWithDuration(
                             pitch,
                             notesOn[ pitch ].velocity,
-                            durationMs,
+                            useDurationMs,
                             selectedOutput
                         );
                     }
                 } );
             }
+
+            // Set the next recursion:
+            const bpsIntervalMin = 1000 / userMinBps;
+            const bpsIntervalMax = 1000 / bps;
+            const bpsInterval = bpsIntervalMin + Math.random() * ( bpsIntervalMax - bpsIntervalMin );
+            bpsTimer = setTimeout( bpsListener, bpsInterval );
         }
 
-        const bpsInterval = 1000 / bps;
-        const bpsTimer = setInterval( bpsListener, bpsInterval );
-        return () => clearInterval( bpsTimer );
+        // Begin  the recursion:
+        bpsListener();
+
+        return () => clearTimeout( bpsTimer );
     }, [ bps, notesOn, playMode, probabilityThreshold, durationMs, selectedOutput ] );
 
     return (
@@ -87,7 +101,7 @@ export default function Featherise ( { selectedOutput } ) {
             <div className={ styles.row }>
                 <label htmlFor="bps-input">{ bps } notes per second:</label>
                 <RangeInput
-                    min={ MIN_BPS }
+                    min={ userMinBps }
                     max={ MAX_BPS }
                     value={ bps }
                     onChange={ handleChangeBps }
