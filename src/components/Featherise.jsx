@@ -27,29 +27,29 @@ export default function Featherise ( { selectedOutput } ) {
     const [ bpsRange, setBpsRange ] = useState( { minValue: MIN_BPS, maxValue: MAX_BPS } );
     const [ durationRange, setDurationRange ] = useState( { minValue: MIN_DURATION_MS, maxValue: MAX_DURATION_MS } );
 
-    const handleBpsRangeChange = ( event ) => {
+    const handleBpsRangeChange = ( newRange ) => {
         setBpsRange( {
-            minValue: Math.floor( Number( event.target.minValue !== undefined ? event.target.minValue : bpsRange.minValue ) ),
-            maxValue: Math.floor( Number( event.target.maxValue !== undefined ? event.target.maxValue : bpsRange.maxValue ) ),
+            minValue: Math.floor( Number( newRange.minValue !== undefined ? newRange.minValue : bpsRange.minValue ) ),
+            maxValue: Math.floor( Number( newRange.maxValue !== undefined ? newRange.maxValue : bpsRange.maxValue ) ),
         } );
-        console.log( `Selected BPS Range: Min = ${ event.target.minValue }, Max = ${ event.target.maxValue }` );
+        console.log( `Selected BPS Range: Min = ${ newRange.minValue }, Max = ${ newRange.maxValue }` );
     };
 
-    const handleDurationRangeChange = ( event ) => {
+    const handleDurationRangeChange = ( newRange ) => {
         setDurationRange( {
-            minValue: Math.floor( Number( event.target.minValue ) ),
-            maxValue: Math.floor( Number( event.target.maxValue ) ),
+            minValue: Math.floor( Number( newRange.minValue ) ),
+            maxValue: Math.floor( Number( newRange.maxValue ) ),
         } );
-        console.log( event.target );
-        console.log( `Selected Duration Range: Min = ${ event.target.minValue }, Max = ${ event.target.maxValue }` );
+        console.log( newRange );
+        console.log( `Selected Duration Range: Min = ${ newRange.minValue }, Max = ${ newRange.maxValue }` );
     };
 
-    const handleProbabilityThresholdRangeChange = ( event ) => {
+    const handleProbabilityThresholdRangeChange = ( newRange ) => {
         setProbabilityThresholdRange( {
-            minValue: Number( event.target.minValue ),
-            maxValue: Number( event.target.maxValue ),
+            minValue: Number( newRange.minValue ),
+            maxValue: Number( newRange.maxValue ),
         } );
-        console.log( `Selected Probability Threshold Range: Min = ${ event.target.minValue }, Max = ${ event.target.maxValue }` );
+        console.log( `Selected Probability Threshold Range: Min = ${ newRange.minValue }, Max = ${ newRange.maxValue }` );
     };
 
     const handlePlayModeChange = ( event ) => {

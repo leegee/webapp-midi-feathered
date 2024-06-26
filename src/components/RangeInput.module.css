@@ -1,0 +1,36 @@
+:root {
+    --midi-app-thumb-width: 2em;
+    --midi-app-thumb-width-half: calc(var(--midi-app-thumb-width) /2);
+}
+
+.custom-range-input {
+    position: relative;
+    min-height: 4em;
+    max-height: 4em;
+    min-width: 10em;
+    /* Width must account for the massive thumb */
+    width: calc(100% - var(--midi-app-thumb-width));
+    margin: 0 var(--midi-app-thumb-width-half) !important;
+    background-color: transparent;
+    border: var(--midi-app-border);
+    border-radius: var(--midi-app-border-radius);
+}
+
+.bar {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    background-color: hsl(39, 100%, 50%);
+}
+
+.handle {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    transform: translateX(-50%);
+    width: var(--midi-app-thumb-width);
+    height: 100%;
+    background-color: hsl(39, 100%, 42%);
+    cursor: ew-resize;
+    transition: position 30ms;
+}
