@@ -42,28 +42,29 @@ export default function MIDIComponent () {
                     </div>
                 );
             }
-        } else if ( !watchMidiInitialized ) {
+        }
+
+        else if ( !watchMidiInitialized ) {
             setMidiOutputs( () => {
                 const newOutputs = Array.from( midiAccess.outputs.values() ).reduce(
                     ( map, output ) => {
                         map[ output.name ] = output;
                         return map;
-                    },
-                    {}
+                    }, {}
                 );
-                console.log( 'Initialized MIDI outputs', newOutputs );
 
                 // Initialize the first MIDI output as the default selectedOutput
                 const firstOutputName = Object.keys( newOutputs )[ 0 ];
-                setSelectedOutput( firstOutputName );
-                selectedOutputRef.current = midiOutputs[ selectedOutput ];
+                setSelectedOutput( () => {
+                    selectedOutputRef.current = newOutputs[ firstOutputName ];
 
-                midiAccess.inputs.forEach( ( inputPort ) => {
-                    inputPort.onmidimessage = ( e ) =>
-                        onMidiMessage( e, setNotesOn, midiInputChannel );
+                    midiAccess.inputs.forEach( ( inputPort ) => {
+                        inputPort.onmidimessage = ( e ) => onMidiMessage( e, setNotesOn, midiInputChannel );
+                    } );
+
+                    return firstOutputName;
                 } );
 
-                console.log( 'Initialized MIDI inputs' );
                 return newOutputs;
             } );
 
@@ -74,7 +75,7 @@ export default function MIDIComponent () {
     useEffect( () => {
         if ( midiOutputs[ selectedOutput ] ) {
             selectedOutputRef.current = midiOutputs[ selectedOutput ];
-            console.log( 'Selected MIDI output:', selectedOutputRef.current );
+            console.log( 'Have now a selected MIDI output:', selectedOutputRef.current );
         }
     }, [ selectedOutput, midiOutputs ] );
 
