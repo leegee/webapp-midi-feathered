@@ -15,7 +15,7 @@ import InputChannelSelect from './InputChannelSelect';
 import OutputChannelSelect from './OutputChannelSelect';
 import OutputSelect from './OutputSelect';
 import PianoKeyboard from './Piano';
-import ChordNoteRandomiserComponent from './ChordNoteRandomiserComponent';
+import Featherise from './Featherise';
 
 let watchMidiInitialized = false;
 
@@ -81,7 +81,7 @@ export default function MIDIComponent () {
     return (
         <main className={ styles.main }>
             { selectedOutputRef.current && (
-                <ChordNoteRandomiserComponent selectedOutput={ selectedOutputRef.current } />
+                <Featherise selectedOutput={ selectedOutputRef.current } />
             ) }
 
             <footer className='bottom'>

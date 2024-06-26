@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { useAtom } from 'jotai';
 
-import styles from './ChordNoteRandomiserComponent.module.css';
+import styles from './Featherise.module.css';
 import RangeInput from './RangeInput';
 import { notesOnAtom } from '../lib/store';
 import { sendNoteWithDuration } from '../lib/midi-messages';
@@ -19,7 +19,7 @@ const MIN_DURATION_MS = 10;
 const MAX_DURATION_MS = 10000;
 const INITIAL_DURATION_MS = 1000;
 
-export default function ChordNoteRandomiserComponent ( { selectedOutput } ) {
+export default function Featherise ( { selectedOutput } ) {
     const [ notesOn ] = useAtom( notesOnAtom );
     const [ bps, setBps ] = useState( INITIAL_BPS );
     const [ playMode, setPlayMode ] = useState( playModeTypes.PROBABILITY );
@@ -136,6 +136,6 @@ export default function ChordNoteRandomiserComponent ( { selectedOutput } ) {
     );
 }
 
-ChordNoteRandomiserComponent.propTypes = {
+Featherise.propTypes = {
     selectedOutput: PropTypes.object.isRequired,
 };
