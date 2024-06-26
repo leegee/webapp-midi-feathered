@@ -72,7 +72,7 @@ export default function MIDIComponent () {
 
             watchMidiInitialized = true;
         }
-    }, [ midiAccess, setMidiAccess, midiOutputs, setMidiOutputs, setNotesOn, setSelectedOutput, selectedOutput, midiInputChannel ] );
+    }, [ midiAccess, setMidiAccess, midiOutputs, setMidiOutputs, setNotesOn, setSelectedOutput, selectedOutput, midiInputChannel, setCCs ] );
 
     useEffect( () => {
         if ( midiOutputs[ selectedOutput ] ) {

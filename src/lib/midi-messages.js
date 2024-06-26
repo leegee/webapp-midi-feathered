@@ -1,18 +1,18 @@
 // midi-messages.js
-import { CC_CMD, MIDI_CHANNEL_OUT, NOTE_OFF, NOTE_ON, EVENT_NOTE_START, EVENT_NOTE_STOP } from './constants';
+import { CC_CMD, NOTE_OFF, NOTE_ON, EVENT_NOTE_START, EVENT_NOTE_STOP } from './constants';
 
 const timersForPitches = {};
 const USE_EVENTS = false;
 
-export function startMidiNote ( pitch, velocity, selectedOutput, midiChannel = MIDI_CHANNEL_OUT ) {
-    selectedOutput.send( [ 0x90 +  midiChannel, pitch, velocity ] );
+export function startMidiNote ( pitch, velocity, selectedOutput, midiChannel ) {
+    selectedOutput.send( [ 0x90 + midiChannel, pitch, velocity ] );
 }
 
-export function stopMidiNote ( pitch, selectedOutput, midiChannel = MIDI_CHANNEL_OUT ) {
-    selectedOutput.send( [ 0x80 +  midiChannel, pitch, 0 ] );
+export function stopMidiNote ( pitch, selectedOutput, midiChannel ) {
+    selectedOutput.send( [ 0x80 + midiChannel, pitch, 0 ] );
 }
 
-export function sendNoteWithDuration (  pitch, velocity, durationMs, selectedOutput, midiChannel = MIDI_CHANNEL_OUT ) {
+export function sendNoteWithDuration ( pitch, velocity, durationMs, selectedOutput, midiChannel ) {
     // If the note is playing already
     if ( Object.hasOwn( timersForPitches, pitch ) ) {
         clearTimeout( timersForPitches[ pitch ] );
@@ -20,7 +20,7 @@ export function sendNoteWithDuration (  pitch, velocity, durationMs, selectedOut
     }
 
     startMidiNote( pitch, velocity, selectedOutput, midiChannel );
-    
+
     const timer = setTimeout(
         () => stopMidiNote( pitch, selectedOutput, midiChannel ),
         durationMs

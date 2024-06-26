@@ -4,8 +4,9 @@ import { useAtom } from 'jotai';
 
 import styles from './Featherise.module.css';
 import RangeInput from './RangeInput';
-import { notesOnAtom } from '../lib/store';
+import { notesOnAtom, midiOutputChannelAtom } from '../lib/store';
 import { sendNoteWithDuration } from '../lib/midi-messages';
+import { } from '../lib/store';
 
 const playModeTypes = {
     PROBABILITY: 1,
@@ -22,6 +23,8 @@ const useMinDurationMs = 10;
 
 export default function Featherise ( { selectedOutput } ) {
     const [ notesOn ] = useAtom( notesOnAtom );
+    const [ midiOutputChannel ] = useAtom( midiOutputChannelAtom );
+
     const [ probabilityThresholdRange, setProbabilityThresholdRange ] = useState( { minValue: 0, maxValue: 1 } );
     const [ playMode, setPlayMode ] = useState( playModeTypes.PROBABILITY );
     const [ bpsRange, setBpsRange ] = useState( { minValue: MIN_BPS, maxValue: MAX_BPS } );
@@ -75,7 +78,8 @@ export default function Featherise ( { selectedOutput } ) {
                     pitch,
                     notesOn[ pitch ].velocity,
                     useDurationMs,
-                    selectedOutput
+                    selectedOutput,
+                    midiOutputChannel
                 );
             } else if ( playMode === playModeTypes.PROBABILITY ) {
                 // Iterate through all notes based on the probability threshold
@@ -86,7 +90,8 @@ export default function Featherise ( { selectedOutput } ) {
                             pitch,
                             notesOn[ pitch ].velocity,
                             useDurationMs,
-                            selectedOutput
+                            selectedOutput,
+                            midiOutputChannel
                         );
                     }
                 } );
@@ -103,7 +108,7 @@ export default function Featherise ( { selectedOutput } ) {
         bpsListener();
 
         return () => clearTimeout( bpsTimer );
-    }, [ notesOn, playMode, probabilityThresholdRange, durationRange, selectedOutput, bpsRange.minValue, bpsRange.maxValue ] );
+    }, [ notesOn, playMode, probabilityThresholdRange, durationRange, selectedOutput, bpsRange.minValue, bpsRange.maxValue, midiOutputChannel ] );
 
     return (
         <section className="padded">
