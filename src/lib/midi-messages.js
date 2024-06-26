@@ -1,8 +1,8 @@
 // midi-messages.js
-import { MIDI_CHANNEL_OUT, NOTE_OFF, NOTE_ON, EVENT_NOTE_START, EVENT_NOTE_STOP } from './constants';
+import { CC_CMD, MIDI_CHANNEL_OUT, NOTE_OFF, NOTE_ON, EVENT_NOTE_START, EVENT_NOTE_STOP } from './constants';
 
 const timersForPitches = {};
-const  USE_EVENTS = false;
+const USE_EVENTS = false;
 
 export function startMidiNote ( pitch, velocity, selectedOutput, midiChannel = MIDI_CHANNEL_OUT ) {
     selectedOutput.send( [ 0x90 +  midiChannel, pitch, velocity ] );
@@ -33,7 +33,7 @@ export function sendNoteWithDuration (  pitch, velocity, durationMs, selectedOut
  * @fires EVENT_NOTE_START
  * @fires EVENT_NOTE_STOP
 */
-export function onMidiMessage ( event, setNotesOn, midiInputChannel ) {
+export function onMidiMessage ( event, setNotesOn, setCCs, midiInputChannel ) {
     const timestamp = Date.now();
     const midiChannel = event.data[ 0 ] & 0x0F;
 
@@ -46,10 +46,11 @@ export function onMidiMessage ( event, setNotesOn, midiInputChannel ) {
     const velocity = ( event.data.length > 2 ) ? event.data[ 2 ] : 1;
 
     // CC
-    // if ( cmd === 11 ) {
-    //     const ccNumber = pitch;
-    //     const ccValue = velocity;
-    // }
+    if ( cmd === CC_CMD ) {
+        setCCs( ( oldCCs ) => {
+            return { ...oldCCs, [ pitch ]: velocity };
+        } );
+    }
 
     setNotesOn( ( prevNotesOn ) => {
         const newNotesOn = { ...prevNotesOn };

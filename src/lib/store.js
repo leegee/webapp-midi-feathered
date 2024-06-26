@@ -8,3 +8,5 @@ export const notesOnAtom = atom({});
 
 export const midiInputChannelAtom = atom( MIDI_CHANNEL_IN );
 export const midiOutputChannelAtom = atom(MIDI_CHANNEL_OUT);
+
+export const CCsAtom = atom( {} );

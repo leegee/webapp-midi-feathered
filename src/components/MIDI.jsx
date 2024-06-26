@@ -6,7 +6,8 @@ import {
     midiOutputsAtom,
     selectedOutputAtom,
     midiInputChannelAtom,
-    notesOnAtom
+    notesOnAtom,
+    CCsAtom,
 } from '../lib/store';
 import { onMidiMessage } from '../lib/midi-messages';
 
@@ -23,6 +24,7 @@ export default function MIDIComponent () {
     const [ midiAccess, setMidiAccess ] = useAtom( midiAccessAtom );
     const [ midiOutputs, setMidiOutputs ] = useAtom( midiOutputsAtom );
     const [ selectedOutput, setSelectedOutput ] = useAtom( selectedOutputAtom );
+    const [ , setCCs ] = useAtom( CCsAtom );
     const [ midiInputChannel ] = useAtom( midiInputChannelAtom );
     const [ , setNotesOn ] = useAtom( notesOnAtom );
 
@@ -59,7 +61,7 @@ export default function MIDIComponent () {
                     selectedOutputRef.current = newOutputs[ firstOutputName ];
 
                     midiAccess.inputs.forEach( ( inputPort ) => {
-                        inputPort.onmidimessage = ( e ) => onMidiMessage( e, setNotesOn, midiInputChannel );
+                        inputPort.onmidimessage = ( e ) => onMidiMessage( e, setNotesOn, setCCs, midiInputChannel );
                     } );
 
                     return firstOutputName;
