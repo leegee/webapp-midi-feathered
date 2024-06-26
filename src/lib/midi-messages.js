@@ -1,5 +1,5 @@
 // midi-messages.js
-import { MIDI_CHANNEL_IN, MIDI_CHANNEL_OUT, NOTE_OFF, NOTE_ON, EVENT_NOTE_START, EVENT_NOTE_STOP } from './constants';
+import { MIDI_CHANNEL_OUT, NOTE_OFF, NOTE_ON, EVENT_NOTE_START, EVENT_NOTE_STOP } from './constants';
 
 const timersForPitches = {};
 const  USE_EVENTS = false;
@@ -37,11 +37,11 @@ export function sendNoteWithDuration (  pitch, velocity, durationMs, selectedOut
  * @fires EVENT_NOTE_START
  * @fires EVENT_NOTE_STOP
 */
-export function onMidiMessage ( event, setNotesOn, /*selectedOutput*/ ) {
+export function onMidiMessage ( event, setNotesOn, midiInputChannel ) {
     const timestamp = Date.now();
     const midiChannel = event.data[ 0 ] & 0x0F;
 
-    if ( midiChannel !== MIDI_CHANNEL_IN ) {
+    if ( midiChannel !== midiInputChannel ) {
         return;
     }
 

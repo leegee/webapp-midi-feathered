@@ -5,11 +5,14 @@ import {
     midiAccessAtom,
     midiOutputsAtom,
     selectedOutputAtom,
+    midiInputChannelAtom,
     notesOnAtom
 } from '../lib/store';
 import { onMidiMessage } from '../lib/midi-messages';
 
 import styles from './MIDI.module.css';
+import InputChannelSelect from './InputChannelSelect';
+import OutputChannelSelect from './OutputChannelSelect';
 import OutputSelect from './OutputSelect';
 import PianoKeyboard from './Piano';
 import ChordNoteRandomiserComponent from './ChordNoteRandomiserComponent';
@@ -20,6 +23,7 @@ export default function MIDIComponent () {
     const [ midiAccess, setMidiAccess ] = useAtom( midiAccessAtom );
     const [ midiOutputs, setMidiOutputs ] = useAtom( midiOutputsAtom );
     const [ selectedOutput, setSelectedOutput ] = useAtom( selectedOutputAtom );
+    const [ midiInputChannel ] = useAtom( midiInputChannelAtom );
     const [ , setNotesOn ] = useAtom( notesOnAtom );
 
     const selectedOutputRef = useRef( null );
@@ -56,7 +60,7 @@ export default function MIDIComponent () {
 
                 midiAccess.inputs.forEach( ( inputPort ) => {
                     inputPort.onmidimessage = ( e ) =>
-                        onMidiMessage( e, setNotesOn, selectedOutputRef.current );
+                        onMidiMessage( e, setNotesOn, midiInputChannel );
                 } );
 
                 console.log( 'Initialized MIDI inputs' );
@@ -65,7 +69,7 @@ export default function MIDIComponent () {
 
             watchMidiInitialized = true;
         }
-    }, [ midiAccess, setMidiAccess, midiOutputs, setMidiOutputs, setNotesOn, setSelectedOutput, selectedOutput ] );
+    }, [ midiAccess, setMidiAccess, midiOutputs, setMidiOutputs, setNotesOn, setSelectedOutput, selectedOutput, midiInputChannel ] );
 
     useEffect( () => {
         if ( midiOutputs[ selectedOutput ] ) {
@@ -87,8 +91,12 @@ export default function MIDIComponent () {
             ) }
 
             <footer className='bottom'>
+                <section className={ `padded ${ styles[ 'midi-channel-settings' ] }` }>
+                    <InputChannelSelect />
+                    <OutputChannelSelect />
+                </section>
                 <PianoKeyboard />
             </footer>
-        </main>
+        </main >
     );
 }
