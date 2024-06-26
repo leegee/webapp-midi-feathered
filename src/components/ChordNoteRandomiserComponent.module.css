@@ -18,12 +18,9 @@
 }
 
 label {
-    max-width: 10em;
-    width: 10em;
-    min-width: 10em;
-    overflow: hidden;
-    margin: 0 0.5em 0 1em;
-    display: inline-flex;
+    margin: 0;
+    display: flex;
+    width: 100%;
     align-items: center;
 }
 
