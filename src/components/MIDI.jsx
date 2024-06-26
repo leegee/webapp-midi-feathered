@@ -84,7 +84,7 @@ export default function MIDIComponent () {
                 <Featherise selectedOutput={ selectedOutputRef.current } />
             ) }
 
-            <footer className='bottom'>
+            <footer className={ styles.bottom }>
                 <section className={ `padded ${ styles[ 'midi-channel-settings' ] }` }>
                     <InputChannelSelect />
                     <OutputChannelSelect />
