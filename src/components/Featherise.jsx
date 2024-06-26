@@ -28,11 +28,11 @@ export default function Featherise ( { selectedOutput } ) {
     const [ durationRange, setDurationRange ] = useState( { minValue: MIN_DURATION_MS, maxValue: MAX_DURATION_MS } );
 
     const handleBpsRangeChange = ( event ) => {
-        const newRange = {
+        setBpsRange( {
             minValue: Math.floor( Number( event.target.minValue !== undefined ? event.target.minValue : bpsRange.minValue ) ),
             maxValue: Math.floor( Number( event.target.maxValue !== undefined ? event.target.maxValue : bpsRange.maxValue ) ),
-        };
-        setBpsRange( newRange );
+        } );
+        console.log( `Selected BPS Range: Min = ${ event.target.minValue }, Max = ${ event.target.maxValue }` );
     };
 
     const handleDurationRangeChange = ( event ) => {
@@ -40,6 +40,8 @@ export default function Featherise ( { selectedOutput } ) {
             minValue: Math.floor( Number( event.target.minValue ) ),
             maxValue: Math.floor( Number( event.target.maxValue ) ),
         } );
+        console.log( event.target );
+        console.log( `Selected Duration Range: Min = ${ event.target.minValue }, Max = ${ event.target.maxValue }` );
     };
 
     const handleProbabilityThresholdRangeChange = ( event ) => {
@@ -47,10 +49,12 @@ export default function Featherise ( { selectedOutput } ) {
             minValue: Number( event.target.minValue ),
             maxValue: Number( event.target.maxValue ),
         } );
+        console.log( `Selected Probability Threshold Range: Min = ${ event.target.minValue }, Max = ${ event.target.maxValue }` );
     };
 
     const handlePlayModeChange = ( event ) => {
-        setPlayMode( event.target.checked ? playModeTypes.PROBABILITY : playModeTypes.ONE_NOTE );
+        const newValue = event.target.checked ? playModeTypes.PROBABILITY : playModeTypes.ONE_NOTE;
+        setPlayMode( newValue );
     };
 
     useEffect( () => {
