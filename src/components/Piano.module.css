@@ -7,9 +7,13 @@
     --key-black-height: 3rem;
 }
 
-aside {
+.piano-keyboard {
     display: flex;
     background: black;
+    align-items: flex-start;
+    justify-content: space-between;
+    flex-direction: row;
+    flex-wrap: nowrap;
 }
 
 .piano-key {

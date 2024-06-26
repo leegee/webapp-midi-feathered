@@ -9,6 +9,7 @@ import {
 } from '../lib/store';
 import { onMidiMessage } from '../lib/midi-messages';
 
+import styles from './MIDI.module.css';
 import OutputSelect from './OutputSelect';
 import PianoKeyboard from './Piano';
 import ChordNoteRandomiserComponent from './ChordNoteRandomiserComponent';
@@ -74,18 +75,20 @@ export default function MIDIComponent () {
     }, [ selectedOutput, midiOutputs ] );
 
     return (
-        <main>
+        <main className={ styles.main }>
             <h1>
                 MIDI
                 <OutputSelect />
             </h1>
 
-            <PianoKeyboard />
 
             { selectedOutputRef.current && (
                 <ChordNoteRandomiserComponent selectedOutput={ selectedOutputRef.current } />
             ) }
 
+            <footer className='bottom'>
+                <PianoKeyboard />
+            </footer>
         </main>
     );
 }
