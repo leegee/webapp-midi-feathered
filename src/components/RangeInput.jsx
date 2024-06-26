@@ -1,8 +1,19 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 import styles from './SliderInput.module.css';
 
-const RangeInput = ( { min, max, minValue, maxValue, onChange } ) => {
+function debounce ( func, delay ) {
+    let timeoutId;
+    return function ( ...args ) {
+        if ( timeoutId ) {
+            clearTimeout( timeoutId );
+        }
+        timeoutId = setTimeout( () => {
+            func( ...args );
+        }, delay );
+    };
+}
+const RangeInput = ( { min, max, minValue, maxValue, onChange, debounceMs = 50 } ) => {
     const [ minPercentage, setMinPercentage ] = useState( ( ( minValue - min ) / ( max - min ) ) * 100 );
     const [ maxPercentage, setMaxPercentage ] = useState( ( ( maxValue - min ) / ( max - min ) ) * 100 );
 
@@ -11,16 +22,34 @@ const RangeInput = ( { min, max, minValue, maxValue, onChange } ) => {
         setMaxPercentage( ( ( maxValue - min ) / ( max - min ) ) * 100 );
     }, [ minValue, maxValue, min, max ] );
 
+    // Debounce logic
+    const debounceTimeout = useRef( null );
+
+    const debouncedOnChange = useRef(
+        debounce( ( newValues ) => {
+            onChange( newValues );
+        }, debounceMs )
+    ).current;
+
+    function handleDebouncedChange ( newValues ) {
+        if ( debounceTimeout.current ) {
+            clearTimeout( debounceTimeout.current );
+        }
+        debounceTimeout.current = setTimeout( () => {
+            debouncedOnChange( newValues );
+        }, debounceMs );
+    }
+
     const handleResize = ( newPercentage, isMin ) => {
         newPercentage = Math.max( 0, Math.min( 100, newPercentage ) );
         if ( isMin ) {
             setMinPercentage( Math.min( newPercentage, maxPercentage - 1 ) );
             const newValue = min + ( ( max - min ) * Math.min( newPercentage, maxPercentage - 1 ) ) / 100;
-            onChange( { minValue: newValue, maxValue } );
+            handleDebouncedChange( { minValue: newValue, maxValue } );
         } else {
             setMaxPercentage( Math.max( newPercentage, minPercentage + 1 ) );
             const newValue = min + ( ( max - min ) * Math.max( newPercentage, minPercentage + 1 ) ) / 100;
-            onChange( { minValue, maxValue: newValue } );
+            handleDebouncedChange( { minValue, maxValue: newValue } );
         }
     };
 
@@ -93,6 +122,7 @@ RangeInput.propTypes = {
     minValue: PropTypes.number.isRequired,
     maxValue: PropTypes.number.isRequired,
     onChange: PropTypes.func.isRequired,
+    debounceMs: PropTypes.number,
 };
 
 export default RangeInput;
