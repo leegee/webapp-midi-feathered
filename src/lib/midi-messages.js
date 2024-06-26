@@ -45,6 +45,12 @@ export function onMidiMessage ( event, setNotesOn, midiInputChannel ) {
     const pitch = event.data[ 1 ];
     const velocity = ( event.data.length > 2 ) ? event.data[ 2 ] : 1;
 
+    // CC
+    // if ( cmd === 11 ) {
+    //     const ccNumber = pitch;
+    //     const ccValue = velocity;
+    // }
+
     setNotesOn( ( prevNotesOn ) => {
         const newNotesOn = { ...prevNotesOn };
 
