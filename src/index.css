@@ -6,8 +6,8 @@
   --midi-app-fg: rgba(255, 255, 255, 0.87);
   --midi-app-bg: #242424;
   --midi-app-border: 1px solid grey;
-  --midi-app-padding: 1em;
   --midi-app-border-radius: 1pt;
+  --midi-app-padding: 1em;
 
   color-scheme: dark;
   color: var(--midi-app-fg);

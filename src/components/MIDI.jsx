@@ -10,13 +10,12 @@ import {
     CCsAtom,
 } from '../lib/store';
 import { onMidiMessage } from '../lib/midi-messages';
-
-import styles from './MIDI.module.css';
 import InputChannelSelect from './InputChannelSelect';
 import OutputChannelSelect from './OutputChannelSelect';
 import OutputSelect from './OutputSelect';
 import PianoKeyboard from './Piano';
 import Featherise from './Featherise';
+import styles from './MIDI.module.css';
 
 let watchMidiInitialized = false;
 
@@ -61,7 +60,8 @@ export default function MIDIComponent () {
                     selectedOutputRef.current = newOutputs[ firstOutputName ];
 
                     midiAccess.inputs.forEach( ( inputPort ) => {
-                        inputPort.onmidimessage = ( e ) => onMidiMessage( e, setNotesOn, setCCs, midiInputChannel );
+                        inputPort.onmidimessage = ( event ) => onMidiMessage(
+                            event, midiInputChannel, setNotesOn, setCCs );
                     } );
 
                     return firstOutputName;

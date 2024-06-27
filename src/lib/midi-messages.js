@@ -33,7 +33,7 @@ export function sendNoteWithDuration ( pitch, velocity, durationMs, selectedOutp
  * @fires EVENT_NOTE_START
  * @fires EVENT_NOTE_STOP
 */
-export function onMidiMessage ( event, setNotesOn, setCCs, midiInputChannel ) {
+export function onMidiMessage ( event, midiInputChannel, setNotesOn, setCCs ) {
     const timestamp = Date.now();
     const midiChannel = event.data[ 0 ] & 0x0F;
 
@@ -46,7 +46,7 @@ export function onMidiMessage ( event, setNotesOn, setCCs, midiInputChannel ) {
     const velocity = ( event.data.length > 2 ) ? event.data[ 2 ] : 1;
 
     // CC
-    if ( cmd === CC_CMD ) {
+    if ( cmd === CC_CMD ) { // pitch = cc, velocity = value
         setCCs( ( oldCCs ) => {
             return { ...oldCCs, [ pitch ]: velocity };
         } );

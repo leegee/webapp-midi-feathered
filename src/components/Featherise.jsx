@@ -2,11 +2,11 @@ import { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { useAtom } from 'jotai';
 
-import styles from './Featherise.module.css';
-import RangeInput from './RangeInput';
-import { notesOnAtom, midiOutputChannelAtom } from '../lib/store';
 import { sendNoteWithDuration } from '../lib/midi-messages';
-import { } from '../lib/store';
+import { notesOnAtom, CCsAtom, CCs2rangesAtom, midiOutputChannelAtom } from '../lib/store';
+import RangeInput from './RangeInput';
+import LearnCcComponent from './LearnCcComponent';
+import styles from './Featherise.module.css';
 
 const playModeTypes = {
     PROBABILITY: 1,
@@ -18,17 +18,17 @@ const MAX_BPS = 30;
 const MIN_DURATION_MS = 10;
 const MAX_DURATION_MS = 10000;
 
-const userMinProb = 0;
-const useMinDurationMs = 10;
-
 export default function Featherise ( { selectedOutput } ) {
     const [ notesOn ] = useAtom( notesOnAtom );
     const [ midiOutputChannel ] = useAtom( midiOutputChannelAtom );
+    const [ CCs ] = useAtom( CCsAtom );
+    const [ CCs2ranges, setCCs2ranges ] = useAtom( CCs2rangesAtom );
 
-    const [ probabilityThresholdRange, setProbabilityThresholdRange ] = useState( { minValue: 0, maxValue: 1 } );
     const [ playMode, setPlayMode ] = useState( playModeTypes.PROBABILITY );
+    const [ probabilityThresholdRange, setProbabilityThresholdRange ] = useState( { minValue: 0, maxValue: 1 } );
     const [ bpsRange, setBpsRange ] = useState( { minValue: MIN_BPS, maxValue: MAX_BPS } );
     const [ durationRange, setDurationRange ] = useState( { minValue: MIN_DURATION_MS, maxValue: MAX_DURATION_MS } );
+    const [ controllerNumbers, setControllerNumbers ] = useState( new Set() );
 
     const handleBpsRangeChange = ( newRange ) => {
         setBpsRange( {
@@ -60,6 +60,15 @@ export default function Featherise ( { selectedOutput } ) {
         );
     };
 
+    const setController = ( controllerNumber, rangeToModify ) => {
+        console.log( 'Learnt controller:', controllerNumber, rangeToModify );
+        setCCs2ranges( ( oldValue ) => {
+            const newValue = { ...oldValue, [ controllerNumber ]: rangeToModify };
+            setControllerNumbers( new Set( Object.keys( newValue ) ) );
+            return newValue;
+        } );
+    };
+
     useEffect( () => {
         let bpsTimer;
 
@@ -69,7 +78,7 @@ export default function Featherise ( { selectedOutput } ) {
                 return;
             }
 
-            const useDurationMs = useMinDurationMs + Math.random() * ( durationRange.maxValue - durationRange.minValue );
+            const useDurationMs = durationRange.minValue + Math.random() * ( durationRange.maxValue - durationRange.minValue );
 
             if ( playMode === playModeTypes.ONE_NOTE ) {
                 // Always play one random note
@@ -81,10 +90,12 @@ export default function Featherise ( { selectedOutput } ) {
                     selectedOutput,
                     midiOutputChannel
                 );
-            } else if ( playMode === playModeTypes.PROBABILITY ) {
-                // Iterate through all notes based on the probability threshold
+            }
+
+            else if ( playMode === playModeTypes.PROBABILITY ) {
+                // Mabye play some of the notes:
                 Object.keys( notesOn ).forEach( ( pitch ) => {
-                    const probability = userMinProb + ( 1 - userMinProb ) * Math.random();
+                    const probability = Math.random();
                     if ( probability < probabilityThresholdRange.maxValue && probability > probabilityThresholdRange.minValue ) {
                         sendNoteWithDuration(
                             pitch,
@@ -110,12 +121,28 @@ export default function Featherise ( { selectedOutput } ) {
         return () => clearTimeout( bpsTimer );
     }, [ notesOn, playMode, probabilityThresholdRange, durationRange, selectedOutput, bpsRange.minValue, bpsRange.maxValue, midiOutputChannel ] );
 
+    useEffect( () => {
+        for ( const key in CCs ) {
+            if ( controllerNumbers.has( key ) ) {
+                console.log( `Process range CC ${ key } :`, CCs2ranges[ key ] );
+                // These will go out of range but will maintain their relative values
+                CCs2ranges[ key ] = {
+                    minValue: 2 * CCs[ key ] - CCs2ranges[ key ].maxValue,
+                    maxValue: 2 * CCs[ key ] - CCs2ranges[ key ].minValue,
+                };
+            }
+        }
+    }, [ controllerNumbers, CCs2ranges, CCs ] );
+
     return (
-        <section className="padded">
-            <h2>Feathered Chords</h2>
+        <fieldset className={ `padded ${ styles.fieldset }` }>
+            <legend className={ styles.legend }>Feathered Chords</legend>
 
             <div className={ styles.row }>
-                <label htmlFor="bps-input">{ bpsRange.minValue }-{ bpsRange.maxValue } notes per second:</label>
+                <label htmlFor="bps-input">
+                    { bpsRange.minValue }-{ bpsRange.maxValue } notes per second:
+                    <LearnCcComponent onChange={ ( controllerNumber ) => setController( controllerNumber, bpsRange ) } />
+                </label>
                 <RangeInput
                     id='bps-input'
                     min={ MIN_BPS }
@@ -129,6 +156,7 @@ export default function Featherise ( { selectedOutput } ) {
             <div className={ styles.row }>
                 <label htmlFor="duration-input">
                     Duration Range: { Math.floor( durationRange.minValue ) } ms - { Math.floor( durationRange.maxValue ) } ms
+                    <LearnCcComponent onChange={ ( controllerNumber ) => setController( controllerNumber, durationRange ) } />
                 </label>
                 <RangeInput
                     id='duration-input'
@@ -148,6 +176,7 @@ export default function Featherise ( { selectedOutput } ) {
                         onChange={ handlePlayModeChange }
                     />
                     Probability Threshold Range
+                    <LearnCcComponent onChange={ ( controllerNumber ) => setController( controllerNumber, probabilityThresholdRange ) } />
                 </label>
                 { playMode === playModeTypes.PROBABILITY && (
                     <RangeInput
@@ -159,7 +188,7 @@ export default function Featherise ( { selectedOutput } ) {
                     />
                 ) }
             </div>
-        </section>
+        </fieldset>
     );
 }
 

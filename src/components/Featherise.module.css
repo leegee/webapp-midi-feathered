@@ -1,12 +1,13 @@
-.bpsInputContainer {
-    display: inline-flex;
-    align-items: center;
+.fieldset {
+    border: var(--midi-app-border);
+    border-radius: var(--midi-app-border-radius);
 }
 
-.bpsInput,
-.probabilityInput {
-    margin-left: var(--midi-app-padding);
-    width: 10em;
+.legend {
+    border: var(--midi-app-border);
+    border-radius: var(--midi-app-border-radius);
+    font-weight: normal;
+    padding: 0.25em 1em;
 }
 
 .row {
@@ -28,11 +29,4 @@
 
 .row input {
     margin-right: 1em;
-}
-
-input[type=range] {
-    font-size: 200%;
-    min-width: 10em;
-    width: 10em;
-    max-width: 10em;
 }

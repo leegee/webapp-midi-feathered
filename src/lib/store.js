@@ -10,3 +10,4 @@ export const midiInputChannelAtom = atom( DEFAULT_MIDI_CHANNEL_IN );
 export const midiOutputChannelAtom = atom( DEFAULT_MIDI_CHANNEL_OUT );
 
 export const CCsAtom = atom( {} );
+export const CCs2rangesAtom = atom( {} );
