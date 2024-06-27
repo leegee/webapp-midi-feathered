@@ -7,7 +7,6 @@ import {
     selectedOutputAtom,
     midiInputChannelAtom,
     notesOnAtom,
-    CCsAtom,
 } from '../lib/store';
 import { onMidiMessage } from '../lib/midi-messages';
 import InputChannelSelect from './InputChannelSelect';
@@ -23,7 +22,6 @@ export default function MIDIComponent () {
     const [ midiAccess, setMidiAccess ] = useAtom( midiAccessAtom );
     const [ midiOutputs, setMidiOutputs ] = useAtom( midiOutputsAtom );
     const [ selectedOutput, setSelectedOutput ] = useAtom( selectedOutputAtom );
-    const [ , setCCs ] = useAtom( CCsAtom );
     const [ midiInputChannel ] = useAtom( midiInputChannelAtom );
     const [ , setNotesOn ] = useAtom( notesOnAtom );
 
@@ -61,7 +59,7 @@ export default function MIDIComponent () {
 
                     midiAccess.inputs.forEach( ( inputPort ) => {
                         inputPort.onmidimessage = ( event ) => onMidiMessage(
-                            event, midiInputChannel, setNotesOn, setCCs );
+                            event, midiInputChannel, setNotesOn );
                     } );
 
                     return firstOutputName;
@@ -72,7 +70,7 @@ export default function MIDIComponent () {
 
             watchMidiInitialized = true;
         }
-    }, [ midiAccess, setMidiAccess, midiOutputs, setMidiOutputs, setNotesOn, setSelectedOutput, selectedOutput, midiInputChannel, setCCs ] );
+    }, [ midiAccess, setMidiAccess, midiOutputs, setMidiOutputs, setNotesOn, setSelectedOutput, selectedOutput, midiInputChannel ] );
 
     useEffect( () => {
         if ( midiOutputs[ selectedOutput ] ) {

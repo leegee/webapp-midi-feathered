@@ -3,9 +3,8 @@ import PropTypes from 'prop-types';
 import { useAtom } from 'jotai';
 
 import { sendNoteWithDuration } from '../lib/midi-messages';
-import { notesOnAtom, CCsAtom, CCs2rangesAtom, midiOutputChannelAtom } from '../lib/store';
+import { notesOnAtom, midiOutputChannelAtom } from '../lib/store';
 import RangeInput from './RangeInput';
-import LearnCcComponent from './LearnCcComponent';
 import styles from './Featherise.module.css';
 
 const playModeTypes = {
@@ -21,14 +20,11 @@ const MAX_DURATION_MS = 10000;
 export default function Featherise ( { selectedOutput } ) {
     const [ notesOn ] = useAtom( notesOnAtom );
     const [ midiOutputChannel ] = useAtom( midiOutputChannelAtom );
-    const [ CCs ] = useAtom( CCsAtom );
-    const [ CCs2ranges, setCCs2ranges ] = useAtom( CCs2rangesAtom );
 
     const [ playMode, setPlayMode ] = useState( playModeTypes.PROBABILITY );
     const [ probabilityThresholdRange, setProbabilityThresholdRange ] = useState( { minValue: 0, maxValue: 1 } );
     const [ bpsRange, setBpsRange ] = useState( { minValue: MIN_BPS, maxValue: MAX_BPS } );
     const [ durationRange, setDurationRange ] = useState( { minValue: MIN_DURATION_MS, maxValue: MAX_DURATION_MS } );
-    const [ controllerNumbers, setControllerNumbers ] = useState( new Set() );
 
     const handleBpsRangeChange = ( newRange ) => {
         setBpsRange( {
@@ -58,15 +54,6 @@ export default function Featherise ( { selectedOutput } ) {
         setPlayMode(
             event.target.checked ? playModeTypes.PROBABILITY : playModeTypes.ONE_NOTE
         );
-    };
-
-    const setController = ( controllerNumber, rangeToModify ) => {
-        console.log( 'Learnt controller:', controllerNumber, rangeToModify );
-        setCCs2ranges( ( oldValue ) => {
-            const newValue = { ...oldValue, [ controllerNumber ]: rangeToModify };
-            setControllerNumbers( new Set( Object.keys( newValue ) ) );
-            return newValue;
-        } );
     };
 
     useEffect( () => {
@@ -121,19 +108,6 @@ export default function Featherise ( { selectedOutput } ) {
         return () => clearTimeout( bpsTimer );
     }, [ notesOn, playMode, probabilityThresholdRange, durationRange, selectedOutput, bpsRange.minValue, bpsRange.maxValue, midiOutputChannel ] );
 
-    useEffect( () => {
-        for ( const key in CCs ) {
-            if ( controllerNumbers.has( key ) ) {
-                console.log( `Process range CC ${ key } :`, CCs2ranges[ key ] );
-                // These will go out of range but will maintain their relative values
-                CCs2ranges[ key ] = {
-                    minValue: 2 * CCs[ key ] - CCs2ranges[ key ].maxValue,
-                    maxValue: 2 * CCs[ key ] - CCs2ranges[ key ].minValue,
-                };
-            }
-        }
-    }, [ controllerNumbers, CCs2ranges, CCs ] );
-
     return (
         <fieldset className={ `padded ${ styles.fieldset }` }>
             <legend className={ styles.legend }>Feathered Chords</legend>
@@ -141,7 +115,6 @@ export default function Featherise ( { selectedOutput } ) {
             <div className={ styles.row }>
                 <label htmlFor="bps-input">
                     { bpsRange.minValue }-{ bpsRange.maxValue } notes per second:
-                    <LearnCcComponent onChange={ ( controllerNumber ) => setController( controllerNumber, bpsRange ) } />
                 </label>
                 <RangeInput
                     id='bps-input'
@@ -156,7 +129,6 @@ export default function Featherise ( { selectedOutput } ) {
             <div className={ styles.row }>
                 <label htmlFor="duration-input">
                     Duration Range: { Math.floor( durationRange.minValue ) } ms - { Math.floor( durationRange.maxValue ) } ms
-                    <LearnCcComponent onChange={ ( controllerNumber ) => setController( controllerNumber, durationRange ) } />
                 </label>
                 <RangeInput
                     id='duration-input'
@@ -176,7 +148,6 @@ export default function Featherise ( { selectedOutput } ) {
                         onChange={ handlePlayModeChange }
                     />
                     Probability Threshold Range
-                    <LearnCcComponent onChange={ ( controllerNumber ) => setController( controllerNumber, probabilityThresholdRange ) } />
                 </label>
                 { playMode === playModeTypes.PROBABILITY && (
                     <RangeInput
