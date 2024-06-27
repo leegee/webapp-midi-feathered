@@ -67,6 +67,8 @@ export default function Featherise ( { selectedOutput } ) {
         );
     };
 
+    const percentage = ( real ) => Math.floor( real * 100 );
+
     useEffect( () => {
         let bpsTimer;
 
@@ -125,7 +127,7 @@ export default function Featherise ( { selectedOutput } ) {
 
             <div className={ styles.row }>
                 <label htmlFor="bps-input">
-                    { bpsRange.minValue }-{ bpsRange.maxValue } notes per second:
+                    { bpsRange.minValue }-{ bpsRange.maxValue } notes per second
                 </label>
                 <RangeInput
                     id='bps-input'
@@ -172,8 +174,8 @@ export default function Featherise ( { selectedOutput } ) {
                         checked={ playMode === playModeTypes.PROBABILITY }
                         onChange={ handlePlayModeChange }
                     />
-                    { probabilityThresholdRange.minValue }-{ probabilityThresholdRange.maxValue }
-                    Probability Threshold Range
+                    Probability Threshold Range:&nbsp;
+                    { percentage( probabilityThresholdRange.minValue ) }-{ percentage( probabilityThresholdRange.maxValue ) }%
                 </label>
                 { playMode === playModeTypes.PROBABILITY && (
                     <RangeInput
