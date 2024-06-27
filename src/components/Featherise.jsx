@@ -14,8 +14,10 @@ const playModeTypes = {
 
 const MIN_BPS = 1;
 const MAX_BPS = 30;
+const MIN_FREQ_MS = 10;
+const MAX_FREQ_MS = 10000;
 const MIN_DURATION_MS = 10;
-const MAX_DURATION_MS = 10000;
+const MAX_DURATION_MS = 5000;
 
 export default function Featherise ( { selectedOutput } ) {
     const [ notesOn ] = useAtom( notesOnAtom );
@@ -23,8 +25,9 @@ export default function Featherise ( { selectedOutput } ) {
 
     const [ playMode, setPlayMode ] = useState( playModeTypes.PROBABILITY );
     const [ probabilityThresholdRange, setProbabilityThresholdRange ] = useState( { minValue: 0, maxValue: 1 } );
-    const [ bpsRange, setBpsRange ] = useState( { minValue: MIN_BPS, maxValue: MAX_BPS } );
     const [ durationRange, setDurationRange ] = useState( { minValue: MIN_DURATION_MS, maxValue: MAX_DURATION_MS } );
+    const [ bpsRange, setBpsRange ] = useState( { minValue: MIN_BPS, maxValue: MAX_BPS } );
+    const [ freqRange, setFreqRange ] = useState( { minValue: MIN_FREQ_MS, maxValue: MAX_FREQ_MS } );
 
     const handleBpsRangeChange = ( newRange ) => {
         setBpsRange( {
@@ -32,6 +35,14 @@ export default function Featherise ( { selectedOutput } ) {
             maxValue: Math.floor( Number( newRange.maxValue !== undefined ? newRange.maxValue : bpsRange.maxValue ) ),
         } );
         console.log( `Selected BPS Range: Min = ${ newRange.minValue }, Max = ${ newRange.maxValue }` );
+    };
+
+    const handleFreqRangeChange = ( newRange ) => {
+        setFreqRange( {
+            minValue: Math.floor( Number( newRange.minValue ) ),
+            maxValue: Math.floor( Number( newRange.maxValue ) ),
+        } );
+        console.log( `Selected Freq Range: Min = ${ newRange.minValue }, Max = ${ newRange.maxValue }` );
     };
 
     const handleDurationRangeChange = ( newRange ) => {
@@ -65,7 +76,7 @@ export default function Featherise ( { selectedOutput } ) {
                 return;
             }
 
-            const useDurationMs = durationRange.minValue + Math.random() * ( durationRange.maxValue - durationRange.minValue );
+            const useDurationMs = freqRange.minValue + Math.random() * ( freqRange.maxValue - freqRange.minValue );
 
             if ( playMode === playModeTypes.ONE_NOTE ) {
                 // Always play one random note
@@ -106,7 +117,7 @@ export default function Featherise ( { selectedOutput } ) {
         bpsListener();
 
         return () => clearTimeout( bpsTimer );
-    }, [ notesOn, playMode, probabilityThresholdRange, durationRange, selectedOutput, bpsRange.minValue, bpsRange.maxValue, midiOutputChannel ] );
+    }, [ notesOn, playMode, probabilityThresholdRange, freqRange, selectedOutput, bpsRange.minValue, bpsRange.maxValue, midiOutputChannel ] );
 
     return (
         <fieldset className={ `padded ${ styles.fieldset }` }>
@@ -127,8 +138,22 @@ export default function Featherise ( { selectedOutput } ) {
             </div>
 
             <div className={ styles.row }>
+                <label htmlFor="freq-input">
+                    Occurance Range: { Math.floor( freqRange.minValue ) } ms - { Math.floor( freqRange.maxValue ) } ms
+                </label>
+                <RangeInput
+                    id='freq-input'
+                    min={ MIN_FREQ_MS }
+                    max={ MAX_FREQ_MS }
+                    minValue={ freqRange.minValue }
+                    maxValue={ freqRange.maxValue }
+                    onChange={ handleFreqRangeChange }
+                />
+            </div>
+
+            <div className={ styles.row }>
                 <label htmlFor="duration-input">
-                    Duration Range: { Math.floor( durationRange.minValue ) } ms - { Math.floor( durationRange.maxValue ) } ms
+                    Duration Range: { Math.floor( freqRange.minValue ) } ms - { Math.floor( freqRange.maxValue ) } ms
                 </label>
                 <RangeInput
                     id='duration-input'
@@ -147,6 +172,7 @@ export default function Featherise ( { selectedOutput } ) {
                         checked={ playMode === playModeTypes.PROBABILITY }
                         onChange={ handlePlayModeChange }
                     />
+                    { probabilityThresholdRange.minValue }-{ probabilityThresholdRange.maxValue }
                     Probability Threshold Range
                 </label>
                 { playMode === playModeTypes.PROBABILITY && (

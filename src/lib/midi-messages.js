@@ -19,6 +19,7 @@ export function sendNoteWithDuration ( pitch, velocity, durationMs, selectedOutp
         stopMidiNote( pitch, selectedOutput, midiChannel );
     }
 
+    console.debug( 'SEND', pitch );
     startMidiNote( pitch, velocity, selectedOutput, midiChannel );
 
     const timer = setTimeout(
