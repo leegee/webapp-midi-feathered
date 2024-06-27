@@ -14,8 +14,8 @@ const playModeTypes = {
 
 const MIN_BPS = 1;
 const MAX_BPS = 30;
-const MIN_FREQ_MS = 10;
-const MAX_FREQ_MS = 10000;
+const MIN_SPEED_MS = 10;
+const MAX_SPEED_MS = 10000;
 const MIN_DURATION_MS = 10;
 const MAX_DURATION_MS = 5000;
 
@@ -27,7 +27,7 @@ export default function Featherise ( { selectedOutput } ) {
     const [ probabilityThresholdRange, setProbabilityThresholdRange ] = useState( { minValue: 0, maxValue: 1 } );
     const [ durationRange, setDurationRange ] = useState( { minValue: MIN_DURATION_MS, maxValue: MAX_DURATION_MS } );
     const [ bpsRange, setBpsRange ] = useState( { minValue: MIN_BPS, maxValue: MAX_BPS } );
-    const [ freqRange, setFreqRange ] = useState( { minValue: MIN_FREQ_MS, maxValue: MAX_FREQ_MS } );
+    const [ speedRange, setSpeedRange ] = useState( { minValue: MIN_SPEED_MS, maxValue: MAX_SPEED_MS } );
 
     const handleBpsRangeChange = ( newRange ) => {
         setBpsRange( {
@@ -37,12 +37,12 @@ export default function Featherise ( { selectedOutput } ) {
         console.log( `Selected BPS Range: Min = ${ newRange.minValue }, Max = ${ newRange.maxValue }` );
     };
 
-    const handleFreqRangeChange = ( newRange ) => {
-        setFreqRange( {
+    const handleSpeedRangeChange = ( newRange ) => {
+        setSpeedRange( {
             minValue: Math.floor( Number( newRange.minValue ) ),
             maxValue: Math.floor( Number( newRange.maxValue ) ),
         } );
-        console.log( `Selected Freq Range: Min = ${ newRange.minValue }, Max = ${ newRange.maxValue }` );
+        console.log( `Selected Speed Range: Min = ${ newRange.minValue }, Max = ${ newRange.maxValue }` );
     };
 
     const handleDurationRangeChange = ( newRange ) => {
@@ -76,7 +76,7 @@ export default function Featherise ( { selectedOutput } ) {
                 return;
             }
 
-            const useDurationMs = freqRange.minValue + Math.random() * ( freqRange.maxValue - freqRange.minValue );
+            const useDurationMs = speedRange.minValue + Math.random() * ( speedRange.maxValue - speedRange.minValue );
 
             if ( playMode === playModeTypes.ONE_NOTE ) {
                 // Always play one random note
@@ -117,7 +117,7 @@ export default function Featherise ( { selectedOutput } ) {
         bpsListener();
 
         return () => clearTimeout( bpsTimer );
-    }, [ notesOn, playMode, probabilityThresholdRange, freqRange, selectedOutput, bpsRange.minValue, bpsRange.maxValue, midiOutputChannel ] );
+    }, [ notesOn, playMode, probabilityThresholdRange, speedRange, selectedOutput, bpsRange.minValue, bpsRange.maxValue, midiOutputChannel ] );
 
     return (
         <fieldset className={ `padded ${ styles.fieldset }` }>
@@ -138,22 +138,22 @@ export default function Featherise ( { selectedOutput } ) {
             </div>
 
             <div className={ styles.row }>
-                <label htmlFor="freq-input">
-                    Occurance Range: { Math.floor( freqRange.minValue ) } ms - { Math.floor( freqRange.maxValue ) } ms
+                <label htmlFor="speed-input">
+                    Speed: { Math.floor( speedRange.minValue ) } ms - { Math.floor( speedRange.maxValue ) } ms
                 </label>
                 <RangeInput
-                    id='freq-input'
-                    min={ MIN_FREQ_MS }
-                    max={ MAX_FREQ_MS }
-                    minValue={ freqRange.minValue }
-                    maxValue={ freqRange.maxValue }
-                    onChange={ handleFreqRangeChange }
+                    id='speed-input'
+                    min={ MIN_SPEED_MS }
+                    max={ MAX_SPEED_MS }
+                    minValue={ speedRange.minValue }
+                    maxValue={ speedRange.maxValue }
+                    onChange={ handleSpeedRangeChange }
                 />
             </div>
 
             <div className={ styles.row }>
                 <label htmlFor="duration-input">
-                    Duration Range: { Math.floor( freqRange.minValue ) } ms - { Math.floor( freqRange.maxValue ) } ms
+                    Duration Range: { Math.floor( speedRange.minValue ) } ms - { Math.floor( speedRange.maxValue ) } ms
                 </label>
                 <RangeInput
                     id='duration-input'
