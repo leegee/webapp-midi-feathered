@@ -1,0 +1,11 @@
+/* LearnCcComponent.module.css */
+
+.learnButton {
+    margin-left: auto;
+    cursor: pointer;
+    font-weight: lighter;
+    text-transform: lowercase;
+    font-variant: small-caps;
+    font-size: small;
+    opacity: 50%;
+}
