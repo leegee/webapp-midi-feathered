@@ -93,11 +93,12 @@ export default function Featherise ( { selectedOutput } ) {
 
     const load = async () => {
         try {
-            const settings = await loadJson( event.target );
+            const settings = await loadJson();
+            console.log( settings );
             setBpsRange( settings.bpsRange );
             setSpeedRange( settings.speedRange );
             setDurationRange( settings.durationRange );
-            setProbabilityThresholdRange( probabilityThresholdRange );
+            setProbabilityThresholdRange( settings.probabilityThresholdRange );
         } catch ( e ) {
             alert( e );
         }
