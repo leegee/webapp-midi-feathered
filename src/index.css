@@ -64,3 +64,11 @@ label {
 select {
   padding: 0.6em;
 }
+
+select {
+  border-color: transparent;
+}
+
+select:hover {
+  border-color: var(--midi-app-fg);
+}
