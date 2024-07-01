@@ -5,13 +5,13 @@ import styles from './NotesOnCanvas.module.css';
 
 const CANVAS_WIDTH = 88 * 9;
 const CANVAS_HEIGHT = 100;
-const NOTE_HEIGHT = 5;
-const RENDER_INTERVAL = 50;
+const NOTE_HEIGHT = 1;
 
 export default function NoteList () {
     const [ notesOn ] = useAtom( notesOnAtom );
     const canvasRef = useRef( null );
     const bufferCanvasRef = useRef( null ); // Buffer canvas to optimize rendering
+    const requestIdRef = useRef( null );
 
     useEffect( () => {
         const canvas = canvasRef.current;
@@ -20,31 +20,35 @@ export default function NoteList () {
         const bufferCtx = bufferCanvas.getContext( '2d' );
         const width = canvas.width;
 
-        // Initialize buffer canvas
         bufferCanvas.width = width;
         bufferCanvas.height = CANVAS_HEIGHT;
 
-        // Function to draw the notes
         const drawNotes = () => {
             // Clear buffer canvas
             bufferCtx.clearRect( 0, 0, width, CANVAS_HEIGHT );
 
-            // Copy current canvas content to buffer canvas shifted upwards
+            // Scrolling: draw previous frame shifted upwards by note height
             bufferCtx.drawImage( canvas, 0, NOTE_HEIGHT, width, CANVAS_HEIGHT - NOTE_HEIGHT, 0, 0, width, CANVAS_HEIGHT - NOTE_HEIGHT );
 
-            // Draw new notes at the bottom with fixed height (NOTE_HEIGHT)
+            // Draw new notes
             Object.entries( notesOn ).forEach( ( [ key, value ] ) => {
                 const pitch = parseInt( key, 10 );
+                const velocity = value.velocity;
 
-                // Calculate y position based on time and render interval
+                // Calculate hue based on pitch (lowest notes are red, highest are violet)
+                const hue = mapRange( pitch, 21, 108, 0, 300 );
+
+                // Calculate luminosity based on velocity and clamp to 2-99
+                const luminosity = Math.max( 2, Math.min( 99, ( ( velocity / 127 ) * 100 ) ) );
+
+                const colourStr = `hsl(${ hue }, 100%, ${ luminosity }%)`;
+
                 const startY = CANVAS_HEIGHT - NOTE_HEIGHT;
                 const noteHeight = NOTE_HEIGHT;
+                const xPosition = ( pitch - 21 ) * ( width / 88 );
 
-                // Calculate x position based on MIDI note value
-                const xPosition = ( pitch - 21 ) * ( width / 88 ); // MIDI note range 21-108
-
-                // Draw the note rectangle on buffer canvas
-                bufferCtx.fillStyle = 'white';
+                // Draw the note on the buffer canvas
+                bufferCtx.fillStyle = colourStr;
                 bufferCtx.fillRect( xPosition, startY, width / 88, noteHeight );
             } );
 
@@ -53,17 +57,25 @@ export default function NoteList () {
 
             // Draw buffer canvas at the top of the main canvas
             ctx.drawImage( bufferCanvas, 0, 0 );
+
+            // Request next animation frame
+            requestIdRef.current = requestAnimationFrame( drawNotes );
         };
 
-        // Render loop
-        const renderLoop = setInterval( () => {
-            drawNotes();
-        }, RENDER_INTERVAL );
+        // Start animation loop
+        requestIdRef.current = requestAnimationFrame( drawNotes );
 
         return () => {
-            clearInterval( renderLoop );
+            // Clean up: cancel animation frame on component unmount
+            if ( requestIdRef.current ) {
+                cancelAnimationFrame( requestIdRef.current );
+            }
         };
     }, [ notesOn ] );
+
+    function mapRange ( value, minIn, maxIn, minOut, maxOut ) {
+        return ( ( value - minIn ) * ( maxOut - minOut ) ) / ( maxIn - minIn ) + minOut;
+    }
 
     return (
         <section className={ styles.canvas }>
