@@ -26,8 +26,6 @@ export default function NoteList () {
 
         // Function to draw the notes
         const drawNotes = () => {
-            const now = Date.now();
-
             // Clear buffer canvas
             bufferCtx.clearRect( 0, 0, width, CANVAS_HEIGHT );
 
@@ -36,14 +34,14 @@ export default function NoteList () {
 
             // Draw new notes at the bottom with fixed height (NOTE_HEIGHT)
             Object.entries( notesOn ).forEach( ( [ key, value ] ) => {
-                const startTime = value.timestamp;
+                const pitch = parseInt( key, 10 );
 
                 // Calculate y position based on time and render interval
-                const startY = CANVAS_HEIGHT - ( ( now - startTime ) * CANVAS_HEIGHT / 1000 );
+                const startY = CANVAS_HEIGHT - NOTE_HEIGHT;
                 const noteHeight = NOTE_HEIGHT;
 
                 // Calculate x position based on MIDI note value
-                const xPosition = ( parseInt( key, 10 ) - 21 ) * ( width / 88 ); // MIDI note range 21-108
+                const xPosition = ( pitch - 21 ) * ( width / 88 ); // MIDI note range 21-108
 
                 // Draw the note rectangle on buffer canvas
                 bufferCtx.fillStyle = 'white';
@@ -71,6 +69,6 @@ export default function NoteList () {
         <section className={ styles.canvas }>
             <canvas ref={ canvasRef } width={ CANVAS_WIDTH } height={ CANVAS_HEIGHT }></canvas>
             <canvas ref={ bufferCanvasRef } style={ { display: 'none' } }></canvas>
-        </section >
+        </section>
     );
 }
