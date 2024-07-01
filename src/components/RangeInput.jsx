@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
-import styles from './SliderInput.module.css';
+import styles from './RangeInput.module.css';
 
 function debounce ( func, delay ) {
     let timeoutId;

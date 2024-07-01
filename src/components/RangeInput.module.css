@@ -30,7 +30,7 @@
     transform: translateX(-50%);
     width: var(--midi-app-thumb-width);
     height: 100%;
-    background-color: hsl(39, 100%, 42%);
     cursor: ew-resize;
     transition: position 30ms;
+    background-color: hsl(39, 100%, 42%);
 }
