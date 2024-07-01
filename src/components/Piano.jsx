@@ -1,5 +1,3 @@
-// eslint-disable-next-line no-unused-vars
-import React from 'react';
 import PropTypes from 'prop-types';
 import { useAtom } from 'jotai';
 
@@ -33,13 +31,15 @@ export default function PianoKeyboard () {
 
     return (
         <section className={ `padded ${ styles[ 'piano-keyboard' ] }` }>
-            { midiPitches.map( ( pitch ) => (
-                <PianoKey
-                    key={ pitch }
-                    pitch={ pitch }
-                    isHighlighted={ notesOn[ pitch ] ? true : false }
-                />
-            ) ) }
+            <div>
+                { midiPitches.map( ( pitch ) => (
+                    <PianoKey
+                        key={ pitch }
+                        pitch={ pitch }
+                        isHighlighted={ notesOn[ pitch ] ? true : false }
+                    />
+                ) ) }
+            </div>
         </section>
     );
 }

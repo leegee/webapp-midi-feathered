@@ -94,6 +94,7 @@ export default function MIDIComponent () {
                 <section className={ `padded ${ styles[ 'midi-channel-settings' ] }` }>
                     <OutputSelect />
                 </section>
+
                 <PianoKeyboard />
             </footer>
         </main >

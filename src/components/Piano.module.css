@@ -5,6 +5,10 @@
     --black-key-width-scale: 0.7;
 }
 
+.piano-keyboard {
+    display: flex;
+    justify-content: center;
+}
 
 .piano-key {
     cursor: not-allowed;
