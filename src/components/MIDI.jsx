@@ -86,12 +86,9 @@ export default function MIDIComponent () {
             ) }
 
             <footer className={ styles.bottom }>
-                <section className={ `padded ${ styles[ 'midi-channel-settings' ] }` }>
+                <section className={ `padded ${ styles[ 'midi-settings' ] }` }>
                     <InputChannelSelect />
                     <OutputChannelSelect />
-                </section>
-
-                <section className={ `padded ${ styles[ 'midi-channel-settings' ] }` }>
                     <DeviceSelect />
                 </section>
 

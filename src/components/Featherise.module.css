@@ -7,7 +7,31 @@
     border: var(--midi-app-border);
     border-radius: var(--midi-app-border-radius);
     font-weight: normal;
-    padding: 0.25em 1em;
+    padding: 0.3em 0.6em;
+    position: relative;
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.settings {
+    margin-left: auto;
+}
+
+.settings button {
+    font-size: 50%;
+    font-weight: 100;
+    text-transform: uppercase;
+    font-variant: small-caps;
+    opacity: 50%;
+}
+
+.settings button:hover {
+    opacity: 100%;
+    cursor: pointer;
 }
 
 .row {

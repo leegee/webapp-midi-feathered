@@ -5,6 +5,7 @@ import { useAtom } from 'jotai';
 import { sendNoteWithDuration } from '../lib/midi-messages';
 import { notesOnAtom, midiOutputChannelAtom } from '../lib/store';
 import RangeInput from './RangeInput';
+import { loadJson, saveJson } from '../lib/settings-files';
 import styles from './Featherise.module.css';
 
 const playModeTypes = {
@@ -69,10 +70,43 @@ export default function Featherise ( { selectedOutput } ) {
 
     const percentage = ( real ) => Math.floor( real * 100 );
 
+    const save = () => {
+        saveJson( {
+            bpsRange: {
+                minValue: bpsRange.minValue,
+                maxValue: bpsRange.maxValue,
+            },
+            speedRange: {
+                minValue: speedRange.minValue,
+                maxValue: speedRange.maxValue,
+            },
+            durationRange: {
+                minValue: durationRange.minValue,
+                maxValue: durationRange.maxValue,
+            },
+            probabilityThresholdRange: {
+                minValue: probabilityThresholdRange.minValue,
+                maxValue: probabilityThresholdRange.maxValue,
+            },
+        } );
+    }
+
+    const load = async () => {
+        try {
+            const settings = await loadJson( event.target );
+            setBpsRange( settings.bpsRange );
+            setSpeedRange( settings.speedRange );
+            setDurationRange( settings.durationRange );
+            setProbabilityThresholdRange( probabilityThresholdRange );
+        } catch ( e ) {
+            alert( e );
+        }
+    }
+
     useEffect( () => {
         let bpsTimer;
 
-        function bpsListener () {
+        const bpsListener = () => {
             const pitches = Object.keys( notesOn );
             if ( !pitches.length ) {
                 return;
@@ -123,7 +157,13 @@ export default function Featherise ( { selectedOutput } ) {
 
     return (
         <fieldset className={ `padded ${ styles.fieldset }` }>
-            <legend className={ styles.legend }>Feathered Chords</legend>
+            <legend className={ styles.legend }>
+                Feathered Chords
+                <span className={ styles.settings }>
+                    <button onClick={ load }>Load</button>
+                    <button onClick={ save }>Save</button>
+                </span>
+            </legend>
 
             <div className={ styles.row }>
                 <label htmlFor="bps-input">
@@ -187,6 +227,7 @@ export default function Featherise ( { selectedOutput } ) {
                     />
                 ) }
             </div>
+
         </fieldset>
     );
 }

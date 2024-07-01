@@ -4,6 +4,8 @@ A web app to feather notes played over any and all MIDI inputs, outputting to a 
 
 To help with loopback, input and output channels can be different.
 
+Settings can be saved and restored through the Load and Save buttons.
+
 ## NB
 
 This project does not use MIDI USB, but the [Web MIDI API](https://caniuse.com/midi). 

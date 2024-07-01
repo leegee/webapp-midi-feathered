@@ -2,7 +2,7 @@
     height: 100vh;
 }
 
-.midi-channel-settings {
+.midi-settings {
     display: flex;
     align-items: center;
     justify-content: space-between;
