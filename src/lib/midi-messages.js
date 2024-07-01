@@ -34,7 +34,6 @@ export function sendNoteWithDuration ( pitch, velocity, durationMs, selectedOutp
  * @fires EVENT_NOTE_STOP
 */
 export function onMidiMessage ( event, midiInputChannel, setNotesOn ) {
-    const timestamp = Date.now();
     const midiChannel = event.data[ 0 ] & 0x0F;
 
     if ( midiChannel !== midiInputChannel ) {
@@ -49,7 +48,7 @@ export function onMidiMessage ( event, midiInputChannel, setNotesOn ) {
         const newNotesOn = { ...prevNotesOn };
 
         if ( cmd === NOTE_ON && velocity > 0 && !newNotesOn[ pitch ] ) {
-            newNotesOn[ pitch ] = { timestamp, velocity };
+            newNotesOn[ pitch ] = { velocity };
             if ( USE_EVENTS ) {
                 window.document.dispatchEvent(
                     new CustomEvent( EVENT_NOTE_START, { detail: { pitch, velocity, midiChannel } } )

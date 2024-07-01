@@ -8,7 +8,7 @@ export default function NoteList () {
         <ul>
             { Object.entries( notesOn ).map( ( [ key, value ] ) => (
                 <li key={ key }>
-                    { key }: { value.velocity } { value.timestamp }
+                    { key }: { value.velocity }
                 </li>
             ) ) }
         </ul>
