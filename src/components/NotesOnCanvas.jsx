@@ -1,6 +1,6 @@
 import { useRef, useEffect } from 'react';
 import { useAtom } from 'jotai';
-import { notesOnAtom } from '../lib/store';
+import { notesOnAtom, featheredNotesOnAtom } from '../lib/store';
 import styles from './NotesOnCanvas.module.css';
 
 const CANVAS_WIDTH = 88 * 9;
@@ -9,6 +9,7 @@ const NOTE_HEIGHT = 1;
 
 export default function NoteList () {
     const [ notesOn ] = useAtom( notesOnAtom );
+    const [ featheredNotesOn ] = useAtom( featheredNotesOnAtom );
     const canvasRef = useRef( null );
     const bufferCanvasRef = useRef( null ); // Buffer canvas to optimize rendering
     const requestIdRef = useRef( null );

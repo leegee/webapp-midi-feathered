@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { useAtom } from 'jotai';
 
 import { sendNoteWithDuration } from '../lib/midi-messages';
-import { notesOnAtom, midiOutputChannelAtom } from '../lib/store';
+import { notesOnAtom, featheredNotesOnAtom, midiOutputChannelAtom } from '../lib/store';
 import RangeInput from './RangeInput';
 import { loadJson, saveJson } from '../lib/settings-files';
 import styles from './Featherise.module.css';
@@ -22,6 +22,7 @@ const MAX_DURATION_MS = 5000;
 
 export default function Featherise ( { selectedOutput } ) {
     const [ notesOn ] = useAtom( notesOnAtom );
+    const [ , setFeatheredNotesOn ] = useAtom( featheredNotesOnAtom );
     const [ midiOutputChannel ] = useAtom( midiOutputChannelAtom );
 
     const [ playMode, setPlayMode ] = useState( playModeTypes.PROBABILITY );
@@ -125,10 +126,14 @@ export default function Featherise ( { selectedOutput } ) {
                     selectedOutput,
                     midiOutputChannel
                 );
+                setFeatheredNotesOn( {
+                    [ pitch ]: { velocity: notesOn[ pitch ].velocity }
+                } );
             }
 
             else if ( playMode === playModeTypes.PROBABILITY ) {
                 // Mabye play some of the notes:
+                const playingPitch2velocity = {};
                 Object.keys( notesOn ).forEach( ( pitch ) => {
                     const probability = Math.random();
                     if ( probability < probabilityThresholdRange.maxValue && probability > probabilityThresholdRange.minValue ) {
@@ -139,8 +144,10 @@ export default function Featherise ( { selectedOutput } ) {
                             selectedOutput,
                             midiOutputChannel
                         );
+                        playingPitch2velocity[ pitch ] = { velocity: notesOn[ pitch ].velocity };
                     }
                 } );
+                setFeatheredNotesOn( { ...playingPitch2velocity } );
             }
 
             // Set the next recursion:
