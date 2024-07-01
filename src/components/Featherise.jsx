@@ -195,7 +195,7 @@ export default function Featherise ( { selectedOutput } ) {
 
             <div className={ styles.row }>
                 <label htmlFor="duration-input">
-                    Duration Range: { Math.floor( speedRange.minValue ) } ms - { Math.floor( speedRange.maxValue ) } ms
+                    Duration Range: { Math.floor( durationRange.minValue ) } ms - { Math.floor( durationRange.maxValue ) } ms
                 </label>
                 <RangeInput
                     id='duration-input'
