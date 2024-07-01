@@ -14,6 +14,7 @@ import OutputChannelSelect from './OutputChannelSelect';
 import DeviceSelect from './DeviceSelect';
 import PianoKeyboard from './Piano';
 import Featherise from './Featherise';
+import NotesOnCanvas from './NotesOnCanvas';
 import styles from './MIDI.module.css';
 
 let watchMidiInitialized = false;
@@ -92,6 +93,7 @@ export default function MIDIComponent () {
                     <DeviceSelect />
                 </section>
 
+                <NotesOnCanvas />
                 <PianoKeyboard />
             </footer>
         </main >
