@@ -12,7 +12,7 @@ export default function InputChannelSelect () {
 
     return (
         <aside>
-            <label htmlFor="midi-input-channel-selector">MIDI Input Channel: &nbsp;</label>
+            <label htmlFor="midi-input-channel-selector">MIDI Input Channel: </label>
             <select id="midi-input-channel-selector" onChange={ handleOutputChange } value={ midiOutputChannel }>
                 { Array.from( Array( 16 ).keys() ).map( ( item ) => (
                     <option key={ item + 1 } value={ item + 1 }>{ item + 1 }</option>

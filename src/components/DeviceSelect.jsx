@@ -30,11 +30,14 @@ function OutputSelect () {
     };
 
     return (
-        <select onChange={ handleOutputChange } value={ selectedOutput }>
-            { Object.entries( midiOutputs ).map( ( [ id, output ] ) => (
-                <option key={ id } value={ id }>{ id } { output.name }</option>
-            ) ) }
-        </select>
+        <section>
+            <label htmlFor='select-device'>MIDI Device:</label>
+            <select id='select-device' onChange={ handleOutputChange } value={ selectedOutput }>
+                { Object.entries( midiOutputs ).map( ( [ id, output ] ) => (
+                    <option key={ id } value={ id }>{ output.name }</option>
+                ) ) }
+            </select>
+        </section>
     );
 }
 

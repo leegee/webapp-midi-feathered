@@ -11,7 +11,7 @@ import {
 import { onMidiMessage } from '../lib/midi-messages';
 import InputChannelSelect from './InputChannelSelect';
 import OutputChannelSelect from './OutputChannelSelect';
-import OutputSelect from './OutputSelect';
+import DeviceSelect from './DeviceSelect';
 import PianoKeyboard from './Piano';
 import Featherise from './Featherise';
 import styles from './MIDI.module.css';
@@ -92,7 +92,7 @@ export default function MIDIComponent () {
                 </section>
 
                 <section className={ `padded ${ styles[ 'midi-channel-settings' ] }` }>
-                    <OutputSelect />
+                    <DeviceSelect />
                 </section>
 
                 <PianoKeyboard />

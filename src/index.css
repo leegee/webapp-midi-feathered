@@ -56,3 +56,11 @@ h2 {
   padding: var(--midi-app-padding);
   border: var(--midi-app-border);
 }
+
+label {
+  margin-right: 0.6em;
+}
+
+select {
+  padding: 0.6em;
+}
