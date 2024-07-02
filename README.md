@@ -16,6 +16,8 @@ A small application using Vite, React, Jotai, Web MIDI, mainly to compare React/
 
 *NB* This project does not use MIDI USB, but the [Web MIDI API](https://caniuse.com/midi). 
 
+The conclusion: this clearly ought to be event-based!
+
 ### To Do
 
 * `notesOn` is now just pitch to velocity, so refactor
