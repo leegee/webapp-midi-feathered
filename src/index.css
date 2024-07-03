@@ -9,7 +9,18 @@
   --midi-app-border-radius: 1pt;
   --midi-app-padding: 1em;
 
-  color-scheme: dark;
+  --midi-app-brand-clr: hsl(39, 100%, 50%);
+  --midi-app-striped-bg-vertical: repeating-linear-gradient(0deg,
+      hsl(39, 100%, 50%),
+      hsl(39, 100%, 50%) 10px,
+      transparent 10px,
+      transparent 20px);
+  --midi-app-striped-bg-horizontal: repeating-linear-gradient(90deg,
+      hsl(39, 100%, 50%),
+      hsl(39, 100%, 50%) 10px,
+      transparent 10px,
+      transparent 20px) color-scheme: dark;
+
   color: var(--midi-app-fg);
   background-color: var(--midi-app-bg);
 

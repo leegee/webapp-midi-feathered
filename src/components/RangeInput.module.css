@@ -30,20 +30,12 @@
     position: absolute;
     top: 0;
     bottom: 0;
-    background-color: hsl(39, 100%, 50%);
-    background: repeating-linear-gradient(90deg,
-            hsl(39, 100%, 50%),
-            hsl(39, 100%, 50%) 10px,
-            transparent 10px,
-            transparent 20px);
+    background-color: var(--midi-app-brand-clr);
+    background: var(--midi-app-striped-bg-horizontal);
 }
 
 .vertical .bar {
-    background: repeating-linear-gradient(0deg,
-            hsl(39, 100%, 50%),
-            hsl(39, 100%, 50%) 10px,
-            transparent 10px,
-            transparent 20px);
+    background: var(--midi-app-striped-bg-vertical);
 }
 
 .custom-range-input.vertical .bar {
@@ -52,6 +44,7 @@
 }
 
 .handle {
+    background-color: transparent;
     position: absolute;
     top: 0;
     bottom: 0;
@@ -60,8 +53,6 @@
     height: 100%;
     cursor: ew-resize;
     transition: position 30ms;
-    background-color: hsl(39, 100%, 42%);
-    background-color: transparent;
 }
 
 .custom-range-input.vertical .handle {
