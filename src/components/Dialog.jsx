@@ -27,6 +27,6 @@ Dialog.propTypes = {
     vertical: PropTypes.bool,
     isOpen: PropTypes.bool,
     onClose: PropTypes.func.isRequired,
-    children: PropTypes.element.isRequired
+    children: PropTypes.arrayOf( PropTypes.element ).isRequired
 };
 
