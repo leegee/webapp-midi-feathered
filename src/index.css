@@ -64,6 +64,8 @@ header {
 
 label {
   margin-right: 0.6em;
+  line-height: normal;
+  font-size: small;
 }
 
 select {
