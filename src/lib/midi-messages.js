@@ -48,7 +48,7 @@ export function onMidiMessage ( event, midiInputChannel, setNotesOn ) {
         const newNotesOn = { ...prevNotesOn };
 
         if ( cmd === NOTE_ON && velocity > 0 && !newNotesOn[ pitch ] ) {
-            newNotesOn[ pitch ] = { velocity };
+            newNotesOn[ pitch ] =  velocity;
             if ( USE_EVENTS ) {
                 window.document.dispatchEvent(
                     new CustomEvent( EVENT_NOTE_START, { detail: { pitch, velocity, midiChannel } } )

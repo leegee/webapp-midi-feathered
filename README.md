@@ -18,4 +18,5 @@ A small application using Vite, React, Jotai, Web MIDI, mainly to compare React/
 
 ### To Do
 
-* `notesOn` is now just pitch to velocity, so refactor
+* Support sustain pedal
+

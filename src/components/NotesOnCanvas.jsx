@@ -59,9 +59,8 @@ export default function NoteList () {
             );
 
             // Draw new notes
-            Object.entries( notesOn ).forEach( ( [ key, value ] ) => {
+            Object.entries( notesOn ).forEach( ( [ key, velocity ] ) => {
                 const pitch = parseInt( key, 10 );
-                const velocity = value.velocity;
 
                 // Calculate hue based on pitch (lowest notes are red, highest are violet)
                 const hue = mapRange( pitch, LOWEST_PITCH, 108, 0, 300 );

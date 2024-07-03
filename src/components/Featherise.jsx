@@ -146,7 +146,7 @@ export default function Featherise ( { selectedOutput, vertical = false } ) {
             if ( playMode === playModeTypes.ONE_NOTE ) {
                 // Always play one random note
                 const pitch = pitches[ Math.floor( Math.random() * pitches.length ) ];
-                const velocity = generateVelocity( notesOn[ pitch ].velocity );
+                const velocity = generateVelocity( notesOn[ pitch ] );
 
                 sendNoteWithDuration(
                     pitch,
@@ -166,7 +166,7 @@ export default function Featherise ( { selectedOutput, vertical = false } ) {
                 Object.keys( notesOn ).forEach( ( pitch ) => {
                     const probability = Math.random();
                     if ( probability < probabilityThresholdRange.maxValue && probability > probabilityThresholdRange.minValue ) {
-                        const velocity = generateVelocity( notesOn[ pitch ].velocity );
+                        const velocity = generateVelocity( notesOn[ pitch ] );
                         sendNoteWithDuration(
                             pitch,
                             velocity,
