@@ -77,7 +77,6 @@ const RangeInput = ( { min, max, minValue, maxValue, onChange, debounceMs = 50, 
     };
 
     const handleTouchStart = ( e, isMin ) => {
-        e.preventDefault( { passive: true } );
         const rect = e.currentTarget.parentElement.getBoundingClientRect();
         const touchPos = vertical ? e.touches[ 0 ].clientY - rect.top : e.touches[ 0 ].clientX - rect.left;
         const newPercentage = ( touchPos / ( vertical ? rect.height : rect.width ) ) * 100;
