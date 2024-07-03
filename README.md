@@ -12,7 +12,7 @@ Contains some novelty visualisations.
 
 [Demo](https://leegee.github.io/webapp-midi-feathered) requires a [Web MIDI API](https://caniuse.com/midi) connection, not a MIDI-over-USB connection.
 
-![Screenshot](.screenshot.png?2)
+![Screenshot](screenshot.png)
 
 ### Installation
 
