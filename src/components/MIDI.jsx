@@ -84,7 +84,7 @@ export default function MIDIComponent () {
     return (
         <main className={ styles.main }>
 
-            <header className={ `${ styles[ 'midi-settings' ] }` }>
+            <header className={ styles.header }>
                 <h1>MIDI</h1>
                 <button onClick={ () => setIsDialogOpen( true ) }>MIDI Settings</button>
             </header>
@@ -93,7 +93,7 @@ export default function MIDIComponent () {
                 <Featherise selectedOutput={ selectedOutputRef.current } vertical={ true } />
             ) }
 
-            <footer className={ styles.bottom }>
+            <footer className={ styles.footer }>
                 <NotesOnCanvas />
                 <PianoKeyboard />
             </footer>

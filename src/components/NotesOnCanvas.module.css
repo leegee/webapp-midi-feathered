@@ -1,6 +1,13 @@
+.canvas-component {
+    margin: 0 auto;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
 .canvas {
     border: var(--midi-app-border);
-    margin: 0 auto;
-    padding: 0;
-    flex: 1;
+    flex-grow: 1;
+    height: auto;
+    width: calc(88px * 8.9);
 }
