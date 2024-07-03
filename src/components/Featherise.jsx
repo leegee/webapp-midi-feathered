@@ -197,7 +197,7 @@ export default function Featherise ( { selectedOutput, vertical = false } ) {
     ] );
 
     return (
-        <fieldset className={ `padded ${ styles.fieldset }` }>
+        <fieldset className={ `padded ${ styles[ 'featherize-component' ] }` }>
             <legend className={ styles.legend }>
                 Feathered Chords
                 <span className={ styles.settings }>
@@ -206,8 +206,8 @@ export default function Featherise ( { selectedOutput, vertical = false } ) {
                 </span>
             </legend>
 
-            <div className={ vertical ? styles.vertical : '' }>
-                <div className={ styles.row }>
+            <div className={ styles[ 'play-controls' ] + ' ' + ( vertical ? styles.vertical : styles.horiztonal ) }>
+                <div className={ styles[ 'play-control' ] }>
                     <label htmlFor="bps-input">
                         { bpsRange.minValue }-{ bpsRange.maxValue } notes per second
                     </label>
@@ -221,7 +221,7 @@ export default function Featherise ( { selectedOutput, vertical = false } ) {
                     />
                 </div>
 
-                <div className={ styles.row }>
+                <div className={ styles[ 'play-control' ] }>
                     <label htmlFor="velocity-input">
                         Velocity variation: { velocityRange.minValue }-{ velocityRange.maxValue } %
                     </label>
@@ -235,7 +235,7 @@ export default function Featherise ( { selectedOutput, vertical = false } ) {
                     />
                 </div>
 
-                <div className={ styles.row }>
+                <div className={ styles[ 'play-control' ] }>
                     <label htmlFor="speed-input">
                         Speed: { Math.floor( speedRange.minValue ) } ms - { Math.floor( speedRange.maxValue ) } ms
                     </label>
@@ -249,7 +249,7 @@ export default function Featherise ( { selectedOutput, vertical = false } ) {
                     />
                 </div>
 
-                <div className={ styles.row }>
+                <div className={ styles[ 'play-control' ] }>
                     <label htmlFor="duration-input">
                         Duration Range: { Math.floor( durationRange.minValue ) } ms - { Math.floor( durationRange.maxValue ) } ms
                     </label>
@@ -263,7 +263,7 @@ export default function Featherise ( { selectedOutput, vertical = false } ) {
                     />
                 </div>
 
-                <div className={ styles.row }>
+                <div className={ styles[ 'play-control' ] }>
                     <label htmlFor="probability-input" title="Probability threshold range">
                         <input
                             type="checkbox"
