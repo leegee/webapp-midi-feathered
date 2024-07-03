@@ -15,7 +15,7 @@ export default defineConfig( {
     VitePWA( {
       registerType: 'autoUpdate',
       workbox: {
-        swDest: "service-worker.js",
+        swDest: "public/sw.js",
         runtimeCaching: [
           {
             urlPattern: /\.(?:png|svg)$/,
