@@ -8,6 +8,8 @@ Settings can be saved and restored through the Load and Save buttons.
 
 Contains some novelty visualisations.
 
+[Demo](https://leegee.github.io/webapp-midi-feathered) requires a [Web MIDI API](https://caniuse.com/midi) connection, not a MIDI-over-USB connection.
+
 ![Screenshot](.screenshot.png)
 
 ### Installation
@@ -21,8 +23,6 @@ Contains some novelty visualisations.
 ### About
 
 A small application using Vite, React, Jotai, Web MIDI, mainly to compare React/Jotai to Vue3/Pinia. 
-
-*NB* This project does not use MIDI USB, but the [Web MIDI API](https://caniuse.com/midi). 
 
 ### To Do
 
