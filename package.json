@@ -11,7 +11,7 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "generate-pwa-assets": "pwa-assets-generator --preset minimal-2023 public/logo.svg",
+    "generate-pwa-assets": "pwa-assets-generator --preset minimal-2023 assets/logo.svg",
     "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
     "test": "echo 'No test yet'",
     "prepreview": "bun run build",
