@@ -209,7 +209,8 @@ export default function Featherise ( { selectedOutput, vertical = false } ) {
             <div className={ styles[ 'play-controls' ] + ' ' + ( vertical ? styles.vertical : styles.horiztonal ) }>
                 <div className={ styles[ 'play-control' ] }>
                     <label htmlFor="bps-input">
-                        { bpsRange.minValue }-{ bpsRange.maxValue } notes per second
+                        { bpsRange.minValue }-{ bpsRange.maxValue }&nbsp;
+                        notes/sec
                     </label>
                     <RangeInput vertical={ vertical }
                         id='bps-input'
@@ -223,7 +224,8 @@ export default function Featherise ( { selectedOutput, vertical = false } ) {
 
                 <div className={ styles[ 'play-control' ] }>
                     <label htmlFor="velocity-input">
-                        Velocity variation: { velocityRange.minValue }-{ velocityRange.maxValue } %
+                        Velocity:&nbsp;
+                        { velocityRange.minValue }-{ velocityRange.maxValue } %
                     </label>
                     <RangeInput vertical={ vertical }
                         id='velocity-input'
@@ -237,7 +239,8 @@ export default function Featherise ( { selectedOutput, vertical = false } ) {
 
                 <div className={ styles[ 'play-control' ] }>
                     <label htmlFor="speed-input">
-                        Speed: { Math.floor( speedRange.minValue ) } ms - { Math.floor( speedRange.maxValue ) } ms
+                        Speed:&nbsp;
+                        { Math.floor( speedRange.minValue ) } ms - { Math.floor( speedRange.maxValue ) } ms
                     </label>
                     <RangeInput vertical={ vertical }
                         id='speed-input'
@@ -251,7 +254,8 @@ export default function Featherise ( { selectedOutput, vertical = false } ) {
 
                 <div className={ styles[ 'play-control' ] }>
                     <label htmlFor="duration-input">
-                        Duration Range: { Math.floor( durationRange.minValue ) } ms - { Math.floor( durationRange.maxValue ) } ms
+                        Duration:&nbsp;
+                        { Math.floor( durationRange.minValue ) } ms - { Math.floor( durationRange.maxValue ) } ms
                     </label>
                     <RangeInput vertical={ vertical }
                         id='duration-input'
@@ -270,7 +274,7 @@ export default function Featherise ( { selectedOutput, vertical = false } ) {
                             checked={ playMode === playModeTypes.PROBABILITY }
                             onChange={ handlePlayModeChange }
                         />
-                        Probability Threshold Range:&nbsp;
+                        Probability:&nbsp;
                         { percentage( probabilityThresholdRange.minValue ) }-{ percentage( probabilityThresholdRange.maxValue ) }%
                     </label>
                     { playMode === playModeTypes.PROBABILITY && (
