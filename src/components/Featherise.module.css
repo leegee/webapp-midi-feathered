@@ -37,6 +37,10 @@
     align-items: center;
 }
 
+.vertical .row label {
+    align-items: baseline;
+}
+
 .row input {
     margin-right: 1em;
 }
