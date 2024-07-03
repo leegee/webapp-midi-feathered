@@ -1,7 +1,10 @@
 {
   "name": "webapp-midi-feathered",
   "description": "Web MIDI API to feather MIDI loopback",
-  "homepage": "https://leegee.github.io/webapp-midi-feathered/",
+  "homepage": "https://leegee.github.io/webapp-midi-feathered",
+  "repository": {
+    "url": "https://github.com/leegee/webapp-midi-feathered"
+  },
   "private": true,
   "version": "0.0.2",
   "type": "module",
