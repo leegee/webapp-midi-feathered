@@ -41,14 +41,14 @@ body {
   overflow: hidden;
 }
 
-h1 {
+h1,
+legend {
   display: flex;
   justify-content: space-between;
   align-items: center;
-}
-
-h2 {
-  margin-top: 0;
+  font-size: 100%;
+  padding: 0;
+  margin: 0;
 }
 
 .padded {
@@ -63,12 +63,22 @@ label {
 
 select {
   padding: 0.6em;
-}
-
-select {
   border-color: transparent;
 }
 
 select:hover {
   border-color: var(--midi-app-fg);
+}
+
+button {
+  font-size: 50%;
+  font-weight: 100;
+  text-transform: uppercase;
+  font-variant: small-caps;
+  opacity: 50%;
+}
+
+button:hover {
+  opacity: 100%;
+  cursor: pointer;
 }

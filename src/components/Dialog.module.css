@@ -1,0 +1,23 @@
+/* Dialog.module.css */
+
+.dialog {
+    border: none;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    position: relative;
+}
+
+.close-button {
+    position: absolute;
+    top: 1pt;
+    right: 1pt;
+    background: none;
+    border: none;
+    font-size: 24pt;
+    cursor: pointer;
+}
+
+.close-button::after {
+    content: '×';
+}

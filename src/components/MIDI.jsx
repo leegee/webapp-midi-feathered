@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useAtom } from 'jotai';
 
 import {
@@ -15,6 +15,7 @@ import DeviceSelect from './DeviceSelect';
 import PianoKeyboard from './Piano';
 import Featherise from './Featherise';
 import NotesOnCanvas from './NotesOnCanvas';
+import Dialog from './Dialog';
 import styles from './MIDI.module.css';
 
 let watchMidiInitialized = false;
@@ -27,6 +28,7 @@ export default function MIDIComponent () {
     const [ , setNotesOn ] = useAtom( notesOnAtom );
 
     const selectedOutputRef = useRef( null );
+    const [ isDialogOpen, setIsDialogOpen ] = useState( false );
 
     useEffect( () => {
         if ( !midiAccess ) {
@@ -37,20 +39,19 @@ export default function MIDIComponent () {
             } catch ( error ) {
                 console.error( 'Failed to access MIDI devices:', error );
                 return (
-                    <div className='error'>
+                    <div className="error">
                         Failed to access MIDI devices: ${ error }
                     </div>
                 );
             }
-        }
-
-        else if ( !watchMidiInitialized ) {
+        } else if ( !watchMidiInitialized ) {
             setMidiOutputs( () => {
                 const newOutputs = Array.from( midiAccess.outputs.values() ).reduce(
                     ( map, output ) => {
                         map[ output.name ] = output;
                         return map;
-                    }, {}
+                    },
+                    {}
                 );
 
                 // Initialize the first MIDI output as the default selectedOutput
@@ -59,8 +60,8 @@ export default function MIDIComponent () {
                     selectedOutputRef.current = newOutputs[ firstOutputName ];
 
                     midiAccess.inputs.forEach( ( inputPort ) => {
-                        inputPort.onmidimessage = ( event ) => onMidiMessage(
-                            event, midiInputChannel, setNotesOn );
+                        inputPort.onmidimessage = ( event ) =>
+                            onMidiMessage( event, midiInputChannel, setNotesOn );
                     } );
 
                     return firstOutputName;
@@ -82,20 +83,26 @@ export default function MIDIComponent () {
 
     return (
         <main className={ styles.main }>
+
+            <section className={ `padded ${ styles[ 'midi-settings' ] }` }>
+                <h1>MIDI</h1>
+                <button onClick={ () => setIsDialogOpen( true ) }>MIDI Settings</button>
+            </section>
+
             { selectedOutputRef.current && (
                 <Featherise selectedOutput={ selectedOutputRef.current } vertical={ true } />
             ) }
 
             <footer className={ styles.bottom }>
-                <section className={ `padded ${ styles[ 'midi-settings' ] }` }>
-                    <InputChannelSelect />
-                    <OutputChannelSelect />
-                    <DeviceSelect />
-                </section>
-
                 <NotesOnCanvas />
                 <PianoKeyboard />
             </footer>
-        </main >
+
+            <Dialog isOpen={ isDialogOpen } onClose={ () => setIsDialogOpen( false ) }>
+                <InputChannelSelect />
+                <OutputChannelSelect />
+                <DeviceSelect />
+            </Dialog>
+        </main>
     );
 }
