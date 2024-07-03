@@ -41,10 +41,11 @@
     margin-bottom: 0.5em;
     line-height: 200%;
     margin-bottom: 0.75em;
-    width: 10em;
+    width: 100%;
 }
 
 .vertical .row {
+    width: 10em;
     flex-direction: column-reverse;
 }
 

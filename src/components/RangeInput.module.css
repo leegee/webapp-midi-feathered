@@ -29,6 +29,19 @@
     top: 0;
     bottom: 0;
     background-color: hsl(39, 100%, 50%);
+    background: repeating-linear-gradient(90deg,
+            hsl(39, 100%, 50%),
+            hsl(39, 100%, 50%) 10px,
+            transparent 10px,
+            transparent 20px);
+}
+
+.vertical .bar {
+    background: repeating-linear-gradient(0deg,
+            hsl(39, 100%, 50%),
+            hsl(39, 100%, 50%) 10px,
+            transparent 10px,
+            transparent 20px);
 }
 
 .custom-range-input.vertical .bar {
