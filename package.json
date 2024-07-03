@@ -12,7 +12,7 @@
     "test": "echo 'No test yet'",
     "preview": "vite preview",
     "predeploy": "bun run build",
-    "deploy": "gh-pages -d build"
+    "deploy": "gh-pages -d dist"
   },
   "dependencies": {
     "jotai": "^2.6.4",
