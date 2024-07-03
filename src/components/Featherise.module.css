@@ -1,6 +1,7 @@
 .featherize-component {
     border: var(--midi-app-border);
     border-radius: var(--midi-app-border-radius);
+    height: 100%;
 }
 
 .legend {
@@ -14,6 +15,7 @@
     display: flex;
     justify-content: space-evenly;
     align-items: flex-start;
+    height: 100%;
 }
 
 .play-control {
@@ -24,6 +26,7 @@
     line-height: 200%;
     margin-bottom: 0.75em;
     width: 100%;
+    height: 100%;
 }
 
 .vertical .play-control {
