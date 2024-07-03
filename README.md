@@ -10,6 +10,14 @@ Contains some novelty visualisations.
 
 ![Screenshot](.screenshot.png)
 
+### Installation
+
+    bun install
+
+### Run/Dev
+    
+    bun run dev
+
 ### About
 
 A small application using Vite, React, Jotai, Web MIDI, mainly to compare React/Jotai to Vue3/Pinia. 
