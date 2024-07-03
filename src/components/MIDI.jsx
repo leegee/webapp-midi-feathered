@@ -29,6 +29,7 @@ export default function MIDIComponent () {
 
     const selectedOutputRef = useRef( null );
     const [ isDialogOpen, setIsDialogOpen ] = useState( false );
+    const [ showExtras, setShowExtras ] = useState( true );
 
     useEffect( () => {
         if ( !midiAccess ) {
@@ -86,23 +87,28 @@ export default function MIDIComponent () {
 
             <header className={ styles.header }>
                 <h1>MIDI</h1>
-                <button onClick={ () => setIsDialogOpen( true ) }>MIDI Settings</button>
+                <span>
+                    <button onClick={ () => setShowExtras( prev => !prev ) }>Note Display</button>
+                    <button onClick={ () => setIsDialogOpen( true ) }>MIDI Settings</button>
+                </span>
             </header>
 
             { selectedOutputRef.current && (
                 <Featherise selectedOutput={ selectedOutputRef.current } vertical={ true } />
             ) }
 
-            <footer className={ styles.footer }>
-                <NotesOnCanvas />
-                <PianoKeyboard />
-            </footer>
+            { showExtras && (
+                <footer className={ styles.footer }>
+                    <NotesOnCanvas />
+                    <PianoKeyboard />
+                </footer>
+            ) }
 
             <Dialog isOpen={ isDialogOpen } onClose={ () => setIsDialogOpen( false ) }>
                 <InputChannelSelect />
                 <OutputChannelSelect />
                 <DeviceSelect />
             </Dialog>
-        </main>
+        </main >
     );
 }
