@@ -1,0 +1,20 @@
+{
+  "name": "Feathered MIDI",
+  "short_name": "Feathered MIDI",
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#ffffff",
+  "background_color": "#242424",
+  "icons": [
+    {
+      "src": "assets/feather.svg",
+      "sizes": "192x192",
+      "type": "image/svg"
+    },
+    {
+      "src": "assets/feather.svg",
+      "sizes": "512x512",
+      "type": "image/svg"
+    }
+  ]
+}
