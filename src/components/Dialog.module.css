@@ -3,21 +3,30 @@
 .dialog {
     border: none;
     border-radius: 8px;
-    padding: 20px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    padding: 1em;
     position: relative;
+    background-color: var(--midi-app-bg);
+    border: var(--midi-app-border);
+    color: var(--midi-app-fg);
 }
 
-.close-button {
+.dialog * {
+    background-color: var(--midi-app-bg);
+    color: var(--midi-app-fg);
+}
+
+.dialog button {
+    margin: 0;
     position: absolute;
     top: 1pt;
     right: 1pt;
     background: none;
-    border: none;
-    font-size: 24pt;
+    font-size: larger;
+    font-weight: bolder;
+    min-width: 1em;
+    min-height: 1em;
     cursor: pointer;
-}
-
-.close-button::after {
-    content: '×';
+    color: var(--midi-app-fg);
+    opacity: 1;
+    border: none;
 }

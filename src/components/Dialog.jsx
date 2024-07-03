@@ -14,11 +14,9 @@ export default function Dialog ( { isOpen, onClose, children } ) {
     }
 
     return (
-        <dialog ref={ dialogRef } className={ styles.mask }>
-            <div className={ styles.dialog }>
-                <button className={ styles[ 'close-button' ] } onClick={ onClose } title='Close' />
-                { children }
-            </div>
+        <dialog ref={ dialogRef } className={ styles.dialog }>
+            <button onClick={ onClose } title='Close'>×</button>
+            { children }
         </dialog>
     );
 }

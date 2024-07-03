@@ -15,6 +15,7 @@
       hsl(39, 100%, 50%) 10px,
       transparent 10px,
       transparent 20px);
+
   --midi-app-striped-bg-horizontal: repeating-linear-gradient(90deg,
       hsl(39, 100%, 50%),
       hsl(39, 100%, 50%) 10px,
@@ -89,11 +90,19 @@ select:hover {
 }
 
 button {
-  font-size: 50%;
+  font-size: 66%;
   font-weight: 100;
   text-transform: uppercase;
   font-variant: small-caps;
   opacity: 50%;
+  background-color: transparent;
+  color: var(--midi-app-fg);
+  border: var(--midi-app-border);
+  margin-right: 0.5em;
+}
+
+button:last-of-type {
+  margin-right: none;
 }
 
 button:hover {
