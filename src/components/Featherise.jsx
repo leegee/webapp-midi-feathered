@@ -270,7 +270,7 @@ export default function Featherise ( { selectedOutput, vertical = false } ) {
                             checked={ playMode === playModeTypes.PROBABILITY }
                             onChange={ handlePlayModeChange }
                         />
-                        Probability Threshold Range:
+                        Probability Threshold Range:&nbsp;
                         { percentage( probabilityThresholdRange.minValue ) }-{ percentage( probabilityThresholdRange.maxValue ) }%
                     </label>
                     { playMode === playModeTypes.PROBABILITY && (
