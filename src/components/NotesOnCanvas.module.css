@@ -2,4 +2,5 @@
     border: var(--midi-app-border);
     margin: 0 auto;
     padding: 0;
+    flex: 1;
 }

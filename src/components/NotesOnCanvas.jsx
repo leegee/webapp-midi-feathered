@@ -1,4 +1,4 @@
-import { useRef, useEffect } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useAtom } from 'jotai';
 import {
     notesOnAtom,
@@ -7,17 +7,38 @@ import {
 import styles from './NotesOnCanvas.module.css';
 
 const CANVAS_WIDTH = 88 * 9;
-const CANVAS_HEIGHT = 100;
 const NOTE_HEIGHT = 1;
 
 export default function NoteList () {
     const [ notesOn ] = useAtom( notesOnAtom );
     // const [ featheredNotesOn ] = useAtom( featheredNotesOnAtom );
     const canvasRef = useRef( null );
+    const [ canvasHeight, setCanvasHeight ] = useState( 0 );
     const bufferCanvasRef = useRef( null ); // Buffer canvas to optimize rendering
     const requestIdRef = useRef( null );
 
     useEffect( () => {
+        if ( canvasRef.current ) {
+            setCanvasHeight( canvasRef.current.clientHeight );
+        }
+
+        const handleResize = () => {
+            if ( canvasRef.current ) {
+                setCanvasHeight( canvasRef.current.clientHeight );
+            }
+        };
+
+        window.addEventListener( 'resize', handleResize );
+
+        return () => {
+            window.removeEventListener( 'resize', handleResize );
+        };
+    }, [] );
+
+    useEffect( () => {
+        if ( !canvasHeight ) {
+            return;
+        }
         const canvas = canvasRef.current;
         const ctx = canvas.getContext( '2d' );
         const bufferCanvas = bufferCanvasRef.current;
@@ -25,14 +46,14 @@ export default function NoteList () {
         const width = canvas.width;
 
         bufferCanvas.width = width;
-        bufferCanvas.height = CANVAS_HEIGHT;
+        bufferCanvas.height = canvasHeight;
 
         const drawNotes = () => {
             // Clear buffer canvas
-            bufferCtx.clearRect( 0, 0, width, CANVAS_HEIGHT );
+            bufferCtx.clearRect( 0, 0, width, canvasHeight );
 
             // Scrolling: draw previous frame shifted upwards by note height
-            bufferCtx.drawImage( canvas, 0, NOTE_HEIGHT, width, CANVAS_HEIGHT - NOTE_HEIGHT, 0, 0, width, CANVAS_HEIGHT - NOTE_HEIGHT );
+            bufferCtx.drawImage( canvas, 0, NOTE_HEIGHT, width, canvasHeight - NOTE_HEIGHT, 0, 0, width, canvasHeight - NOTE_HEIGHT );
 
             // Draw new notes
             Object.entries( notesOn ).forEach( ( [ key, value ] ) => {
@@ -47,7 +68,7 @@ export default function NoteList () {
 
                 const colourStr = `hsl(${ hue }, 100%, ${ luminosity }%)`;
 
-                const startY = CANVAS_HEIGHT - NOTE_HEIGHT;
+                const startY = canvasHeight - NOTE_HEIGHT;
                 const noteHeight = NOTE_HEIGHT;
                 const xPosition = ( pitch - 21 ) * ( width / 88 );
 
@@ -57,7 +78,7 @@ export default function NoteList () {
             } );
 
             // Clear main canvas
-            ctx.clearRect( 0, 0, width, CANVAS_HEIGHT );
+            ctx.clearRect( 0, 0, width, canvasHeight );
 
             // Draw buffer canvas at the top of the main canvas
             ctx.drawImage( bufferCanvas, 0, 0 );
@@ -75,7 +96,7 @@ export default function NoteList () {
                 cancelAnimationFrame( requestIdRef.current );
             }
         };
-    }, [ notesOn ] );
+    }, [ canvasHeight, notesOn ] );
 
     function mapRange ( value, minIn, maxIn, minOut, maxOut ) {
         return ( ( value - minIn ) * ( maxOut - minOut ) ) / ( maxIn - minIn ) + minOut;
@@ -83,7 +104,7 @@ export default function NoteList () {
 
     return (
         <section className={ styles.canvas }>
-            <canvas ref={ canvasRef } width={ CANVAS_WIDTH } height={ CANVAS_HEIGHT }></canvas>
+            <canvas ref={ canvasRef } width={ CANVAS_WIDTH } ></canvas>
             <canvas ref={ bufferCanvasRef } style={ { display: 'none' } }></canvas>
         </section>
     );
