@@ -1,6 +1,7 @@
 {
   "name": "webapp-midi-feathered",
   "description": "Web MIDI API to feather MIDI loopback",
+  "homepage": "https://leegee.github.io/webapp-midi-feathered/",
   "private": true,
   "version": "0.0.2",
   "type": "module",
@@ -9,7 +10,9 @@
     "build": "vite build",
     "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
     "test": "echo 'No test yet'",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build"
   },
   "dependencies": {
     "jotai": "^2.6.4",
