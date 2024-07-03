@@ -13,7 +13,8 @@ function debounce ( func, delay ) {
         }, delay );
     };
 }
-const RangeInput = ( { min, max, minValue, maxValue, onChange, debounceMs = 50 } ) => {
+
+const RangeInput = ( { min, max, minValue, maxValue, onChange, debounceMs = 50, vertical = false } ) => {
     const [ minPercentage, setMinPercentage ] = useState( ( ( minValue - min ) / ( max - min ) ) * 100 );
     const [ maxPercentage, setMaxPercentage ] = useState( ( ( maxValue - min ) / ( max - min ) ) * 100 );
 
@@ -56,13 +57,13 @@ const RangeInput = ( { min, max, minValue, maxValue, onChange, debounceMs = 50 }
     const handleMouseDown = ( e, isMin ) => {
         e.preventDefault( { passive: false } );
         const rect = e.currentTarget.parentElement.getBoundingClientRect();
-        const clickX = e.clientX - rect.left;
-        const newPercentage = ( clickX / rect.width ) * 100;
+        const clickPos = vertical ? e.clientY - rect.top : e.clientX - rect.left;
+        const newPercentage = ( clickPos / ( vertical ? rect.height : rect.width ) ) * 100;
         handleResize( newPercentage, isMin );
 
         const handleMouseMove = ( e ) => {
-            const moveX = e.clientX - rect.left;
-            const newPercentage = ( moveX / rect.width ) * 100;
+            const movePos = vertical ? e.clientY - rect.top : e.clientX - rect.left;
+            const newPercentage = ( movePos / ( vertical ? rect.height : rect.width ) ) * 100;
             handleResize( newPercentage, isMin );
         };
 
@@ -78,13 +79,13 @@ const RangeInput = ( { min, max, minValue, maxValue, onChange, debounceMs = 50 }
     const handleTouchStart = ( e, isMin ) => {
         e.preventDefault( { passive: true } );
         const rect = e.currentTarget.parentElement.getBoundingClientRect();
-        const touchX = e.touches[ 0 ].clientX - rect.left;
-        const newPercentage = ( touchX / rect.width ) * 100;
+        const touchPos = vertical ? e.touches[ 0 ].clientY - rect.top : e.touches[ 0 ].clientX - rect.left;
+        const newPercentage = ( touchPos / ( vertical ? rect.height : rect.width ) ) * 100;
         handleResize( newPercentage, isMin );
 
         const handleTouchMove = ( e ) => {
-            const moveX = e.touches[ 0 ].clientX - rect.left;
-            const newPercentage = ( moveX / rect.width ) * 100;
+            const movePos = vertical ? e.touches[ 0 ].clientY - rect.top : e.touches[ 0 ].clientX - rect.left;
+            const newPercentage = ( movePos / ( vertical ? rect.height : rect.width ) ) * 100;
             handleResize( newPercentage, isMin );
         };
 
@@ -98,17 +99,29 @@ const RangeInput = ( { min, max, minValue, maxValue, onChange, debounceMs = 50 }
     };
 
     return (
-        <div className={ styles[ 'custom-range-input' ] }>
-            <div className={ styles.bar } style={ { left: `${ minPercentage }%`, right: `${ 100 - maxPercentage }%` } }></div>
+        <div className={ `${ styles[ 'custom-range-input' ] } ${ vertical ? styles.vertical : '' }` }>
+            <div
+                className={ styles.bar }
+                style={ vertical
+                    ? { top: `${ minPercentage }%`, bottom: `${ 100 - maxPercentage }%` }
+                    : { left: `${ minPercentage }%`, right: `${ 100 - maxPercentage }%` }
+                }
+            ></div>
             <div
                 className={ styles.handle }
-                style={ { left: `${ minPercentage }%` } }
+                style={ vertical
+                    ? { top: `${ minPercentage }%`, width: '100%' }
+                    : { left: `${ minPercentage }%` }
+                }
                 onMouseDown={ ( e ) => handleMouseDown( e, true ) }
                 onTouchStart={ ( e ) => handleTouchStart( e, true ) }
             />
             <div
                 className={ styles.handle }
-                style={ { left: `${ maxPercentage }%` } }
+                style={ vertical
+                    ? { top: `${ maxPercentage }%`, width: '100%' }
+                    : { left: `${ maxPercentage }%` }
+                }
                 onMouseDown={ ( e ) => handleMouseDown( e, false ) }
                 onTouchStart={ ( e ) => handleTouchStart( e, false ) }
             />
@@ -123,6 +136,7 @@ RangeInput.propTypes = {
     maxValue: PropTypes.number.isRequired,
     onChange: PropTypes.func.isRequired,
     debounceMs: PropTypes.number,
+    vertical: PropTypes.bool,
 };
 
 export default RangeInput;

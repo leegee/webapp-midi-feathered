@@ -1,6 +1,6 @@
 :root {
     --midi-app-thumb-width: 2em;
-    --midi-app-thumb-width-half: calc(var(--midi-app-thumb-width) /2);
+    --midi-app-thumb-width-half: calc(var(--midi-app-thumb-width) / 2);
 }
 
 .custom-range-input {
@@ -16,11 +16,24 @@
     border-radius: var(--midi-app-border-radius);
 }
 
+.custom-range-input.vertical {
+    min-height: 10em;
+    max-height: 100%;
+    min-width: 4em;
+    width: calc(100% - var(--midi-app-thumb-width));
+    margin: var(--midi-app-thumb-width-half) 0 !important;
+}
+
 .bar {
     position: absolute;
     top: 0;
     bottom: 0;
     background-color: hsl(39, 100%, 50%);
+}
+
+.custom-range-input.vertical .bar {
+    left: 0;
+    right: 0;
 }
 
 .handle {
@@ -33,4 +46,14 @@
     cursor: ew-resize;
     transition: position 30ms;
     background-color: hsl(39, 100%, 42%);
+}
+
+.custom-range-input.vertical .handle {
+    left: 0;
+    right: 0;
+    top: 0;
+    height: var(--midi-app-thumb-width);
+    width: 100%;
+    transform: translateY(-50%);
+    cursor: ns-resize;
 }

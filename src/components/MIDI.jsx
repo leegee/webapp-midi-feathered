@@ -83,7 +83,7 @@ export default function MIDIComponent () {
     return (
         <main className={ styles.main }>
             { selectedOutputRef.current && (
-                <Featherise selectedOutput={ selectedOutputRef.current } />
+                <Featherise selectedOutput={ selectedOutputRef.current } vertical={ true } />
             ) }
 
             <footer className={ styles.bottom }>

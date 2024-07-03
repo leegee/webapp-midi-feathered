@@ -22,7 +22,7 @@ const MAX_SPEED_MS = 10000;
 const MIN_DURATION_MS = 10;
 const MAX_DURATION_MS = 5000;
 
-export default function Featherise ( { selectedOutput } ) {
+export default function Featherise ( { selectedOutput, vertical = false } ) {
     const [ notesOn ] = useAtom( notesOnAtom );
     const [ , setFeatheredNotesOn ] = useAtom( featheredNotesOnAtom );
     const [ midiOutputChannel ] = useAtom( midiOutputChannelAtom );
@@ -206,81 +206,83 @@ export default function Featherise ( { selectedOutput } ) {
                 </span>
             </legend>
 
-            <div className={ styles.row }>
-                <label htmlFor="bps-input">
-                    { bpsRange.minValue }-{ bpsRange.maxValue } notes per second
-                </label>
-                <RangeInput
-                    id='bps-input'
-                    min={ MIN_BPS }
-                    max={ MAX_BPS }
-                    minValue={ bpsRange.minValue }
-                    maxValue={ bpsRange.maxValue }
-                    onChange={ handleBpsRangeChange }
-                />
-            </div>
-
-            <div className={ styles.row }>
-                <label htmlFor="velocity-input">
-                    Velocity variation: { velocityRange.minValue }-{ velocityRange.maxValue } %
-                </label>
-                <RangeInput
-                    id='velocity-input'
-                    min={ MIN_VELOCITY_PC }
-                    max={ MAX_VELOCITY_PC }
-                    minValue={ velocityRange.minValue }
-                    maxValue={ velocityRange.maxValue }
-                    onChange={ handleVelocityRangeChange }
-                />
-            </div>
-
-            <div className={ styles.row }>
-                <label htmlFor="speed-input">
-                    Speed: { Math.floor( speedRange.minValue ) } ms - { Math.floor( speedRange.maxValue ) } ms
-                </label>
-                <RangeInput
-                    id='speed-input'
-                    min={ MIN_SPEED_MS }
-                    max={ MAX_SPEED_MS }
-                    minValue={ speedRange.minValue }
-                    maxValue={ speedRange.maxValue }
-                    onChange={ handleSpeedRangeChange }
-                />
-            </div>
-
-            <div className={ styles.row }>
-                <label htmlFor="duration-input">
-                    Duration Range: { Math.floor( durationRange.minValue ) } ms - { Math.floor( durationRange.maxValue ) } ms
-                </label>
-                <RangeInput
-                    id='duration-input'
-                    min={ MIN_DURATION_MS }
-                    max={ MAX_DURATION_MS }
-                    minValue={ durationRange.minValue }
-                    maxValue={ durationRange.maxValue }
-                    onChange={ handleDurationRangeChange }
-                />
-            </div>
-
-            <div className={ styles.row }>
-                <label htmlFor="probability-input" title="Probability threshold range">
-                    <input
-                        type="checkbox"
-                        checked={ playMode === playModeTypes.PROBABILITY }
-                        onChange={ handlePlayModeChange }
+            <div className={ vertical ? styles.vertical : '' }>
+                <div className={ styles.row }>
+                    <label htmlFor="bps-input">
+                        { bpsRange.minValue }-{ bpsRange.maxValue } notes per second
+                    </label>
+                    <RangeInput vertical={ vertical }
+                        id='bps-input'
+                        min={ MIN_BPS }
+                        max={ MAX_BPS }
+                        minValue={ bpsRange.minValue }
+                        maxValue={ bpsRange.maxValue }
+                        onChange={ handleBpsRangeChange }
                     />
-                    Probability Threshold Range:
-                    { percentage( probabilityThresholdRange.minValue ) }-{ percentage( probabilityThresholdRange.maxValue ) }%
-                </label>
-                { playMode === playModeTypes.PROBABILITY && (
-                    <RangeInput
-                        min={ 0 }
-                        max={ 1 }
-                        minValue={ probabilityThresholdRange.minValue }
-                        maxValue={ probabilityThresholdRange.maxValue }
-                        onChange={ handleProbabilityThresholdRangeChange }
+                </div>
+
+                <div className={ styles.row }>
+                    <label htmlFor="velocity-input">
+                        Velocity variation: { velocityRange.minValue }-{ velocityRange.maxValue } %
+                    </label>
+                    <RangeInput vertical={ vertical }
+                        id='velocity-input'
+                        min={ MIN_VELOCITY_PC }
+                        max={ MAX_VELOCITY_PC }
+                        minValue={ velocityRange.minValue }
+                        maxValue={ velocityRange.maxValue }
+                        onChange={ handleVelocityRangeChange }
                     />
-                ) }
+                </div>
+
+                <div className={ styles.row }>
+                    <label htmlFor="speed-input">
+                        Speed: { Math.floor( speedRange.minValue ) } ms - { Math.floor( speedRange.maxValue ) } ms
+                    </label>
+                    <RangeInput vertical={ vertical }
+                        id='speed-input'
+                        min={ MIN_SPEED_MS }
+                        max={ MAX_SPEED_MS }
+                        minValue={ speedRange.minValue }
+                        maxValue={ speedRange.maxValue }
+                        onChange={ handleSpeedRangeChange }
+                    />
+                </div>
+
+                <div className={ styles.row }>
+                    <label htmlFor="duration-input">
+                        Duration Range: { Math.floor( durationRange.minValue ) } ms - { Math.floor( durationRange.maxValue ) } ms
+                    </label>
+                    <RangeInput vertical={ vertical }
+                        id='duration-input'
+                        min={ MIN_DURATION_MS }
+                        max={ MAX_DURATION_MS }
+                        minValue={ durationRange.minValue }
+                        maxValue={ durationRange.maxValue }
+                        onChange={ handleDurationRangeChange }
+                    />
+                </div>
+
+                <div className={ styles.row }>
+                    <label htmlFor="probability-input" title="Probability threshold range">
+                        <input
+                            type="checkbox"
+                            checked={ playMode === playModeTypes.PROBABILITY }
+                            onChange={ handlePlayModeChange }
+                        />
+                        Probability Threshold Range:
+                        { percentage( probabilityThresholdRange.minValue ) }-{ percentage( probabilityThresholdRange.maxValue ) }%
+                    </label>
+                    { playMode === playModeTypes.PROBABILITY && (
+                        <RangeInput vertical={ vertical }
+                            min={ 0 }
+                            max={ 1 }
+                            minValue={ probabilityThresholdRange.minValue }
+                            maxValue={ probabilityThresholdRange.maxValue }
+                            onChange={ handleProbabilityThresholdRangeChange }
+                        />
+                    ) }
+                </div>
             </div>
 
         </fieldset>
@@ -289,4 +291,5 @@ export default function Featherise ( { selectedOutput } ) {
 
 Featherise.propTypes = {
     selectedOutput: PropTypes.object.isRequired,
+    vertical: PropTypes.bool,
 };
