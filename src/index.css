@@ -51,6 +51,11 @@ legend {
   margin: 0;
 }
 
+header {
+  margin: 0 var(--midi-app-padding);
+  border-bottom: var(--midi-app-border);
+}
+
 .padded {
   margin: var(--midi-app-padding);
   padding: var(--midi-app-padding);

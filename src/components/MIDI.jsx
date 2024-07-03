@@ -84,10 +84,10 @@ export default function MIDIComponent () {
     return (
         <main className={ styles.main }>
 
-            <section className={ `padded ${ styles[ 'midi-settings' ] }` }>
+            <header className={ `${ styles[ 'midi-settings' ] }` }>
                 <h1>MIDI</h1>
                 <button onClick={ () => setIsDialogOpen( true ) }>MIDI Settings</button>
-            </section>
+            </header>
 
             { selectedOutputRef.current && (
                 <Featherise selectedOutput={ selectedOutputRef.current } vertical={ true } />
