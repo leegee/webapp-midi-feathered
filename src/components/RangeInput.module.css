@@ -46,6 +46,7 @@
     cursor: ew-resize;
     transition: position 30ms;
     background-color: hsl(39, 100%, 42%);
+    background-color: transparent;
 }
 
 .custom-range-input.vertical .handle {
