@@ -30,7 +30,7 @@ export default function PianoKeyboard () {
     const midiPitches = Array.from( { length: 88 }, ( _, index ) => index + 21 );
 
     return (
-        <section className={ `padded ${ styles[ 'piano-keyboard' ] }` }>
+        <section className={ styles[ 'piano-keyboard' ] }>
             <div>
                 { midiPitches.map( ( pitch ) => (
                     <PianoKey
