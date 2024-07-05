@@ -30,7 +30,7 @@
 }
 
 .vertical .play-control {
-    width: 10em;
+    width: auto;
     flex-direction: column-reverse;
 }
 
