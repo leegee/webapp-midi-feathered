@@ -3,6 +3,9 @@
     --midi-app-thumb-width: 2em;
     --midi-app-thumb-width-half: calc(var(--midi-app-thumb-width) / 2);
     --midi-app-range-height-input: 100%;
+    --midi-app-range-size-normal: 4em;
+    --midi-app-range-size-wide: 8em;
+    --midi-app-range-size-narrow: 2em;
 }
 
 .custom-range-input {
@@ -26,6 +29,18 @@
     min-width: var(--midi-app-thumb-width);
     width: calc(100% - var(--midi-app-thumb-width));
     margin: var(--midi-app-thumb-width-half) 0 !important;
+}
+
+.custom-range-input.vertical.narrow {
+    width: var(--midi-app-range-size-narrow);
+}
+
+.custom-range-input.vertical.normal {
+    width: var(--midi-app-range-size-normal);
+}
+
+.custom-range-input.vertical.wide {
+    width: var(--midi-app-range-size-wide);
 }
 
 .bar {
