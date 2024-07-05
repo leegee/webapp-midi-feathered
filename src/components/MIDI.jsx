@@ -105,9 +105,10 @@ export default function MIDIComponent () {
             ) }
 
             <Dialog isOpen={ isDialogOpen } onClose={ () => setIsDialogOpen( false ) }>
+                <h2>MIDI Settings</h2>
+                <DeviceSelect />
                 <InputChannelSelect />
                 <OutputChannelSelect />
-                <DeviceSelect />
             </Dialog>
         </main >
     );

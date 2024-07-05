@@ -15,11 +15,16 @@
     color: var(--midi-app-fg);
 }
 
-.dialog button {
+.dialog h2 {
+    font-weight: 100;
+}
+
+.close {
     margin: 0;
-    position: absolute;
-    top: 1pt;
-    right: 1pt;
+    position: relative;
+    float: right;
+    top: -0.15em;
+    right: 0;
     background: none;
     font-size: larger;
     font-weight: bolder;

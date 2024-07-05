@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { useAtom } from 'jotai';
 
 import { sendNoteWithDuration } from '../lib/midi-messages';
-import { notesOnAtom, featheredNotesOnAtom, midiOutputChannelAtom } from '../lib/store';
+import { notesOnAtom, featheredNotesOnAtom, midiOutputChannelsAtom } from '../lib/store';
 import RangeInput from './RangeInput';
 import { loadJson, saveJson } from '../lib/settings-files';
 import styles from './Featherise.module.css';
@@ -25,7 +25,7 @@ const MAX_DURATION_MS = 2400;
 export default function Featherise ( { selectedOutput, vertical = false } ) {
     const [ notesOn ] = useAtom( notesOnAtom );
     const [ , setFeatheredNotesOn ] = useAtom( featheredNotesOnAtom );
-    const [ midiOutputChannel ] = useAtom( midiOutputChannelAtom );
+    const [ midiOutputChannels ] = useAtom( midiOutputChannelsAtom );
 
     const [ playMode, setPlayMode ] = useState( playModeTypes.PROBABILITY );
     const [ probabilityThresholdRange, setProbabilityThresholdRange ] = useState( { minValue: 0, maxValue: 1 } );
@@ -144,6 +144,11 @@ export default function Featherise ( { selectedOutput, vertical = false } ) {
             }
 
             const useDurationMs = speedRange.minValue + Math.random() * ( speedRange.maxValue - speedRange.minValue );
+            const midiOutputChannel = midiOutputChannels.length == 1
+                // Use the only output selected
+                ? midiOutputChannels[ 0 ]
+                // Use a random output channel
+                : midiOutputChannels[ Math.floor( Math.random() * midiOutputChannels.length ) ];
 
             if ( playMode === playModeTypes.ONE_NOTE ) {
                 // Always play one random note
@@ -195,7 +200,7 @@ export default function Featherise ( { selectedOutput, vertical = false } ) {
         return () => clearTimeout( bpsTimer );
     }, [
         notesOn, playMode, probabilityThresholdRange, speedRange, selectedOutput,
-        bpsRange.minValue, bpsRange.maxValue, midiOutputChannel, setFeatheredNotesOn
+        bpsRange.minValue, bpsRange.maxValue, midiOutputChannels, setFeatheredNotesOn
     ] );
 
     return (

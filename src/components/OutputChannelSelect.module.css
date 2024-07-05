@@ -1,0 +1,11 @@
+/* midi-output-channel-selector-component */
+
+.midi-output-channel-selector-component {
+    display: flex;
+    flex-direction: column;
+}
+
+.midi-output-channel-selector-component small {
+    text-align: right;
+    margin-top: 1em;
+}

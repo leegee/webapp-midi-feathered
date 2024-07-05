@@ -8,7 +8,7 @@ export const notesOnAtom = atom( {} );
 export const featheredNotesOnAtom = atom( {} );
 
 export const midiInputChannelAtom = atom( DEFAULT_MIDI_CHANNEL_IN );
-export const midiOutputChannelAtom = atom( DEFAULT_MIDI_CHANNEL_OUT );
+export const midiOutputChannelsAtom = atom( [ DEFAULT_MIDI_CHANNEL_OUT ] );
 
 export const CCsAtom = atom( {} );
 export const CCs2rangesAtom = atom( {} );
