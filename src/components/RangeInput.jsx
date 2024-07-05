@@ -14,7 +14,7 @@ function debounce ( func, delay ) {
     };
 }
 
-const RangeInput = ( { min, max, minValue, maxValue, onChange, debounceMs = 50, vertical = false, size = 'normal' } ) => {
+const RangeInput = ( { min, max, minValue, maxValue, onChange, debounceMs = 50, vertical = false, size = 'wide' } ) => {
     const [ minPercentage, setMinPercentage ] = useState( ( ( minValue - min ) / ( max - min ) ) * 100 );
     const [ maxPercentage, setMaxPercentage ] = useState( ( ( maxValue - min ) / ( max - min ) ) * 100 );
 
