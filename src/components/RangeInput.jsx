@@ -14,7 +14,7 @@ function debounce ( func, delay ) {
     };
 }
 
-const RangeInput = ( { min, max, minValue, maxValue, onChange, debounceMs = 50, vertical = false } ) => {
+const RangeInput = ( { min, max, minValue, maxValue, onChange, debounceMs = 50, vertical = false, size = 'normal' } ) => {
     const [ minPercentage, setMinPercentage ] = useState( ( ( minValue - min ) / ( max - min ) ) * 100 );
     const [ maxPercentage, setMaxPercentage ] = useState( ( ( maxValue - min ) / ( max - min ) ) * 100 );
 
@@ -23,7 +23,7 @@ const RangeInput = ( { min, max, minValue, maxValue, onChange, debounceMs = 50, 
         setMaxPercentage( ( ( maxValue - min ) / ( max - min ) ) * 100 );
     }, [ minValue, maxValue, min, max ] );
 
-    // Debounce logic
+    // Debounce
     const debounceTimeout = useRef( null );
 
     const debouncedOnChange = useRef(
@@ -98,7 +98,7 @@ const RangeInput = ( { min, max, minValue, maxValue, onChange, debounceMs = 50, 
     };
 
     return (
-        <div className={ `${ styles[ 'custom-range-input' ] } ${ vertical ? styles.vertical : '' }` }>
+        <section className={ `${ styles[ 'custom-range-input' ] } ${ vertical ? styles.vertical : '' } ${ styles[ size ] }` }>
             <div
                 className={ styles.bar }
                 style={ vertical
@@ -124,7 +124,7 @@ const RangeInput = ( { min, max, minValue, maxValue, onChange, debounceMs = 50, 
                 onMouseDown={ ( e ) => handleMouseDown( e, false ) }
                 onTouchStart={ ( e ) => handleTouchStart( e, false ) }
             />
-        </div>
+        </section>
     );
 };
 
@@ -136,6 +136,7 @@ RangeInput.propTypes = {
     onChange: PropTypes.func.isRequired,
     debounceMs: PropTypes.number,
     vertical: PropTypes.bool,
+    size: PropTypes.oneOf( [ 'normal', 'wide', 'narrow' ] ),
 };
 
 export default RangeInput;
