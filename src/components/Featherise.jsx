@@ -145,39 +145,39 @@ export default function Featherise ( { selectedOutput, vertical = false } ) {
 
             if ( playMode === playModeTypes.ONE_NOTE ) {
                 // Always play one random note
-                const pitch = pitches[ Math.floor( Math.random() * pitches.length ) ];
-                const velocity = generateVelocity( notesOn[ pitch ] );
+                const usePitch = pitches[ Math.floor( Math.random() * pitches.length ) ];
+                const useVelocity = generateVelocity( notesOn[ usePitch ] );
 
                 sendNoteWithDuration(
-                    pitch,
-                    velocity,
+                    usePitch,
+                    useVelocity,
                     useDurationMs,
                     selectedOutput,
                     midiOutputChannel
                 );
                 setFeatheredNotesOn( {
-                    [ pitch ]: { velocity }
+                    [ usePitch ]: { velocity: useVelocity }
                 } );
             }
 
             else { // if ( playMode === playModeTypes.PROBABILITY ) {
                 // Mabye play some of the notes:
                 const playingPitch2velocity = {};
-                Object.keys( notesOn ).forEach( ( pitch ) => {
+                Object.keys( notesOn ).forEach( ( usePitch ) => {
                     const probability = Math.random();
                     if ( probability < probabilityThresholdRange.maxValue && probability > probabilityThresholdRange.minValue ) {
-                        const velocity = generateVelocity( notesOn[ pitch ] );
+                        const useVelocity = generateVelocity( notesOn[ usePitch ] );
                         sendNoteWithDuration(
-                            pitch,
-                            velocity,
+                            usePitch,
+                            useVelocity,
                             useDurationMs,
                             selectedOutput,
                             midiOutputChannel
                         );
-                        playingPitch2velocity[ pitch ] = { velocity };
-                        setFeatheredNotesOn( { ...playingPitch2velocity } );
+                        playingPitch2velocity[ usePitch ] = { velocity: useVelocity };
                     }
                 } );
+                setFeatheredNotesOn( { ...playingPitch2velocity } );
             }
 
             // Set the next recursion:
