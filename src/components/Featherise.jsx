@@ -17,10 +17,10 @@ const MIN_BPS = 1;
 const MAX_BPS = 30;
 const MIN_VELOCITY_PC = -100;
 const MAX_VELOCITY_PC = 100;
-const MIN_SPEED_MS = 10;
-const MAX_SPEED_MS = 10000;
-const MIN_DURATION_MS = 10;
-const MAX_DURATION_MS = 5000;
+const MIN_SPEED_MS = 6000;
+const MAX_SPEED_MS = 200;
+const MIN_DURATION_MS = 60000;
+const MAX_DURATION_MS = 2400;
 
 export default function Featherise ( { selectedOutput, vertical = false } ) {
     const [ notesOn ] = useAtom( notesOnAtom );
@@ -81,6 +81,8 @@ export default function Featherise ( { selectedOutput, vertical = false } ) {
     };
 
     const percentage = ( real ) => Math.floor( real * 100 );
+
+    const ms2bpm = ( n ) => 60000 / Number( n );
 
     const save = () => {
         saveJson( {
@@ -240,7 +242,7 @@ export default function Featherise ( { selectedOutput, vertical = false } ) {
                 <div className={ styles[ 'play-control' ] }>
                     <label htmlFor="speed-input">
                         Speed:&nbsp;
-                        { Math.floor( speedRange.minValue ) } ms - { Math.floor( speedRange.maxValue ) } ms
+                        { Math.floor( ms2bpm( speedRange.minValue ) ) } - { Math.floor( ms2bpm( speedRange.maxValue ) ) } bpm
                     </label>
                     <RangeInput vertical={ vertical }
                         id='speed-input'
@@ -255,7 +257,7 @@ export default function Featherise ( { selectedOutput, vertical = false } ) {
                 <div className={ styles[ 'play-control' ] }>
                     <label htmlFor="duration-input">
                         Duration:&nbsp;
-                        { Math.floor( durationRange.minValue ) } ms - { Math.floor( durationRange.maxValue ) } ms
+                        { ms2bpm( durationRange.minValue ) } - { ms2bpm( durationRange.maxValue ) } bpm
                     </label>
                     <RangeInput vertical={ vertical }
                         id='duration-input'
