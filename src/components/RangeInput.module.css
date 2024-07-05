@@ -1,3 +1,4 @@
+/* RangeInput.module.css */
 :root {
     --midi-app-thumb-width: 2em;
     --midi-app-thumb-width-half: calc(var(--midi-app-thumb-width) / 2);
@@ -19,9 +20,10 @@
 
 .custom-range-input.vertical {
     min-height: 10em;
+    min-height: calc(var(--midi-app-thumb-width) * 2);
     height: var(--midi-app-range-height-input, 100%);
     max-height: 100%;
-    min-width: 4em;
+    min-width: var(--midi-app-thumb-width);
     width: calc(100% - var(--midi-app-thumb-width));
     margin: var(--midi-app-thumb-width-half) 0 !important;
 }
