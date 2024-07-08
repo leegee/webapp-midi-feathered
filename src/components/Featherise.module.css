@@ -46,8 +46,15 @@
 
 .vertical .play-control label {
     align-items: baseline;
+    flex-direction: column;
+    ;
 }
 
 .play-control input {
     margin-right: 0.5em;
+}
+
+.play-control small {
+    font-size: xx-small;
+    margin: 0 0.3em;
 }
