@@ -9,3 +9,7 @@
     text-align: right;
     margin-top: 1em;
 }
+
+.midi-output-channel-selector-component select {
+    height: 22em;
+}

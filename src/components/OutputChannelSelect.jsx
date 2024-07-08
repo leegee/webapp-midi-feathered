@@ -1,15 +1,16 @@
 import { useAtom } from 'jotai';
-import { midiOutputChannelsAtom } from '../lib/store';
+import { midiInputChannelAtom, midiOutputChannelsAtom } from '../lib/store';
 import styles from './OutputChannelSelect.module.css';
 
 export default function OutputChannelSelect () {
     const [ midiOutputChannels, setMidiOutputChannels ] = useAtom( midiOutputChannelsAtom );
+    const [ midiInputChannel ] = useAtom( midiInputChannelAtom );
 
     const handleOutputChange = ( event ) => {
         const options = event.target.options;
         const selectedValues = [];
         for ( let i = 0, l = options.length; i < l; i++ ) {
-            if ( options[ i ].selected ) {
+            if ( options[ i ].selected && options[ i ].value !== midiInputChannel ) {
                 selectedValues.push( Number( options[ i ].value ) );
             }
         }
@@ -29,7 +30,8 @@ export default function OutputChannelSelect () {
                 { Array.from( Array( 16 ).keys() ).map( ( item ) => (
                     <option key={ item + 1 }
                         value={ item + 1 }
-                        selected={ midiOutputChannels.includes( item + 1 ) }
+                        disabled={ item + 1 === midiInputChannel }
+                        title={ item + 1 === midiInputChannel ? 'This is the input channel' : `Channel ${ item + 1 } is available` }
                     >
                         { item + 1 }
                     </option>
