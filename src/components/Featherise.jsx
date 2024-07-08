@@ -220,11 +220,11 @@ export default function Featherise ( { selectedOutput, vertical = false } ) {
                 const useDurationMs = rangeState.speedRange.minValue + Math.random() * ( rangeState.speedRange.maxValue - rangeState.speedRange.minValue );
                 const useVelocity = generateVelocity( notesOn[ [ aPitch ] ] );
 
-                const useOctave = 12 * Math.floor(
+                const useOctave = ( Math.floor(
                     rangeState.octaveRange.minValue == rangeState.octaveRange.maxValue
                         ? rangeState.octaveRange.minValue
                         : probabilityTriangular( rangeState.octaveRange.minValue, rangeState.octaveRange.maxValue )
-                ) - 1;
+                ) - 1 ) * 12;
 
                 const midiOutputChannel = midiOutputChannels.length == 1
                     ? midiOutputChannels[ 0 ]                                                        // Use the only output selected
