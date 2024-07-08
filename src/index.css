@@ -96,6 +96,10 @@ select:hover {
   border-color: var(--midi-app-fg);
 }
 
+option:checked {
+  background-color: #b3d4fc;
+}
+
 button {
   font-size: 66%;
   font-weight: 100;

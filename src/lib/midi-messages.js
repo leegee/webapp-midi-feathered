@@ -6,6 +6,7 @@ const DISPATCH_EVENTS_STD = false;
 const DISPATCH_EVENTS_FOR_EXTRAS = true;
 
 export function startMidiNote ( pitch, velocity, selectedOutput, midiChannel ) {
+    console.debug( 'send', midiChannel );
     selectedOutput.send( [ 0x90 + midiChannel, pitch, velocity ] );
 }
 
@@ -22,7 +23,6 @@ export function sendNoteWithDuration ( pitch, velocity, durationMs, selectedOutp
 
     startMidiNote( pitch, velocity, selectedOutput, midiChannel );
     if ( DISPATCH_EVENTS_FOR_EXTRAS ) {
-        console.debug( 'send', pitch );
         window.dispatchEvent(
             new CustomEvent( EVENT_NOTE_START, { detail: { pitch, velocity, midiChannel } } )
         );

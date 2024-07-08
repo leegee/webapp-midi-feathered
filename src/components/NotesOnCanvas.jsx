@@ -115,7 +115,6 @@ export default function NoteList () {
     useEffect( () => {
         const handleNoteEvent = ( event ) => {
             if ( event.type === EVENT_NOTE_START ) {
-                console.debug( 'received', event.detail.pitch )
                 setPlayingExtraNotes( ( prevEvents ) => ( {
                     ...prevEvents,
                     [ event.detail.pitch ]: event.detail.velocity,
