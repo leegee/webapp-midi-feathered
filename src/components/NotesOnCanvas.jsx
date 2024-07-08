@@ -35,6 +35,7 @@ export default function NoteList () {
         };
     }, [] );
 
+    // Rendering loop for continious scrolling: new notes at drawn at the bottom of the canvas after the whole canvas has been moved up by a copy
     useEffect( () => {
         if ( !canvasHeight ) {
             return;
