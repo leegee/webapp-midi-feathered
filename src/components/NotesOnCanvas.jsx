@@ -46,8 +46,7 @@ export default function NoteList () {
         const bufferCtx = bufferCanvas.getContext( '2d' );
         const canvasWidth = canvas.width;
         const noteWidth = canvasWidth / NUMBER_OF_NOTES;
-
-        const startY = canvasHeight - NOTE_HEIGHT;
+        const y = canvasHeight - NOTE_HEIGHT;
 
         bufferCanvas.width = canvasWidth;
         bufferCanvas.height = canvasHeight;
@@ -57,37 +56,53 @@ export default function NoteList () {
             bufferCtx.clearRect( 0, 0, canvasWidth, canvasHeight );
 
             // Scrolling: draw previous frame shifted upwards by note height
-            bufferCtx.drawImage( canvas,
-                0, NOTE_HEIGHT, canvasWidth, canvasHeight - NOTE_HEIGHT,
-                0, 0, canvasWidth, canvasHeight - NOTE_HEIGHT
+            bufferCtx.drawImage(
+                canvas,
+                0,
+                NOTE_HEIGHT,
+                canvasWidth,
+                canvasHeight - NOTE_HEIGHT,
+                0,
+                0,
+                canvasWidth,
+                canvasHeight - NOTE_HEIGHT
             );
 
             // Draw new notes
             Object.entries( notesOn ).forEach( ( [ key, velocity ] ) => {
                 const pitch = parseInt( key, 10 );
+                const x = ( pitch - LOWEST_PITCH ) * noteWidth;
 
                 // Calculate hue based on pitch (lowest notes are red, highest are violet)
                 const hue = mapRange( pitch, LOWEST_PITCH, 108, 0, 300 );
 
-                // Calculate luminosity based on velocity and clamp to reasonable range
-                const luminosity = Math.max( 10, Math.min( 90, ( ( velocity / 127 ) * 100 ) ) );
+                // Calculate luminosity based on velocity and clamp to easily seen range
+                const luminosity = Math.max( 10, Math.min( 90, ( velocity / 127 ) * 100 ) );
 
-                const colourStr = `hsl(${ hue }, 100%, ${ luminosity }%)`;
+                bufferCtx.fillStyle = `hsl(${ hue }, 100%, ${ luminosity }%)`;
+                bufferCtx.fillRect( x, y, noteWidth, NOTE_HEIGHT );
 
-                const xPosition = ( pitch - LOWEST_PITCH ) * noteWidth;
+                if ( playingEvents[ key ] ) {
+                    // Draw outline for playing notes on left and right sides only
+                    const outlineWidth = 2;
+                    const leftX = x + ( outlineWidth / 2 );
+                    const rightX = x + ( noteWidth - outlineWidth / 2 );
 
-                // Draw the note on the buffer canvas
-                bufferCtx.fillStyle = colourStr;
-                bufferCtx.fillRect( xPosition, startY, noteWidth, NOTE_HEIGHT );
-            } );
+                    bufferCtx.strokeStyle = 'white';
+                    bufferCtx.lineWidth = outlineWidth;
 
-            // Draw playing events in lime green
-            Object.keys( playingEvents ).forEach( ( key ) => {
-                const pitch = parseInt( key, 10 );
-                const xPosition = ( pitch - LOWEST_PITCH ) * noteWidth;
+                    // Left side outline
+                    bufferCtx.beginPath();
+                    bufferCtx.moveTo( leftX, y );
+                    bufferCtx.lineTo( leftX, y + NOTE_HEIGHT );
+                    bufferCtx.stroke();
 
-                bufferCtx.fillStyle = 'limegreen';
-                bufferCtx.fillRect( xPosition, startY, noteWidth, NOTE_HEIGHT );
+                    // Right side outline
+                    bufferCtx.beginPath();
+                    bufferCtx.moveTo( rightX, y );
+                    bufferCtx.lineTo( rightX, y + NOTE_HEIGHT );
+                    bufferCtx.stroke();
+                }
             } );
 
             // Clear main canvas
@@ -120,7 +135,7 @@ export default function NoteList () {
             if ( event.type === EVENT_NOTE_START ) {
                 setPlayingEvents( ( prevEvents ) => ( {
                     ...prevEvents,
-                    [ event.detail.pitch ]: event.detail.velocity
+                    [ event.detail.pitch ]: event.detail.velocity,
                 } ) );
             }
 

@@ -31,6 +31,14 @@
     margin: var(--midi-app-thumb-width-half) 0 !important;
 }
 
+.custom-range-input.flipped {
+    flex-direction: row-reverse;
+}
+
+.custom-range-input.vertical.flipped {
+    flex-direction: column-reverse;
+}
+
 .custom-range-input.vertical.narrow {
     width: var(--midi-app-range-size-narrow);
 }

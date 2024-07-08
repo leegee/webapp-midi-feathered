@@ -275,6 +275,7 @@ export default function Featherise ( { selectedOutput, vertical = false } ) {
                     </label>
                     <RangeInput vertical={ vertical }
                         id='bps-input'
+                        flipDisplay={ true }
                         min={ DEFAULT_RANGES.bpsRange.minValue }
                         max={ DEFAULT_RANGES.bpsRange.maxValue }
                         minValue={ rangeState.bpsRange.minValue }
@@ -290,6 +291,7 @@ export default function Featherise ( { selectedOutput, vertical = false } ) {
                     </label>
                     <RangeInput vertical={ vertical }
                         id='velocity-input'
+                        flipDisplay={ true }
                         forceIntegers={ true }
                         min={ DEFAULT_RANGES.velocityRange.minValue }
                         max={ DEFAULT_RANGES.velocityRange.maxValue }
@@ -306,6 +308,7 @@ export default function Featherise ( { selectedOutput, vertical = false } ) {
                     </label>
                     <RangeInput vertical={ vertical }
                         id='speed-input'
+                        flipDisplay={ true }
                         min={ DEFAULT_RANGES.speedRange.minValue }
                         max={ DEFAULT_RANGES.speedRange.maxValue }
                         minValue={ rangeState.speedRange.minValue }
@@ -339,6 +342,7 @@ export default function Featherise ( { selectedOutput, vertical = false } ) {
                     <RangeInput vertical={ vertical }
                         size='normal'
                         id='duration-input'
+                        flipDisplay={ true }
                         forceIntegers={ true }
                         min={ DEFAULT_RANGES.durationRange.minValue }
                         max={ DEFAULT_RANGES.durationRange.maxValue }

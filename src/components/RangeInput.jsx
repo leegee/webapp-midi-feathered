@@ -23,7 +23,8 @@ const RangeInput = ( {
     debounceMs = 50,
     vertical = false,
     size = 'wide',
-    forceIntegers = false // New prop to force integer values
+    flipDisplay = false,
+    forceIntegers = false
 } ) => {
     const [ minPercentage, setMinPercentage ] = useState( ( ( minValue - min ) / ( max - min ) ) * 100 );
     const [ maxPercentage, setMaxPercentage ] = useState( ( ( maxValue - min ) / ( max - min ) ) * 100 );
@@ -112,7 +113,7 @@ const RangeInput = ( {
     };
 
     return (
-        <section className={ `${ styles[ 'custom-range-input' ] } ${ vertical ? styles.vertical : '' } ${ styles[ size ] }` }>
+        <section className={ `${ styles[ 'custom-range-input' ] } ${ vertical ? styles.vertical : '' } ${ flipDisplay ? styles.flipped : '' } ${ styles[ size ] }` }>
             <div
                 className={ styles.bar }
                 style={
@@ -146,7 +147,8 @@ RangeInput.propTypes = {
     debounceMs: PropTypes.number,
     vertical: PropTypes.bool,
     size: PropTypes.oneOf( [ 'normal', 'wide', 'narrow' ] ),
-    forceIntegers: PropTypes.bool // New prop type declaration
+    forceIntegers: PropTypes.bool,
+    flipDisplay: PropTypes.bool,
 };
 
 export default RangeInput;

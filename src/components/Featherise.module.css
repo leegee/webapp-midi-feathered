@@ -31,7 +31,6 @@
 
 .vertical .play-control {
     width: auto;
-    flex-direction: column-reverse;
 }
 
 .play-control:last-child {
