@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { useAtom } from 'jotai';
 
 import { sendNoteWithDuration } from '../lib/midi-messages';
-import { notesOnAtom, featheredNotesOnAtom, midiOutputChannelsAtom } from '../lib/store';
+import { notesOnAtom, midiOutputChannelsAtom } from '../lib/store';
 import RangeInput from './RangeInput';
 import { loadJson, saveJson } from '../lib/settings-files';
 import styles from './Featherise.module.css';
@@ -61,7 +61,6 @@ function probabilityTriangular ( min, max, mode ) {
 
 export default function Featherise ( { selectedOutput, vertical = false } ) {
     const [ notesOn ] = useAtom( notesOnAtom );
-    const [ , setFeatheredNotesOn ] = useAtom( featheredNotesOnAtom );
     const [ midiOutputChannels ] = useAtom( midiOutputChannelsAtom );
 
     const rangeState = {};
@@ -75,7 +74,6 @@ export default function Featherise ( { selectedOutput, vertical = false } ) {
             minValue: localStorageOr( key + "_minValue", DEFAULT_RANGES[ key ].minValue ),
             maxValue: localStorageOr( key + "_maxValue", DEFAULT_RANGES[ key ].maxValue ),
         } );
-        console.log( `SET ${ key } ` )
     }
 
     const handleBpsRangeChange = ( newRange ) => {
@@ -119,7 +117,7 @@ export default function Featherise ( { selectedOutput, vertical = false } ) {
     };
 
     const handleprobRangeChange = ( newRange ) => {
-        rangeState.setprobRange( {
+        rangeState.setProbRange( {
             minValue: Number( newRange.minValue ),
             maxValue: Number( newRange.maxValue ),
         } );
@@ -169,7 +167,7 @@ export default function Featherise ( { selectedOutput, vertical = false } ) {
             rangeState.setVelocityRange( settings.velocityRange );
             rangeState.setSpeedRange( settings.speedRange );
             rangeState.setDurationRange( settings.durationRange );
-            rangeState.setprobRange( settings.probRange );
+            rangeState.setProbRange( settings.probRange );
         } catch ( e ) {
             console.error( e );
             alert( e );
@@ -194,7 +192,6 @@ export default function Featherise ( { selectedOutput, vertical = false } ) {
         const saveIntervalTimer = setInterval( () => {
             localStorage.setItem( 'playMode', rangeState.playMode );
             for ( let key in DEFAULT_RANGES ) {
-                console.log( key, rangeState[ key ] )
                 localStorage.setItem( key + "_minValue", rangeState[ key ].minValue );
                 localStorage.setItem( key + "_maxValue", rangeState[ key ].maxValue );
             }
@@ -205,60 +202,60 @@ export default function Featherise ( { selectedOutput, vertical = false } ) {
     useEffect( () => {
         let bpsTimer;
 
+        // Was bpsListener
         const playNoteEveryBps = () => {
             const pitches = Object.keys( notesOn );
             if ( !pitches.length ) {
                 return;
             }
 
-            const midiOutputChannel = midiOutputChannels.length == 1
-                // Use the only output selected
-                ? midiOutputChannels[ 0 ]
-                // Use a random output channel
-                : midiOutputChannels[ Math.floor( Math.random() * midiOutputChannels.length ) ];
-
-            const useDurationMs = rangeState.speedRange.minValue + Math.random() * ( rangeState.speedRange.maxValue - rangeState.speedRange.minValue );
-
-            const useOctave = 12 * (
-                rangeState.octaveRange.minValue == rangeState.octaveRange.maxValue
-                    ? rangeState.octaveRange.minValue
-                    : probabilityTriangular( rangeState.octaveRange.minValue, rangeState.octaveRange.maxValue )
-            ) - 1;
-
-            let usePitches = [];
-
-            if ( rangeState.playMode === playModeTypes.ONE_NOTE ) {
-                // Always play one random note
-                const randomPitch = pitches[ Math.floor( Math.random() * pitches.length ) ];
-                usePitches.push( useOctave + randomPitch );
-            } else {
-                // Maybe play some of the notes:
-                usePitches = Object.keys( notesOn ).filter( () => {
+            const usePitches = rangeState.playMode === playModeTypes.ONE_NOTE
+                ? [ Number( pitches[ Math.floor( Math.random() * pitches.length ) ] ) ]
+                : Object.keys( notesOn ).filter( () => {
                     const probability = probabilityTriangular( 0, 1 );
                     return probability < rangeState.probRange.maxValue && probability > rangeState.probRange.minValue;
-                } ).map( usePitch => useOctave + parseInt( usePitch ) );
-            }
+                } ).map( usePitch => Number( usePitch ) );
 
-            const playingPitch2velocity = {};
+            usePitches.forEach( ( aPitch ) => {
+                const useDurationMs = rangeState.speedRange.minValue + Math.random() * ( rangeState.speedRange.maxValue - rangeState.speedRange.minValue );
+                const useVelocity = generateVelocity( notesOn[ [ aPitch ] ] );
 
-            usePitches.forEach( ( usePitch ) => {
-                const basePitch = usePitch - useOctave;
-                const useVelocity = generateVelocity( notesOn[ basePitch ] );
-                playingPitch2velocity[ basePitch ] = { velocity: useVelocity };
-                sendNoteWithDuration( usePitch, useVelocity, useDurationMs, selectedOutput, midiOutputChannel );
+                const useOctave = 12 * Math.floor(
+                    rangeState.octaveRange.minValue == rangeState.octaveRange.maxValue
+                        ? rangeState.octaveRange.minValue
+                        : probabilityTriangular( rangeState.octaveRange.minValue, rangeState.octaveRange.maxValue )
+                ) - 1;
+
+                const midiOutputChannel = midiOutputChannels.length == 1
+                    ? midiOutputChannels[ 0 ]                                                        // Use the only output selected
+                    : midiOutputChannels[ Math.floor( Math.random() * midiOutputChannels.length ) ]; // Use a random output channel
+
+                let usePitch = aPitch + useOctave;
+
+                // Reverse the octave if it puts the note out of range
+                if ( usePitch >= 127 || usePitch < 28 ) {
+                    usePitch -= useOctave;
+                }
+
+                try {
+                    sendNoteWithDuration( usePitch, useVelocity, useDurationMs, selectedOutput, midiOutputChannel );
+                }
+                catch ( e ) {
+                    console.error( `usePitch was ${ usePitch }` );
+                    throw e;
+                }
             } );
 
-            setFeatheredNotesOn( { ...playingPitch2velocity } );
-
             // Set the next recursion:
-            bpsTimer = setTimeout( playNoteEveryBps, probabilityTriangular( rangeState.bpsRange.minValue, rangeState.bpsRange.maxValue ) );
+            const recallTime = 1000 / probabilityTriangular( rangeState.bpsRange.minValue, rangeState.bpsRange.maxValue );
+            bpsTimer = setTimeout( playNoteEveryBps, recallTime );
         };
 
         // Begin the recursion:
         playNoteEveryBps();
 
         return () => clearTimeout( bpsTimer );
-    }, [ notesOn, rangeState.playMode, rangeState.probRange, rangeState.speedRange, selectedOutput, rangeState.bpsRange.minValue, rangeState.bpsRange.maxValue, midiOutputChannels, setFeatheredNotesOn, rangeState.octaveRange.minValue, rangeState.octaveRange.maxValue ] );
+    }, [ notesOn, rangeState.playMode, rangeState.probRange, rangeState.speedRange, selectedOutput, rangeState.bpsRange.minValue, rangeState.bpsRange.maxValue, midiOutputChannels, rangeState.octaveRange.minValue, rangeState.octaveRange.maxValue ] );
 
     return (
         <fieldset className={ `padded ${ styles[ 'featherize-component' ] }` }>
@@ -340,6 +337,7 @@ export default function Featherise ( { selectedOutput, vertical = false } ) {
                     <RangeInput vertical={ vertical }
                         size='normal'
                         id='duration-input'
+                        int
                         min={ DEFAULT_RANGES.durationRange.minValue }
                         max={ DEFAULT_RANGES.durationRange.maxValue }
                         minValue={ rangeState.durationRange.minValue }
