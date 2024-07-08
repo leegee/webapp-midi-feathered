@@ -1,3 +1,4 @@
+import { EVENT_NOTE_START, EVENT_NOTE_STOP } from '../lib/constants';
 import { useEffect, useRef, useState } from 'react';
 import { useAtom } from 'jotai';
 import { notesOnAtom } from '../lib/store';
@@ -13,6 +14,9 @@ export default function NoteList () {
     const [ canvasHeight, setCanvasHeight ] = useState( 0 );
     const bufferCanvasRef = useRef( null ); // Buffer canvas to optimize rendering
     const requestIdRef = useRef( null );
+
+    // State to keep track of playing events
+    const [ playingEvents, setPlayingEvents ] = useState( {} );
 
     useEffect( () => {
         const handleResize = () => {
@@ -77,6 +81,15 @@ export default function NoteList () {
                 bufferCtx.fillRect( xPosition, startY, noteWidth, NOTE_HEIGHT );
             } );
 
+            // Draw playing events in lime green
+            Object.keys( playingEvents ).forEach( ( key ) => {
+                const pitch = parseInt( key, 10 );
+                const xPosition = ( pitch - LOWEST_PITCH ) * noteWidth;
+
+                bufferCtx.fillStyle = 'limegreen';
+                bufferCtx.fillRect( xPosition, startY, noteWidth, NOTE_HEIGHT );
+            } );
+
             // Clear main canvas
             ctx.clearRect( 0, 0, canvasWidth, canvasHeight );
 
@@ -96,11 +109,40 @@ export default function NoteList () {
                 cancelAnimationFrame( requestIdRef.current );
             }
         };
-    }, [ canvasHeight, notesOn ] );
+    }, [ canvasHeight, notesOn, playingEvents ] );
 
     function mapRange ( value, minIn, maxIn, minOut, maxOut ) {
         return ( ( value - minIn ) * ( maxOut - minOut ) ) / ( maxIn - minIn ) + minOut;
     }
+
+    useEffect( () => {
+        const handleNoteEvent = ( event ) => {
+            const { type, pitch } = event;
+
+            if ( type === EVENT_NOTE_START ) {
+                setPlayingEvents( ( prevEvents ) => ( {
+                    ...prevEvents,
+                    [ pitch ]: true
+                } ) );
+            }
+
+            if ( type === EVENT_NOTE_STOP ) {
+                setPlayingEvents( ( prevEvents ) => {
+                    const newEvents = { ...prevEvents };
+                    delete newEvents[ pitch ];
+                    return newEvents;
+                } );
+            }
+        };
+
+        window.addEventListener( EVENT_NOTE_START, handleNoteEvent );
+        window.addEventListener( EVENT_NOTE_STOP, handleNoteEvent );
+
+        return () => {
+            window.removeEventListener( EVENT_NOTE_START, handleNoteEvent );
+            window.removeEventListener( EVENT_NOTE_STOP, handleNoteEvent );
+        };
+    }, [] );
 
     return (
         <section className={ styles[ 'canvas-component' ] }>

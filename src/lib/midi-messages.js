@@ -2,9 +2,10 @@
 import { NOTE_OFF, NOTE_ON, EVENT_NOTE_START, EVENT_NOTE_STOP } from './constants';
 
 const timersForPitches = {};
-const DISPATCH_EVENTS = false;
+const DISPATCH_EVENTS = true;
 
 export function startMidiNote ( pitch, velocity, selectedOutput, midiChannel ) {
+    console.debug( 'send', [ 0x90 + midiChannel, pitch, velocity ] );
     selectedOutput.send( [ 0x90 + midiChannel, pitch, velocity ] );
 }
 
