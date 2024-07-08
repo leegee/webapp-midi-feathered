@@ -13,52 +13,86 @@ const playModeTypes = {
     ONE_NOTE: 2,
 };
 
-const MIN_BPS = 1;
-const MAX_BPS = 10;
-const MIN_VELOCITY_PC = -100;
-const MAX_VELOCITY_PC = 100;
-const MIN_SPEED_MS = 6000;
-const MAX_SPEED_MS = 200;
-const MIN_DURATION_MS = 60000;
-const MAX_DURATION_MS = 2400;
-const MIN_OCTAVE = 1;
-const MAX_OCTAVE = 5;
+const LOCAL_SAVE_FREQ_MS = 1000 * 10;
+
+const DEFAULT_RANGES = {
+    probRange: {
+        minValue: 0,
+        maxValue: 1,
+    },
+    durationRange: {
+        minValue: 2400,
+        maxValue: 60000,
+    },
+    velocityRange: {
+        minValue: -100,
+        maxValue: 100,
+    },
+    bpsRange: {
+        minValue: 1,
+        maxValue: 10,
+    },
+    speedRange: {
+        minValue: 200,
+        maxValue: 6000,
+    },
+    octaveRange: {
+        minValue: 1,
+        maxValue: 5
+    },
+}
+
+const localStorageOr = ( fieldName, defaultValue ) => {
+    return Number( localStorage.getItem( fieldName ) ) || defaultValue;
+}
+
+const ucfirst = str => str.charAt( 0 ).toUpperCase() + str.slice( 1 );
 
 export default function Featherise ( { selectedOutput, vertical = false } ) {
     const [ notesOn ] = useAtom( notesOnAtom );
     const [ , setFeatheredNotesOn ] = useAtom( featheredNotesOnAtom );
     const [ midiOutputChannels ] = useAtom( midiOutputChannelsAtom );
 
-    const [ playMode, setPlayMode ] = useState( playModeTypes.PROBABILITY );
-    const [ probabilityThresholdRange, setProbabilityThresholdRange ] = useState( { minValue: 0, maxValue: 1 } );
-    const [ durationRange, setDurationRange ] = useState( { minValue: MIN_DURATION_MS, maxValue: MAX_DURATION_MS } );
-    const [ velocityRange, setVelocityRange ] = useState( { minValue: MIN_VELOCITY_PC, maxValue: MAX_VELOCITY_PC } );
-    const [ bpsRange, setBpsRange ] = useState( { minValue: MIN_BPS, maxValue: MAX_BPS } );
-    const [ speedRange, setSpeedRange ] = useState( { minValue: MIN_SPEED_MS, maxValue: MAX_SPEED_MS } );
-    const [ octaveRange, setOctaveRange ] = useState( { minValue: MIN_OCTAVE, maxValue: MAX_OCTAVE } );
+    const rangeState = {
+        playMode: localStorageOr( 'playMode', true ),
+        setPlayMode: useState( playModeTypes.PROBABILITY ),
+    };
 
-    // const localStorageOr = ( varName, defaultValue ) => {
-    //     return Number( localStorage.getItem( varName ) ) || defaultValue;
-    // }
+    for ( let key in DEFAULT_RANGES ) {
+        const setterName = 'set' + ucfirst( key );
+        // eslint-disable-next-line react-hooks/rules-of-hooks
+        [ rangeState[ key ], rangeState[ setterName ] ] = useState( {
+            minValue: localStorageOr( key + "_minValue", DEFAULT_RANGES[ key ].minValue ),
+            maxValue: localStorageOr( key + "_maxValue", DEFAULT_RANGES[ key ].maxValue ),
+        } );
+        console.log( `SET ${ key } ` )
+    }
+
+    // [ rangeState.probRange, rangeState.setprobRange ] = useState( defaultRanges.probRange );
+    // [ rangeState.durationRange, rangeState.setDurationRange ] = useState( defaultRanges.durationRange );
+    // [ rangeState.velocityRange, rangeState.setVelocityRange ] = useState( { minValue: MIN_VELOCITY_PC, maxValue: MAX_VELOCITY_PC } );
+    // [ rangeState.bpsRange, rangeState.setBpsRange ] = useState( { minValue: MIN_BPS, maxValue: MAX_BPS } );
+    // [ rangeState.speedRange, rangeState.setSpeedRange ] = useState( { minValue: MIN_SPEED_MS, maxValue: MAX_SPEED_MS } );
+    // [ rangeState.octaveRange, rangeState.setOctaveRange ] = useState( { minValue: MIN_OCTAVE, maxValue: MAX_OCTAVE } );
 
     const handleBpsRangeChange = ( newRange ) => {
-        setBpsRange( {
-            minValue: Math.floor( Number( newRange.minValue !== undefined ? newRange.minValue : bpsRange.minValue ) ),
-            maxValue: Math.floor( Number( newRange.maxValue !== undefined ? newRange.maxValue : bpsRange.maxValue ) ),
+        rangeState.setBpsRange( {
+            minValue: Math.floor( Number( newRange.minValue !== undefined ? newRange.minValue : rangeState.bpsRange.minValue ) ),
+            maxValue: Math.floor( Number( newRange.maxValue !== undefined ? newRange.maxValue : rangeState.bpsRange.maxValue ) ),
         } );
         console.log( `Selected BPS Range: Min = ${ newRange.minValue }, Max = ${ newRange.maxValue }` );
     };
 
     const handleVelocityRangeChange = ( newRange ) => {
-        setVelocityRange( {
-            minValue: Math.floor( Number( newRange.minValue !== undefined ? newRange.minValue : velocityRange.minValue ) ),
-            maxValue: Math.floor( Number( newRange.maxValue !== undefined ? newRange.maxValue : velocityRange.maxValue ) ),
+        rangeState.setVelocityRange( {
+            minValue: Math.floor( Number( newRange.minValue !== undefined ? newRange.minValue : rangeState.velocityRange.minValue ) ),
+            maxValue: Math.floor( Number( newRange.maxValue !== undefined ? newRange.maxValue : rangeState.velocityRange.maxValue ) ),
         } );
         console.log( `Selected velocity range: Min = ${ newRange.minValue }, Max = ${ newRange.maxValue }` );
     };
 
     const handleSpeedRangeChange = ( newRange ) => {
-        setSpeedRange( {
+        rangeState.setSpeedRange( {
             minValue: Math.floor( Number( newRange.minValue ) ),
             maxValue: Math.floor( Number( newRange.maxValue ) ),
         } );
@@ -66,7 +100,7 @@ export default function Featherise ( { selectedOutput, vertical = false } ) {
     };
 
     const handleOctaveRangeChange = ( newRange ) => {
-        setOctaveRange( {
+        rangeState.setOctaveRange( {
             minValue: Math.floor( Number( newRange.minValue ) ),
             maxValue: Math.floor( Number( newRange.maxValue ) ),
         } );
@@ -74,15 +108,15 @@ export default function Featherise ( { selectedOutput, vertical = false } ) {
     };
 
     const handleDurationRangeChange = ( newRange ) => {
-        setDurationRange( {
+        rangeState.setDurationRange( {
             minValue: Math.floor( Number( newRange.minValue ) ),
             maxValue: Math.floor( Number( newRange.maxValue ) ),
         } );
         console.log( `Selected Duration Range: Min = ${ newRange.minValue }, Max = ${ newRange.maxValue }` );
     };
 
-    const handleProbabilityThresholdRangeChange = ( newRange ) => {
-        setProbabilityThresholdRange( {
+    const handleprobRangeChange = ( newRange ) => {
+        rangeState.setprobRange( {
             minValue: Number( newRange.minValue ),
             maxValue: Number( newRange.maxValue ),
         } );
@@ -90,7 +124,7 @@ export default function Featherise ( { selectedOutput, vertical = false } ) {
     };
 
     const handlePlayModeChange = ( event ) => {
-        setPlayMode(
+        rangeState.setPlayMode(
             event.target.checked ? playModeTypes.PROBABILITY : playModeTypes.ONE_NOTE
         );
     };
@@ -102,24 +136,24 @@ export default function Featherise ( { selectedOutput, vertical = false } ) {
     const save = () => {
         saveJson( {
             bpsRange: {
-                minValue: bpsRange.minValue,
-                maxValue: bpsRange.maxValue,
+                minValue: rangeState.bpsRange.minValue,
+                maxValue: rangeState.bpsRange.maxValue,
             },
             velocityRange: {
-                minValue: velocityRange.minValue,
-                maxValue: velocityRange.maxValue,
+                minValue: rangeState.velocityRange.minValue,
+                maxValue: rangeState.velocityRange.maxValue,
             },
             speedRange: {
-                minValue: speedRange.minValue,
-                maxValue: speedRange.maxValue,
+                minValue: rangeState.speedRange.minValue,
+                maxValue: rangeState.speedRange.maxValue,
             },
             durationRange: {
-                minValue: durationRange.minValue,
-                maxValue: durationRange.maxValue,
+                minValue: rangeState.durationRange.minValue,
+                maxValue: rangeState.durationRange.maxValue,
             },
-            probabilityThresholdRange: {
-                minValue: probabilityThresholdRange.minValue,
-                maxValue: probabilityThresholdRange.maxValue,
+            probRange: {
+                minValue: rangeState.probRange.minValue,
+                maxValue: rangeState.probRange.maxValue,
             },
         } );
     }
@@ -128,12 +162,13 @@ export default function Featherise ( { selectedOutput, vertical = false } ) {
         try {
             const settings = await loadJson();
             console.log( settings );
-            setBpsRange( settings.bpsRange );
-            setVelocityRange( settings.velocityRange );
-            setSpeedRange( settings.speedRange );
-            setDurationRange( settings.durationRange );
-            setProbabilityThresholdRange( settings.probabilityThresholdRange );
+            rangeState.setBpsRange( settings.bpsRange );
+            rangeState.setVelocityRange( settings.velocityRange );
+            rangeState.setSpeedRange( settings.speedRange );
+            rangeState.setDurationRange( settings.durationRange );
+            rangeState.setprobRange( settings.probRange );
         } catch ( e ) {
+            console.error( e );
             alert( e );
         }
     }
@@ -142,12 +177,26 @@ export default function Featherise ( { selectedOutput, vertical = false } ) {
     const generateVelocity = ( velocity ) => {
         return Math.min(
             Math.max(
-                ( velocity * ( 1 + Math.random() * ( MAX_VELOCITY_PC - MIN_VELOCITY_PC ) + MIN_VELOCITY_PC / 100 ) ),
+                ( velocity * ( 1 + Math.random() * (
+                    DEFAULT_RANGES.velocityRange.maxValue - DEFAULT_RANGES.velocityRange.minValue
+                ) + DEFAULT_RANGES.velocityRange.minValue / 100 ) ),
                 0
             ),
             127
         );
     }
+
+    // @see localStorageOr
+    useEffect( () => {
+        const saveIntervalTimer = setInterval( () => {
+            for ( let key in DEFAULT_RANGES ) {
+                console.log( key, rangeState[ key ] )
+                localStorage.setItem( key + "_minValue", rangeState[ key ].minValue );
+                localStorage.setItem( key + "_maxValue", rangeState[ key ].maxValue );
+            }
+        }, LOCAL_SAVE_FREQ_MS );
+        return () => clearInterval( saveIntervalTimer );
+    } );
 
     useEffect( () => {
         let bpsTimer;
@@ -158,12 +207,12 @@ export default function Featherise ( { selectedOutput, vertical = false } ) {
                 return;
             }
 
-            const useDurationMs = speedRange.minValue + Math.random() * ( speedRange.maxValue - speedRange.minValue );
+            const useDurationMs = rangeState.speedRange.minValue + Math.random() * ( rangeState.speedRange.maxValue - rangeState.speedRange.minValue );
 
             const useOctave = 12 * (
-                octaveRange.minValue == octaveRange.maxValue
-                    ? octaveRange.minValue
-                    : octaveRange.minValue + Math.random() * ( octaveRange.maxValue - octaveRange.minValue )
+                rangeState.octaveRange.minValue == rangeState.octaveRange.maxValue
+                    ? rangeState.octaveRange.minValue
+                    : rangeState.octaveRange.minValue + Math.random() * ( rangeState.octaveRange.maxValue - rangeState.octaveRange.minValue )
             ) - 1;
 
             const midiOutputChannel = midiOutputChannels.length == 1
@@ -172,7 +221,7 @@ export default function Featherise ( { selectedOutput, vertical = false } ) {
                 // Use a random output channel
                 : midiOutputChannels[ Math.floor( Math.random() * midiOutputChannels.length ) ];
 
-            if ( playMode === playModeTypes.ONE_NOTE ) {
+            if ( rangeState.playMode === playModeTypes.ONE_NOTE ) {
                 // Always play one random note
                 const usePitch = useOctave + pitches[ Math.floor( Math.random() * pitches.length ) ];
                 const useVelocity = generateVelocity( notesOn[ usePitch ] );
@@ -194,7 +243,7 @@ export default function Featherise ( { selectedOutput, vertical = false } ) {
                 const playingPitch2velocity = {};
                 Object.keys( notesOn ).forEach( ( usePitch ) => {
                     const probability = Math.random();
-                    if ( probability < probabilityThresholdRange.maxValue && probability > probabilityThresholdRange.minValue ) {
+                    if ( probability < rangeState.probRange.maxValue && probability > rangeState.probRange.minValue ) {
                         const useVelocity = generateVelocity( notesOn[ usePitch ] );
                         sendNoteWithDuration(
                             useOctave + usePitch,
@@ -210,8 +259,8 @@ export default function Featherise ( { selectedOutput, vertical = false } ) {
             }
 
             // Set the next recursion:
-            const bpsIntervalMin = 1000 / bpsRange.minValue;
-            const bpsIntervalMax = 1000 / bpsRange.maxValue;
+            const bpsIntervalMin = 1000 / rangeState.bpsRange.minValue;
+            const bpsIntervalMax = 1000 / rangeState.bpsRange.maxValue;
             const bpsInterval = bpsIntervalMin + Math.random() * ( bpsIntervalMax - bpsIntervalMin );
             bpsTimer = setTimeout( bpsListener, bpsInterval );
         }
@@ -220,10 +269,7 @@ export default function Featherise ( { selectedOutput, vertical = false } ) {
         bpsListener();
 
         return () => clearTimeout( bpsTimer );
-    }, [
-        notesOn, playMode, probabilityThresholdRange, speedRange, selectedOutput,
-        bpsRange.minValue, bpsRange.maxValue, midiOutputChannels, setFeatheredNotesOn
-    ] );
+    }, [ notesOn, rangeState.playMode, rangeState.probRange, rangeState.speedRange, selectedOutput, rangeState.bpsRange.minValue, rangeState.bpsRange.maxValue, midiOutputChannels, setFeatheredNotesOn, rangeState.octaveRange.minValue, rangeState.octaveRange.maxValue ] );
 
     return (
         <fieldset className={ `padded ${ styles[ 'featherize-component' ] }` }>
@@ -238,15 +284,15 @@ export default function Featherise ( { selectedOutput, vertical = false } ) {
             <div className={ styles[ 'play-controls' ] + ' ' + ( vertical ? styles.vertical : styles.horiztonal ) }>
                 <div className={ styles[ 'play-control' ] }>
                     <label htmlFor="bps-input">
-                        { bpsRange.minValue }-{ bpsRange.maxValue }<br />
+                        { rangeState.bpsRange.minValue }-{ rangeState.bpsRange.maxValue }<br />
                         notes/sec
                     </label>
                     <RangeInput vertical={ vertical }
                         id='bps-input'
-                        min={ MIN_BPS }
-                        max={ MAX_BPS }
-                        minValue={ bpsRange.minValue }
-                        maxValue={ bpsRange.maxValue }
+                        min={ DEFAULT_RANGES.bpsRange.minValue }
+                        max={ DEFAULT_RANGES.bpsRange.maxValue }
+                        minValue={ rangeState.bpsRange.minValue }
+                        maxValue={ rangeState.bpsRange.maxValue }
                         onChange={ handleBpsRangeChange }
                     />
                 </div>
@@ -254,14 +300,14 @@ export default function Featherise ( { selectedOutput, vertical = false } ) {
                 <div className={ styles[ 'play-control' ] }>
                     <label htmlFor="velocity-input">
                         Velocity:<br />
-                        { velocityRange.minValue }-{ velocityRange.maxValue } %
+                        { rangeState.velocityRange.minValue }-{ rangeState.velocityRange.maxValue } %
                     </label>
                     <RangeInput vertical={ vertical }
                         id='velocity-input'
-                        min={ MIN_VELOCITY_PC }
-                        max={ MAX_VELOCITY_PC }
-                        minValue={ velocityRange.minValue }
-                        maxValue={ velocityRange.maxValue }
+                        min={ DEFAULT_RANGES.velocityRange.minValue }
+                        max={ DEFAULT_RANGES.velocityRange.maxValue }
+                        minValue={ rangeState.velocityRange.minValue }
+                        maxValue={ rangeState.velocityRange.maxValue }
                         onChange={ handleVelocityRangeChange }
                     />
                 </div>
@@ -269,14 +315,14 @@ export default function Featherise ( { selectedOutput, vertical = false } ) {
                 <div className={ styles[ 'play-control' ] }>
                     <label htmlFor="speed-input">
                         Speed:<br />
-                        { Math.floor( ms2bpm( speedRange.minValue ) ) } - { Math.floor( ms2bpm( speedRange.maxValue ) ) } bpm
+                        { Math.floor( ms2bpm( rangeState.speedRange.minValue ) ) } - { Math.floor( ms2bpm( rangeState.speedRange.maxValue ) ) } bpm
                     </label>
                     <RangeInput vertical={ vertical }
                         id='speed-input'
-                        min={ MIN_SPEED_MS }
-                        max={ MAX_SPEED_MS }
-                        minValue={ speedRange.minValue }
-                        maxValue={ speedRange.maxValue }
+                        min={ DEFAULT_RANGES.speedRange.minValue }
+                        max={ DEFAULT_RANGES.speedRange.maxValue }
+                        minValue={ rangeState.speedRange.minValue }
+                        maxValue={ rangeState.speedRange.maxValue }
                         onChange={ handleSpeedRangeChange }
                     />
                 </div>
@@ -284,15 +330,15 @@ export default function Featherise ( { selectedOutput, vertical = false } ) {
                 <div className={ styles[ 'play-control' ] }>
                     <label htmlFor="octave-input">
                         Octaves:<br />
-                        { octaveRange.minValue } - { octaveRange.maxValue }
+                        { rangeState.octaveRange.minValue } - { rangeState.octaveRange.maxValue }
                     </label>
                     <RangeInput vertical={ vertical }
                         size='normal'
                         id='octave-input'
-                        min={ MIN_OCTAVE }
-                        max={ MAX_OCTAVE }
-                        minValue={ octaveRange.minValue }
-                        maxValue={ octaveRange.maxValue }
+                        min={ DEFAULT_RANGES.octaveRange.minValue }
+                        max={ DEFAULT_RANGES.octaveRange.maxValue }
+                        minValue={ rangeState.octaveRange.minValue }
+                        maxValue={ rangeState.octaveRange.maxValue }
                         onChange={ handleOctaveRangeChange }
                     />
                 </div>
@@ -300,15 +346,15 @@ export default function Featherise ( { selectedOutput, vertical = false } ) {
                 <div className={ styles[ 'play-control' ] }>
                     <label htmlFor="duration-input">
                         Length:<br />
-                        { ms2bpm( durationRange.minValue ) } - { ms2bpm( durationRange.maxValue ) } bpm
+                        { ms2bpm( rangeState.durationRange.minValue ) } - { ms2bpm( rangeState.durationRange.maxValue ) } bpm
                     </label>
                     <RangeInput vertical={ vertical }
                         size='normal'
                         id='duration-input'
-                        min={ MIN_DURATION_MS }
-                        max={ MAX_DURATION_MS }
-                        minValue={ durationRange.minValue }
-                        maxValue={ durationRange.maxValue }
+                        min={ DEFAULT_RANGES.durationRange.minValue }
+                        max={ DEFAULT_RANGES.durationRange.maxValue }
+                        minValue={ rangeState.durationRange.minValue }
+                        maxValue={ rangeState.durationRange.maxValue }
                         onChange={ handleDurationRangeChange }
                     />
                 </div>
@@ -317,19 +363,19 @@ export default function Featherise ( { selectedOutput, vertical = false } ) {
                     <label htmlFor="probability-input" title="Probability threshold range">
                         <input
                             type="checkbox"
-                            checked={ playMode === playModeTypes.PROBABILITY }
+                            checked={ rangeState.playMode === playModeTypes.PROBABILITY }
                             onChange={ handlePlayModeChange }
                         />
                         Probability:<br />
-                        { percentage( probabilityThresholdRange.minValue ) }-{ percentage( probabilityThresholdRange.maxValue ) }%
+                        { percentage( rangeState.probRange.minValue ) }-{ percentage( rangeState.probRange.maxValue ) }%
                     </label>
-                    { playMode === playModeTypes.PROBABILITY && (
+                    { rangeState.playMode === playModeTypes.PROBABILITY && (
                         <RangeInput vertical={ vertical }
-                            min={ 0 }
-                            max={ 1 }
-                            minValue={ probabilityThresholdRange.minValue }
-                            maxValue={ probabilityThresholdRange.maxValue }
-                            onChange={ handleProbabilityThresholdRangeChange }
+                            min={ DEFAULT_RANGES.probRange.minValue }
+                            max={ DEFAULT_RANGES.probRange.maxValue }
+                            minValue={ rangeState.probRange.minValue }
+                            maxValue={ rangeState.probRange.maxValue }
+                            onChange={ handleprobRangeChange }
                         />
                     ) }
                 </div>
