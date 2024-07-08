@@ -49,6 +49,7 @@ const localStorageOr = ( fieldName, defaultValue ) => {
 const ucfirst = str => str.charAt( 0 ).toUpperCase() + str.slice( 1 );
 
 function probabilityTriangular ( min, max, mode ) {
+    mode = mode || ( min + ( max - min ) / 2 );
     const u = Math.random();
 
     if ( u < ( mode - min ) / ( max - min ) ) {
@@ -204,7 +205,7 @@ export default function Featherise ( { selectedOutput, vertical = false } ) {
     useEffect( () => {
         let bpsTimer;
 
-        const bpsListener = () => {
+        const playNoteEveryBps = () => {
             const pitches = Object.keys( notesOn );
             if ( !pitches.length ) {
                 return;
@@ -221,7 +222,7 @@ export default function Featherise ( { selectedOutput, vertical = false } ) {
             const useOctave = 12 * (
                 rangeState.octaveRange.minValue == rangeState.octaveRange.maxValue
                     ? rangeState.octaveRange.minValue
-                    : rangeState.octaveRange.minValue + Math.random() * ( rangeState.octaveRange.maxValue - rangeState.octaveRange.minValue )
+                    : probabilityTriangular( rangeState.octaveRange.minValue, rangeState.octaveRange.maxValue )
             ) - 1;
 
             let usePitches = [];
@@ -233,7 +234,7 @@ export default function Featherise ( { selectedOutput, vertical = false } ) {
             } else {
                 // Maybe play some of the notes:
                 usePitches = Object.keys( notesOn ).filter( () => {
-                    const probability = probabilityTriangular( 0, 1, 0.5 );
+                    const probability = probabilityTriangular( 0, 1 );
                     return probability < rangeState.probRange.maxValue && probability > rangeState.probRange.minValue;
                 } ).map( usePitch => useOctave + parseInt( usePitch ) );
             }
@@ -250,14 +251,11 @@ export default function Featherise ( { selectedOutput, vertical = false } ) {
             setFeatheredNotesOn( { ...playingPitch2velocity } );
 
             // Set the next recursion:
-            const bpsIntervalMin = 1000 / rangeState.bpsRange.minValue;
-            const bpsIntervalMax = 1000 / rangeState.bpsRange.maxValue;
-            const bpsInterval = bpsIntervalMin + Math.random() * ( bpsIntervalMax - bpsIntervalMin );
-            bpsTimer = setTimeout( bpsListener, bpsInterval );
-        }
+            bpsTimer = setTimeout( playNoteEveryBps, probabilityTriangular( rangeState.bpsRange.minValue, rangeState.bpsRange.maxValue ) );
+        };
 
         // Begin the recursion:
-        bpsListener();
+        playNoteEveryBps();
 
         return () => clearTimeout( bpsTimer );
     }, [ notesOn, rangeState.playMode, rangeState.probRange, rangeState.speedRange, selectedOutput, rangeState.bpsRange.minValue, rangeState.bpsRange.maxValue, midiOutputChannels, setFeatheredNotesOn, rangeState.octaveRange.minValue, rangeState.octaveRange.maxValue ] );
