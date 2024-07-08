@@ -48,15 +48,24 @@ const localStorageOr = ( fieldName, defaultValue ) => {
 
 const ucfirst = str => str.charAt( 0 ).toUpperCase() + str.slice( 1 );
 
+function probabilityTriangular ( min, max, mode ) {
+    const u = Math.random();
+
+    if ( u < ( mode - min ) / ( max - min ) ) {
+        return min + Math.sqrt( u * ( max - min ) * ( mode - min ) );
+    } else {
+        return max - Math.sqrt( ( 1 - u ) * ( max - min ) * ( max - mode ) );
+    }
+}
+
 export default function Featherise ( { selectedOutput, vertical = false } ) {
     const [ notesOn ] = useAtom( notesOnAtom );
     const [ , setFeatheredNotesOn ] = useAtom( featheredNotesOnAtom );
     const [ midiOutputChannels ] = useAtom( midiOutputChannelsAtom );
 
-    const rangeState = {
-        playMode: localStorageOr( 'playMode', true ),
-        setPlayMode: useState( playModeTypes.PROBABILITY ),
-    };
+    const rangeState = {};
+
+    [ rangeState.playMode, rangeState.setPlayMode ] = useState( localStorageOr( 'playMode', true ) );
 
     for ( let key in DEFAULT_RANGES ) {
         const setterName = 'set' + ucfirst( key );
@@ -67,13 +76,6 @@ export default function Featherise ( { selectedOutput, vertical = false } ) {
         } );
         console.log( `SET ${ key } ` )
     }
-
-    // [ rangeState.probRange, rangeState.setprobRange ] = useState( defaultRanges.probRange );
-    // [ rangeState.durationRange, rangeState.setDurationRange ] = useState( defaultRanges.durationRange );
-    // [ rangeState.velocityRange, rangeState.setVelocityRange ] = useState( { minValue: MIN_VELOCITY_PC, maxValue: MAX_VELOCITY_PC } );
-    // [ rangeState.bpsRange, rangeState.setBpsRange ] = useState( { minValue: MIN_BPS, maxValue: MAX_BPS } );
-    // [ rangeState.speedRange, rangeState.setSpeedRange ] = useState( { minValue: MIN_SPEED_MS, maxValue: MAX_SPEED_MS } );
-    // [ rangeState.octaveRange, rangeState.setOctaveRange ] = useState( { minValue: MIN_OCTAVE, maxValue: MAX_OCTAVE } );
 
     const handleBpsRangeChange = ( newRange ) => {
         rangeState.setBpsRange( {
@@ -189,6 +191,7 @@ export default function Featherise ( { selectedOutput, vertical = false } ) {
     // @see localStorageOr
     useEffect( () => {
         const saveIntervalTimer = setInterval( () => {
+            localStorage.setItem( 'playMode', rangeState.playMode );
             for ( let key in DEFAULT_RANGES ) {
                 console.log( key, rangeState[ key ] )
                 localStorage.setItem( key + "_minValue", rangeState[ key ].minValue );
@@ -207,6 +210,12 @@ export default function Featherise ( { selectedOutput, vertical = false } ) {
                 return;
             }
 
+            const midiOutputChannel = midiOutputChannels.length == 1
+                // Use the only output selected
+                ? midiOutputChannels[ 0 ]
+                // Use a random output channel
+                : midiOutputChannels[ Math.floor( Math.random() * midiOutputChannels.length ) ];
+
             const useDurationMs = rangeState.speedRange.minValue + Math.random() * ( rangeState.speedRange.maxValue - rangeState.speedRange.minValue );
 
             const useOctave = 12 * (
@@ -215,48 +224,30 @@ export default function Featherise ( { selectedOutput, vertical = false } ) {
                     : rangeState.octaveRange.minValue + Math.random() * ( rangeState.octaveRange.maxValue - rangeState.octaveRange.minValue )
             ) - 1;
 
-            const midiOutputChannel = midiOutputChannels.length == 1
-                // Use the only output selected
-                ? midiOutputChannels[ 0 ]
-                // Use a random output channel
-                : midiOutputChannels[ Math.floor( Math.random() * midiOutputChannels.length ) ];
+            let usePitches = [];
 
             if ( rangeState.playMode === playModeTypes.ONE_NOTE ) {
                 // Always play one random note
-                const usePitch = useOctave + pitches[ Math.floor( Math.random() * pitches.length ) ];
-                const useVelocity = generateVelocity( notesOn[ usePitch ] );
-
-                sendNoteWithDuration(
-                    usePitch,
-                    useVelocity,
-                    useDurationMs,
-                    selectedOutput,
-                    midiOutputChannel
-                );
-                setFeatheredNotesOn( {
-                    [ usePitch ]: { velocity: useVelocity }
-                } );
+                const randomPitch = pitches[ Math.floor( Math.random() * pitches.length ) ];
+                usePitches.push( useOctave + randomPitch );
+            } else {
+                // Maybe play some of the notes:
+                usePitches = Object.keys( notesOn ).filter( () => {
+                    const probability = probabilityTriangular( 0, 1, 0.5 );
+                    return probability < rangeState.probRange.maxValue && probability > rangeState.probRange.minValue;
+                } ).map( usePitch => useOctave + parseInt( usePitch ) );
             }
 
-            else { // if ( playMode === playModeTypes.PROBABILITY ) {
-                // Mabye play some of the notes:
-                const playingPitch2velocity = {};
-                Object.keys( notesOn ).forEach( ( usePitch ) => {
-                    const probability = Math.random();
-                    if ( probability < rangeState.probRange.maxValue && probability > rangeState.probRange.minValue ) {
-                        const useVelocity = generateVelocity( notesOn[ usePitch ] );
-                        sendNoteWithDuration(
-                            useOctave + usePitch,
-                            useVelocity,
-                            useDurationMs,
-                            selectedOutput,
-                            midiOutputChannel
-                        );
-                        playingPitch2velocity[ usePitch ] = { velocity: useVelocity };
-                    }
-                } );
-                setFeatheredNotesOn( { ...playingPitch2velocity } );
-            }
+            const playingPitch2velocity = {};
+
+            usePitches.forEach( ( usePitch ) => {
+                const basePitch = usePitch - useOctave;
+                const useVelocity = generateVelocity( notesOn[ basePitch ] );
+                playingPitch2velocity[ basePitch ] = { velocity: useVelocity };
+                sendNoteWithDuration( usePitch, useVelocity, useDurationMs, selectedOutput, midiOutputChannel );
+            } );
+
+            setFeatheredNotesOn( { ...playingPitch2velocity } );
 
             // Set the next recursion:
             const bpsIntervalMin = 1000 / rangeState.bpsRange.minValue;
@@ -300,7 +291,7 @@ export default function Featherise ( { selectedOutput, vertical = false } ) {
                 <div className={ styles[ 'play-control' ] }>
                     <label htmlFor="velocity-input">
                         Velocity:<br />
-                        { rangeState.velocityRange.minValue }-{ rangeState.velocityRange.maxValue } %
+                        { rangeState.velocityRange.minValue } - { rangeState.velocityRange.maxValue } %
                     </label>
                     <RangeInput vertical={ vertical }
                         id='velocity-input'
