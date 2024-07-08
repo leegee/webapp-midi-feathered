@@ -6,7 +6,6 @@ const DISPATCH_EVENTS_STD = false;
 const DISPATCH_EVENTS_FOR_EXTRAS = true;
 
 export function startMidiNote ( pitch, velocity, selectedOutput, midiChannel ) {
-    console.debug( 'send', midiChannel );
     midiChannel = 2;
     selectedOutput.send( [ 0x90 + midiChannel, pitch, velocity ] );
 }
