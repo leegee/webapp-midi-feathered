@@ -81,7 +81,7 @@ export default function Featherise ( { selectedOutput, vertical = false } ) {
             minValue: Math.floor( Number( newRange.minValue !== undefined ? newRange.minValue : rangeState.bpsRange.minValue ) ),
             maxValue: Math.floor( Number( newRange.maxValue !== undefined ? newRange.maxValue : rangeState.bpsRange.maxValue ) ),
         } );
-        console.log( `Selected BPS Range: Min = ${ newRange.minValue }, Max = ${ newRange.maxValue }` );
+        // console.debug( `Selected BPS Range: Min = ${ newRange.minValue }, Max = ${ newRange.maxValue }` );
     };
 
     const handleVelocityRangeChange = ( newRange ) => {
@@ -89,7 +89,7 @@ export default function Featherise ( { selectedOutput, vertical = false } ) {
             minValue: Math.floor( Number( newRange.minValue !== undefined ? newRange.minValue : rangeState.velocityRange.minValue ) ),
             maxValue: Math.floor( Number( newRange.maxValue !== undefined ? newRange.maxValue : rangeState.velocityRange.maxValue ) ),
         } );
-        console.log( `Selected velocity range: Min = ${ newRange.minValue }, Max = ${ newRange.maxValue }` );
+        // console.debug( `Selected velocity range: Min = ${ newRange.minValue }, Max = ${ newRange.maxValue }` );
     };
 
     const handleSpeedRangeChange = ( newRange ) => {
@@ -97,7 +97,7 @@ export default function Featherise ( { selectedOutput, vertical = false } ) {
             minValue: Math.floor( Number( newRange.minValue ) ),
             maxValue: Math.floor( Number( newRange.maxValue ) ),
         } );
-        console.log( `Selected Speed Range: Min = ${ newRange.minValue }, Max = ${ newRange.maxValue }` );
+        // console.debug( `Selected Speed Range: Min = ${ newRange.minValue }, Max = ${ newRange.maxValue }` );
     };
 
     const handleOctaveRangeChange = ( newRange ) => {
@@ -105,7 +105,7 @@ export default function Featherise ( { selectedOutput, vertical = false } ) {
             minValue: Math.floor( Number( newRange.minValue ) ),
             maxValue: Math.floor( Number( newRange.maxValue ) ),
         } );
-        console.log( `Selected Octave Range: Min = ${ newRange.minValue }, Max = ${ newRange.maxValue }` );
+        // console.debug( `Selected Octave Range: Min = ${ newRange.minValue }, Max = ${ newRange.maxValue }` );
     };
 
     const handleDurationRangeChange = ( newRange ) => {
@@ -113,7 +113,7 @@ export default function Featherise ( { selectedOutput, vertical = false } ) {
             minValue: Math.floor( Number( newRange.minValue ) ),
             maxValue: Math.floor( Number( newRange.maxValue ) ),
         } );
-        console.log( `Selected Duration Range: Min = ${ newRange.minValue }, Max = ${ newRange.maxValue }` );
+        // console.debug( `Selected Duration Range: Min = ${ newRange.minValue }, Max = ${ newRange.maxValue }` );
     };
 
     const handleprobRangeChange = ( newRange ) => {
@@ -121,7 +121,7 @@ export default function Featherise ( { selectedOutput, vertical = false } ) {
             minValue: Number( newRange.minValue ),
             maxValue: Number( newRange.maxValue ),
         } );
-        console.log( `Selected Probability Threshold Range: Min = ${ newRange.minValue }, Max = ${ newRange.maxValue }` );
+        // console.debug( `Selected Probability Threshold Range: Min = ${ newRange.minValue }, Max = ${ newRange.maxValue }` );
     };
 
     const handlePlayModeChange = ( event ) => {
@@ -162,7 +162,7 @@ export default function Featherise ( { selectedOutput, vertical = false } ) {
     const load = async () => {
         try {
             const settings = await loadJson();
-            console.log( settings );
+            console.log( 'Loaeded', settings );
             rangeState.setBpsRange( settings.bpsRange );
             rangeState.setVelocityRange( settings.velocityRange );
             rangeState.setSpeedRange( settings.speedRange );
