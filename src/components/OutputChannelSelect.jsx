@@ -27,7 +27,10 @@ export default function OutputChannelSelect () {
                 value={ midiOutputChannels }
             >
                 { Array.from( Array( 16 ).keys() ).map( ( item ) => (
-                    <option key={ item + 1 } value={ item + 1 }>
+                    <option key={ item + 1 }
+                        value={ item + 1 }
+                        selected={ midiOutputChannels.includes( item + 1 ) }
+                    >
                         { item + 1 }
                     </option>
                 ) ) }
