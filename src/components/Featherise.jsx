@@ -9,8 +9,8 @@ import { loadJson, saveJson } from '../lib/settings-files';
 import styles from './Featherise.module.css';
 
 const playModeTypes = {
-    PROBABILITY: 1,
-    ONE_NOTE: 2,
+    POLY: 1,
+    MONO: 2,
 };
 
 const LOCAL_SAVE_FREQ_MS = 1000 * 10;
@@ -126,7 +126,7 @@ export default function Featherise ( { selectedOutput, vertical = false } ) {
 
     const handlePlayModeChange = ( event ) => {
         rangeState.setPlayMode(
-            event.target.checked ? playModeTypes.PROBABILITY : playModeTypes.ONE_NOTE
+            event.target.checked ? playModeTypes.POLY : playModeTypes.MONO
         );
     };
 
@@ -213,7 +213,7 @@ export default function Featherise ( { selectedOutput, vertical = false } ) {
                 return;
             }
 
-            const usePitches = rangeState.playMode === playModeTypes.ONE_NOTE
+            const usePitches = rangeState.playMode === playModeTypes.MONO
                 ? [ Number( pitches[ Math.floor( Math.random() * pitches.length ) ] ) ]
                 : Object.keys( notesOn ).filter( () => {
                     const probability = probabilityTriangular( 0, 1 );
@@ -378,19 +378,23 @@ export default function Featherise ( { selectedOutput, vertical = false } ) {
                 </div>
 
                 <div className={ styles[ 'play-control' ] }>
-                    <label htmlFor="probability-input" title="Probability threshold range">
+                    <label htmlFor="probability-input" title="Probability of a note from a chord being triggered">
                         <span>
                             <input
                                 type="checkbox"
-                                checked={ rangeState.playMode === playModeTypes.PROBABILITY }
+                                checked={ rangeState.playMode === playModeTypes.POLY }
                                 onChange={ handlePlayModeChange }
                             />
-                            Probability:
+                            { rangeState.playMode === playModeTypes.MONO && ( <>Monophonic</> ) }
+                            { rangeState.playMode === playModeTypes.POLY && ( <>Polyphony:</> ) }
                         </span>
-                        <span>{ percentage( rangeState.probRange.minValue ) } <small>to</small>{ percentage( rangeState.probRange.maxValue ) }%</span>
+                        { rangeState.playMode === playModeTypes.POLY && (
+                            <span>{ percentage( rangeState.probRange.minValue ) } <small>to</small>{ percentage( rangeState.probRange.maxValue ) }%</span>
+                        ) }
                     </label>
-                    { rangeState.playMode === playModeTypes.PROBABILITY && (
+                    { rangeState.playMode === playModeTypes.POLY && (
                         <RangeInput vertical={ vertical }
+                            size='narrow'
                             min={ DEFAULT_RANGES.probRange.minValue }
                             max={ DEFAULT_RANGES.probRange.maxValue }
                             minValue={ rangeState.probRange.minValue }
