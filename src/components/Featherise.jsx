@@ -16,13 +16,13 @@ const playModeTypes = {
 const LOCAL_SAVE_FREQ_MS = 1000 * 10;
 
 const DEFAULT_RANGES = {
-    probRange: {
+    polyProbRange: {
         minValue: 0,
         maxValue: 1,
     },
     durationRange: {
-        minValue: 600,
-        maxValue: 60000,
+        minValue: 10,
+        maxValue: 6000,
     },
     velocityRange: {
         minValue: -100,
@@ -30,7 +30,7 @@ const DEFAULT_RANGES = {
     },
     bpsRange: {
         minValue: 1,
-        maxValue: 10,
+        maxValue: 20,
     },
     speedRange: {
         minValue: 200,
@@ -116,8 +116,8 @@ export default function Featherise ( { selectedOutput, vertical = false } ) {
         // console.debug( `Selected Duration Range: Min = ${ newRange.minValue }, Max = ${ newRange.maxValue }` );
     };
 
-    const handleprobRangeChange = ( newRange ) => {
-        rangeState.setProbRange( {
+    const handlepolyProbRangeChange = ( newRange ) => {
+        rangeState.setpolyProbRange( {
             minValue: Number( newRange.minValue ),
             maxValue: Number( newRange.maxValue ),
         } );
@@ -153,9 +153,9 @@ export default function Featherise ( { selectedOutput, vertical = false } ) {
                 minValue: rangeState.durationRange.minValue,
                 maxValue: rangeState.durationRange.maxValue,
             },
-            probRange: {
-                minValue: rangeState.probRange.minValue,
-                maxValue: rangeState.probRange.maxValue,
+            polyProbRange: {
+                minValue: rangeState.polyProbRange.minValue,
+                maxValue: rangeState.polyProbRange.maxValue,
             },
         } );
     }
@@ -168,7 +168,7 @@ export default function Featherise ( { selectedOutput, vertical = false } ) {
             rangeState.setVelocityRange( settings.velocityRange );
             rangeState.setSpeedRange( settings.speedRange );
             rangeState.setDurationRange( settings.durationRange );
-            rangeState.setProbRange( settings.probRange );
+            rangeState.setpolyProbRange( settings.polyProbRange );
         } catch ( e ) {
             console.error( e );
             alert( e );
@@ -217,7 +217,7 @@ export default function Featherise ( { selectedOutput, vertical = false } ) {
                 ? [ Number( pitches[ Math.floor( Math.random() * pitches.length ) ] ) ]
                 : Object.keys( notesOn ).filter( () => {
                     const probability = probabilityTriangular( 0, 1 );
-                    return probability < rangeState.probRange.maxValue && probability > rangeState.probRange.minValue;
+                    return probability < rangeState.polyProbRange.maxValue && probability > rangeState.polyProbRange.minValue;
                 } ).map( usePitch => Number( usePitch ) );
 
             usePitches.forEach( ( aPitch ) => {
@@ -259,7 +259,7 @@ export default function Featherise ( { selectedOutput, vertical = false } ) {
         playNoteEveryBps();
 
         return () => clearTimeout( bpsTimer );
-    }, [ notesOn, rangeState.playMode, rangeState.probRange, rangeState.speedRange, selectedOutput, rangeState.bpsRange.minValue, rangeState.bpsRange.maxValue, midiOutputChannels, rangeState.octaveRange.minValue, rangeState.octaveRange.maxValue, rangeState.velocityRange ] );
+    }, [ notesOn, rangeState.playMode, rangeState.polyProbRange, rangeState.speedRange, selectedOutput, rangeState.bpsRange.minValue, rangeState.bpsRange.maxValue, midiOutputChannels, rangeState.octaveRange.minValue, rangeState.octaveRange.maxValue, rangeState.velocityRange ] );
 
     return (
         <fieldset className={ `padded ${ styles[ 'featherize-component' ] }` }>
@@ -272,6 +272,27 @@ export default function Featherise ( { selectedOutput, vertical = false } ) {
             </legend>
 
             <div className={ styles[ 'play-controls' ] + ' ' + ( vertical ? styles.vertical : styles.horiztonal ) }>
+
+                <div className={ styles[ 'play-control' ] }>
+                    <label htmlFor="octave-input">
+                        <span>Octaves:</span>
+                        <span>
+                            { rangeState.octaveRange.minValue } <small>to</small> { rangeState.octaveRange.maxValue }
+                        </span>
+                    </label>
+                    <RangeInput vertical={ vertical }
+                        size='normal'
+                        id='octave-input'
+                        flipDisplay={ true }
+                        forceIntegers={ true }
+                        min={ DEFAULT_RANGES.octaveRange.minValue }
+                        max={ DEFAULT_RANGES.octaveRange.maxValue }
+                        minValue={ rangeState.octaveRange.minValue }
+                        maxValue={ rangeState.octaveRange.maxValue }
+                        onChange={ handleOctaveRangeChange }
+                    />
+                </div>
+
                 <div className={ styles[ 'play-control' ] }>
                     <label htmlFor="bps-input">
                         <span>
@@ -336,26 +357,6 @@ export default function Featherise ( { selectedOutput, vertical = false } ) {
                 </div>
 
                 <div className={ styles[ 'play-control' ] }>
-                    <label htmlFor="octave-input">
-                        <span>Octaves:</span>
-                        <span>
-                            { rangeState.octaveRange.minValue } <small>to</small> { rangeState.octaveRange.maxValue }
-                        </span>
-                    </label>
-                    <RangeInput vertical={ vertical }
-                        size='normal'
-                        id='octave-input'
-                        flipDisplay={ true }
-                        forceIntegers={ true }
-                        min={ DEFAULT_RANGES.octaveRange.minValue }
-                        max={ DEFAULT_RANGES.octaveRange.maxValue }
-                        minValue={ rangeState.octaveRange.minValue }
-                        maxValue={ rangeState.octaveRange.maxValue }
-                        onChange={ handleOctaveRangeChange }
-                    />
-                </div>
-
-                <div className={ styles[ 'play-control' ] }>
                     <label htmlFor="duration-input">
                         <span>Length:</span>
                         <span>
@@ -385,21 +386,21 @@ export default function Featherise ( { selectedOutput, vertical = false } ) {
                                 checked={ rangeState.playMode === playModeTypes.POLY }
                                 onChange={ handlePlayModeChange }
                             />
-                            { rangeState.playMode === playModeTypes.MONO && ( <>Monophonic</> ) }
+                            { rangeState.playMode !== playModeTypes.POLY && ( <>Polyphonic</> ) }
                             { rangeState.playMode === playModeTypes.POLY && ( <>Polyphony:</> ) }
                         </span>
                         { rangeState.playMode === playModeTypes.POLY && (
-                            <span>{ percentage( rangeState.probRange.minValue ) } <small>to</small>{ percentage( rangeState.probRange.maxValue ) }%</span>
+                            <span>{ percentage( rangeState.polyProbRange.minValue ) } <small>to</small>{ percentage( rangeState.polyProbRange.maxValue ) }%</span>
                         ) }
                     </label>
                     { rangeState.playMode === playModeTypes.POLY && (
                         <RangeInput vertical={ vertical }
                             size='narrow'
-                            min={ DEFAULT_RANGES.probRange.minValue }
-                            max={ DEFAULT_RANGES.probRange.maxValue }
-                            minValue={ rangeState.probRange.minValue }
-                            maxValue={ rangeState.probRange.maxValue }
-                            onChange={ handleprobRangeChange }
+                            min={ DEFAULT_RANGES.polyProbRange.minValue }
+                            max={ DEFAULT_RANGES.polyProbRange.maxValue }
+                            minValue={ rangeState.polyProbRange.minValue }
+                            maxValue={ rangeState.polyProbRange.maxValue }
+                            onChange={ handlepolyProbRangeChange }
                         />
                     ) }
                 </div>
