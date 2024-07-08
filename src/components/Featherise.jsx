@@ -305,7 +305,7 @@ export default function Featherise ( { selectedOutput, vertical = false } ) {
                     </label>
                     <RangeInput vertical={ vertical }
                         id='velocity-input'
-                        flipDisplay={ true }
+                        flipDisplay={ false }
                         forceIntegers={ true }
                         min={ DEFAULT_RANGES.velocityRange.minValue }
                         max={ DEFAULT_RANGES.velocityRange.maxValue }
