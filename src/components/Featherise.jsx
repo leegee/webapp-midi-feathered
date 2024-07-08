@@ -37,8 +37,8 @@ const DEFAULT_RANGES = {
         maxValue: 6000,
     },
     octaveRange: {
-        minValue: 1,
-        maxValue: 5
+        minValue: -3,
+        maxValue: 3
     },
 }
 
@@ -328,6 +328,7 @@ export default function Featherise ( { selectedOutput, vertical = false } ) {
                     <RangeInput vertical={ vertical }
                         size='normal'
                         id='octave-input'
+                        flipDisplay={ true }
                         forceIntegers={ true }
                         min={ DEFAULT_RANGES.octaveRange.minValue }
                         max={ DEFAULT_RANGES.octaveRange.maxValue }
