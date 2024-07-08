@@ -117,19 +117,17 @@ export default function NoteList () {
 
     useEffect( () => {
         const handleNoteEvent = ( event ) => {
-            const { type, pitch } = event;
-
-            if ( type === EVENT_NOTE_START ) {
+            if ( event.type === EVENT_NOTE_START ) {
                 setPlayingEvents( ( prevEvents ) => ( {
                     ...prevEvents,
-                    [ pitch ]: true
+                    [ event.detail.pitch ]: event.detail.velocity
                 } ) );
             }
 
-            if ( type === EVENT_NOTE_STOP ) {
+            if ( event.type === EVENT_NOTE_STOP ) {
                 setPlayingEvents( ( prevEvents ) => {
                     const newEvents = { ...prevEvents };
-                    delete newEvents[ pitch ];
+                    delete newEvents[ event.detail.pitch ];
                     return newEvents;
                 } );
             }
