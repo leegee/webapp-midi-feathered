@@ -1,5 +1,6 @@
+import { useEffect } from 'react';
 import { useAtom } from 'jotai';
-
+import { saveNow } from '../lib/local-storage';
 import { midiInputChannelAtom } from '../lib/store';
 
 export default function InputChannelSelect () {
@@ -8,7 +9,17 @@ export default function InputChannelSelect () {
     const handleOutputChange = ( event ) => {
         console.log( 'Set MIDI input channel: ', event.target.value );
         setMidiInputChannel( Number( event.target.value ) );
+        saveNow( { midiInputChannel: event.target.value } );
     };
+
+    useEffect( () => {
+        const savedInputChannelsStr = localStorage.getItem( 'midiInputChannels' );
+        if ( savedInputChannelsStr ) {
+            const savedMidiOutputChannels = savedInputChannelsStr.split( ',' ).map( channel => Number( channel ) );
+            setMidiInputChannel( savedMidiOutputChannels );
+        }
+    }, [ setMidiInputChannel ] );
+
 
     return (
         <aside>

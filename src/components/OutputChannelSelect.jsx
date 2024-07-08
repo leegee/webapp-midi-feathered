@@ -1,10 +1,20 @@
+import { useEffect } from 'react';
 import { useAtom } from 'jotai';
-import { midiInputChannelAtom, midiOutputChannelsAtom } from '../lib/store';
 import styles from './OutputChannelSelect.module.css';
+import { midiInputChannelAtom, midiOutputChannelsAtom } from '../lib/store';
+import { saveNow } from '../lib/local-storage';
 
 export default function OutputChannelSelect () {
     const [ midiOutputChannels, setMidiOutputChannels ] = useAtom( midiOutputChannelsAtom );
     const [ midiInputChannel ] = useAtom( midiInputChannelAtom );
+
+    useEffect( () => {
+        const savedOutputChannelsStr = localStorage.getItem( 'midiOutputChannels' );
+        if ( savedOutputChannelsStr ) {
+            const savedMidiOutputChannels = savedOutputChannelsStr.split( ',' ).map( channel => Number( channel ) );
+            setMidiOutputChannels( savedMidiOutputChannels );
+        }
+    }, [ setMidiOutputChannels ] );
 
     const handleOutputChange = ( event ) => {
         const options = event.target.options;
@@ -16,6 +26,8 @@ export default function OutputChannelSelect () {
         }
         console.log( 'Set MIDI output channels: ', selectedValues );
         setMidiOutputChannels( selectedValues );
+        saveNow( { midiOutputChannels: selectedValues } );
+
     };
 
     return (

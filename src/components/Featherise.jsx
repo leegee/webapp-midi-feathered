@@ -3,7 +3,8 @@ import PropTypes from 'prop-types';
 import { useAtom } from 'jotai';
 
 import { sendNoteWithDuration } from '../lib/midi-messages';
-import { notesOnAtom, midiOutputChannelsAtom } from '../lib/store';
+import { notesOnAtom, midiOutputChannelsAtom, CCsOnAtom } from '../lib/store';
+import { localStorageOr, savePeriodically } from '../lib/local-storage';
 import RangeInput from './RangeInput';
 import { loadJson, saveJson } from '../lib/settings-files';
 import styles from './Featherise.module.css';
@@ -12,8 +13,6 @@ const playModeTypes = {
     MONO: 0,
     POLY: 1,
 };
-
-const LOCAL_SAVE_FREQ_MS = 1000 * 10;
 
 const DEFAULT_RANGES = {
     polyProbRange: {
@@ -40,12 +39,9 @@ const DEFAULT_RANGES = {
         minValue: -3,
         maxValue: 3
     },
-}
+};
 
-const localStorageOr = ( fieldName, defaultValue ) => {
-    const val = localStorage.getItem( fieldName );
-    return typeof val !== 'undefined' ? Number( val ) : defaultValue;
-}
+// const CCs = { velocity: 11 };
 
 const ucfirst = str => str.charAt( 0 ).toUpperCase() + str.slice( 1 );
 
@@ -62,10 +58,10 @@ function probabilityTriangular ( min, max, mode ) {
 
 export default function Featherise ( { selectedOutput, vertical = false } ) {
     const [ notesOn ] = useAtom( notesOnAtom );
-    const [ midiOutputChannels ] = useAtom( midiOutputChannelsAtom );
+    const [ CCsOn ] = useAtom( CCsOnAtom );
+    const [ midiOutputChannels, setMidiOutputChannels ] = useAtom( midiOutputChannelsAtom );
 
     const rangeState = {};
-
     [ rangeState.playMode, rangeState.setPlayMode ] = useState( localStorageOr( 'playMode', 1 ) );
 
     for ( let key in DEFAULT_RANGES ) {
@@ -138,6 +134,7 @@ export default function Featherise ( { selectedOutput, vertical = false } ) {
 
     const save = () => {
         saveJson( {
+            midiOutputChannels,
             bpsRange: {
                 minValue: rangeState.bpsRange.minValue,
                 maxValue: rangeState.bpsRange.maxValue,
@@ -165,6 +162,7 @@ export default function Featherise ( { selectedOutput, vertical = false } ) {
         try {
             const settings = await loadJson();
             console.log( 'Loaeded', settings );
+            setMidiOutputChannels( settings.midiOutputChannels );
             rangeState.setBpsRange( settings.bpsRange );
             rangeState.setVelocityRange( settings.velocityRange );
             rangeState.setSpeedRange( settings.speedRange );
@@ -178,21 +176,30 @@ export default function Featherise ( { selectedOutput, vertical = false } ) {
 
     // @see localStorageOr
     useEffect( () => {
-        const saveIntervalTimer = setInterval( () => {
-            localStorage.setItem( 'playMode', rangeState.playMode );
-            for ( let key in DEFAULT_RANGES ) {
-                localStorage.setItem( key + "_minValue", rangeState[ key ].minValue );
-                localStorage.setItem( key + "_maxValue", rangeState[ key ].maxValue );
-            }
-        }, LOCAL_SAVE_FREQ_MS );
-        return () => clearInterval( saveIntervalTimer );
+        const saveValuesToLocalStorage = Object.entries( DEFAULT_RANGES ).reduce( ( acc, [ key ] ) => {
+            acc[ `${ key }_minValue` ] = rangeState[ key ].minValue;
+            acc[ `${ key }_maxValue` ] = rangeState[ key ].maxValue;
+            return acc;
+        }, {} );
+
+        return savePeriodically( {
+            playMode: rangeState.playMode,
+            ...saveValuesToLocalStorage,
+        } );
+
     } );
 
     useEffect( () => {
         let bpsTimer;
 
-        // Returns an velocity adjusted by percentage, clamped to valid MIDI values
-        const generateVelocity = ( velocity ) => {
+        // Either a CC value or based on teh note velocity adjusted by  the range
+        const generateVelocity = ( playedNoteVvelocity ) => {
+            // if ( CCsOn[ CCs.velocity ] ) {
+            //     console.log( CCsOnAtom[ CCs.velocity ] );
+            //     return CCsOnAtom[ CCs.velocity ];
+            // }
+
+            // Returns an velocity adjusted by percentage, clamped to valid MIDI values
             const { maxValue, minValue } = rangeState.velocityRange;
 
             const minPercentageFactor = 1 + ( minValue / 100 );
@@ -201,7 +208,7 @@ export default function Featherise ( { selectedOutput, vertical = false } ) {
             // Generate a random factor between minPercentageFactor and maxPercentageFactor
             const randomFactor = probabilityTriangular( minPercentageFactor, maxPercentageFactor );
 
-            const adjustedVelocity = velocity * randomFactor;
+            const adjustedVelocity = playedNoteVvelocity * randomFactor;
 
             // Ensure the adjusted velocity is within valid MIDI velocity range
             return Math.min( Math.max( adjustedVelocity, 0 ), 127 );
@@ -260,7 +267,7 @@ export default function Featherise ( { selectedOutput, vertical = false } ) {
         playNoteEveryBps();
 
         return () => clearTimeout( bpsTimer );
-    }, [ notesOn, rangeState.playMode, rangeState.polyProbRange, rangeState.speedRange, selectedOutput, rangeState.bpsRange.minValue, rangeState.bpsRange.maxValue, midiOutputChannels, rangeState.octaveRange.minValue, rangeState.octaveRange.maxValue, rangeState.velocityRange ] );
+    }, [ notesOn, rangeState.playMode, rangeState.polyProbRange, rangeState.speedRange, selectedOutput, rangeState.bpsRange.minValue, rangeState.bpsRange.maxValue, midiOutputChannels, rangeState.octaveRange.minValue, rangeState.octaveRange.maxValue, rangeState.velocityRange, CCsOn ] );
 
     return (
         <fieldset className={ styles[ 'featherize-component' ] }>
@@ -318,7 +325,9 @@ export default function Featherise ( { selectedOutput, vertical = false } ) {
 
                 <div className={ styles[ 'play-control' ] }>
                     <label htmlFor="velocity-input">
-                        <span>Velocity:</span>
+                        <span style={ { display: 'inline-flex', width: '100%' } }>
+                            Velocity:
+                        </span>
                         <span>
                             { rangeState.velocityRange.minValue }
                             <small>to</small>
@@ -407,7 +416,7 @@ export default function Featherise ( { selectedOutput, vertical = false } ) {
                 </div>
             </div>
 
-        </fieldset>
+        </fieldset >
     );
 }
 
