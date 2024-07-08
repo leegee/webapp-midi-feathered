@@ -290,6 +290,7 @@ export default function Featherise ( { selectedOutput, vertical = false } ) {
                     </label>
                     <RangeInput vertical={ vertical }
                         id='velocity-input'
+                        forceIntegers={ true }
                         min={ DEFAULT_RANGES.velocityRange.minValue }
                         max={ DEFAULT_RANGES.velocityRange.maxValue }
                         minValue={ rangeState.velocityRange.minValue }
@@ -321,6 +322,7 @@ export default function Featherise ( { selectedOutput, vertical = false } ) {
                     <RangeInput vertical={ vertical }
                         size='normal'
                         id='octave-input'
+                        forceIntegers={ true }
                         min={ DEFAULT_RANGES.octaveRange.minValue }
                         max={ DEFAULT_RANGES.octaveRange.maxValue }
                         minValue={ rangeState.octaveRange.minValue }
@@ -332,12 +334,12 @@ export default function Featherise ( { selectedOutput, vertical = false } ) {
                 <div className={ styles[ 'play-control' ] }>
                     <label htmlFor="duration-input">
                         Length:<br />
-                        { ms2bpm( rangeState.durationRange.minValue ) } - { ms2bpm( rangeState.durationRange.maxValue ) } bpm
+                        { Math.floor( ms2bpm( rangeState.durationRange.minValue ) ) } - { Math.floor( ms2bpm( rangeState.durationRange.maxValue ) ) } bpm
                     </label>
                     <RangeInput vertical={ vertical }
                         size='normal'
                         id='duration-input'
-                        int
+                        forceIntegers={ true }
                         min={ DEFAULT_RANGES.durationRange.minValue }
                         max={ DEFAULT_RANGES.durationRange.maxValue }
                         minValue={ rangeState.durationRange.minValue }

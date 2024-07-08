@@ -14,7 +14,17 @@ function debounce ( func, delay ) {
     };
 }
 
-const RangeInput = ( { min, max, minValue, maxValue, onChange, debounceMs = 50, vertical = false, size = 'wide' } ) => {
+const RangeInput = ( {
+    min,
+    max,
+    minValue,
+    maxValue,
+    onChange,
+    debounceMs = 50,
+    vertical = false,
+    size = 'wide',
+    forceIntegers = false // New prop to force integer values
+} ) => {
     const [ minPercentage, setMinPercentage ] = useState( ( ( minValue - min ) / ( max - min ) ) * 100 );
     const [ maxPercentage, setMaxPercentage ] = useState( ( ( maxValue - min ) / ( max - min ) ) * 100 );
 
@@ -27,7 +37,7 @@ const RangeInput = ( { min, max, minValue, maxValue, onChange, debounceMs = 50, 
     const debounceTimeout = useRef( null );
 
     const debouncedOnChange = useRef(
-        debounce( ( newValues ) => {
+        debounce( newValues => {
             onChange( newValues );
         }, debounceMs )
     ).current;
@@ -37,6 +47,10 @@ const RangeInput = ( { min, max, minValue, maxValue, onChange, debounceMs = 50, 
             clearTimeout( debounceTimeout.current );
         }
         debounceTimeout.current = setTimeout( () => {
+            if ( forceIntegers ) {
+                newValues.minValue = Math.round( newValues.minValue );
+                newValues.maxValue = Math.round( newValues.maxValue );
+            }
             debouncedOnChange( newValues );
         }, debounceMs );
     }
@@ -61,7 +75,7 @@ const RangeInput = ( { min, max, minValue, maxValue, onChange, debounceMs = 50, 
         const newPercentage = ( clickPos / ( vertical ? rect.height : rect.width ) ) * 100;
         handleResize( newPercentage, isMin );
 
-        const handleMouseMove = ( e ) => {
+        const handleMouseMove = e => {
             const movePos = vertical ? e.clientY - rect.top : e.clientX - rect.left;
             const newPercentage = ( movePos / ( vertical ? rect.height : rect.width ) ) * 100;
             handleResize( newPercentage, isMin );
@@ -82,7 +96,7 @@ const RangeInput = ( { min, max, minValue, maxValue, onChange, debounceMs = 50, 
         const newPercentage = ( touchPos / ( vertical ? rect.height : rect.width ) ) * 100;
         handleResize( newPercentage, isMin );
 
-        const handleTouchMove = ( e ) => {
+        const handleTouchMove = e => {
             const movePos = vertical ? e.touches[ 0 ].clientY - rect.top : e.touches[ 0 ].clientX - rect.left;
             const newPercentage = ( movePos / ( vertical ? rect.height : rect.width ) ) * 100;
             handleResize( newPercentage, isMin );
@@ -101,28 +115,23 @@ const RangeInput = ( { min, max, minValue, maxValue, onChange, debounceMs = 50, 
         <section className={ `${ styles[ 'custom-range-input' ] } ${ vertical ? styles.vertical : '' } ${ styles[ size ] }` }>
             <div
                 className={ styles.bar }
-                style={ vertical
-                    ? { top: `${ minPercentage }%`, bottom: `${ 100 - maxPercentage }%` }
-                    : { left: `${ minPercentage }%`, right: `${ 100 - maxPercentage }%` }
+                style={
+                    vertical
+                        ? { top: `${ minPercentage }%`, bottom: `${ 100 - maxPercentage }%` }
+                        : { left: `${ minPercentage }%`, right: `${ 100 - maxPercentage }%` }
                 }
             ></div>
             <div
                 className={ styles.handle }
-                style={ vertical
-                    ? { top: `${ minPercentage }%`, width: '100%' }
-                    : { left: `${ minPercentage }%` }
-                }
-                onMouseDown={ ( e ) => handleMouseDown( e, true ) }
-                onTouchStart={ ( e ) => handleTouchStart( e, true ) }
+                style={ vertical ? { top: `${ minPercentage }%`, width: '100%' } : { left: `${ minPercentage }%` } }
+                onMouseDown={ e => handleMouseDown( e, true ) }
+                onTouchStart={ e => handleTouchStart( e, true ) }
             />
             <div
                 className={ styles.handle }
-                style={ vertical
-                    ? { top: `${ maxPercentage }%`, width: '100%' }
-                    : { left: `${ maxPercentage }%` }
-                }
-                onMouseDown={ ( e ) => handleMouseDown( e, false ) }
-                onTouchStart={ ( e ) => handleTouchStart( e, false ) }
+                style={ vertical ? { top: `${ maxPercentage }%`, width: '100%' } : { left: `${ maxPercentage }%` } }
+                onMouseDown={ e => handleMouseDown( e, false ) }
+                onTouchStart={ e => handleTouchStart( e, false ) }
             />
         </section>
     );
@@ -137,6 +146,7 @@ RangeInput.propTypes = {
     debounceMs: PropTypes.number,
     vertical: PropTypes.bool,
     size: PropTypes.oneOf( [ 'normal', 'wide', 'narrow' ] ),
+    forceIntegers: PropTypes.bool // New prop type declaration
 };
 
 export default RangeInput;
