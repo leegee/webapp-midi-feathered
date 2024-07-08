@@ -2,7 +2,7 @@
 import { NOTE_OFF, NOTE_ON, EVENT_NOTE_START, EVENT_NOTE_STOP } from './constants';
 
 const timersForPitches = {};
-const USE_EVENTS = false;
+const DISPATCH_EVENTS = false;
 
 export function startMidiNote ( pitch, velocity, selectedOutput, midiChannel ) {
     selectedOutput.send( [ 0x90 + midiChannel, pitch, velocity ] );
@@ -48,8 +48,8 @@ export function onMidiMessage ( event, midiInputChannel, setNotesOn ) {
         const newNotesOn = { ...prevNotesOn };
 
         if ( cmd === NOTE_ON && velocity > 0 && !newNotesOn[ pitch ] ) {
-            newNotesOn[ pitch ] =  velocity;
-            if ( USE_EVENTS ) {
+            newNotesOn[ pitch ] = velocity;
+            if ( DISPATCH_EVENTS ) {
                 window.document.dispatchEvent(
                     new CustomEvent( EVENT_NOTE_START, { detail: { pitch, velocity, midiChannel } } )
                 );
@@ -59,7 +59,7 @@ export function onMidiMessage ( event, midiInputChannel, setNotesOn ) {
         else if ( cmd === NOTE_OFF || velocity === 0 ) {
             if ( newNotesOn[ pitch ] ) {
                 delete newNotesOn[ pitch ];
-                if ( USE_EVENTS ) {
+                if ( DISPATCH_EVENTS ) {
                     window.document.dispatchEvent(
                         new CustomEvent( EVENT_NOTE_STOP, { detail: { pitch, midiChannel } } )
                     );
