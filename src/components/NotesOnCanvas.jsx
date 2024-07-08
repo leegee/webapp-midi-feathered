@@ -77,7 +77,7 @@ export default function NoteList () {
                 const hue = mapRange( pitch, LOWEST_PITCH, 108, 0, 300 );
 
                 // Calculate luminosity based on velocity and clamp to easily seen range
-                const luminosity = Math.max( 10, Math.min( 90, ( velocity / 127 ) * 100 ) );
+                const luminosity = Math.max( 30, Math.min( 110, ( velocity / 127 ) * 100 ) );
 
                 bufferCtx.fillStyle = `hsl(${ hue }, 100%, ${ luminosity }%)`;
                 bufferCtx.fillRect( x, y, noteWidth, NOTE_HEIGHT );
