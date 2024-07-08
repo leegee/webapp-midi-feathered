@@ -16,7 +16,7 @@ export default function NoteList () {
     const requestIdRef = useRef( null );
 
     // State to keep track of playing events
-    const [ playingEvents, setPlayingEvents ] = useState( {} );
+    const [ playingExtraNotes, setPlayingExtraNotes ] = useState( {} );
 
     useEffect( () => {
         const handleResize = () => {
@@ -70,7 +70,10 @@ export default function NoteList () {
             );
 
             // Draw new notes
-            Object.entries( notesOn ).forEach( ( [ key, velocity ] ) => {
+            [
+                ...Object.entries( playingExtraNotes ),
+                ...Object.entries( notesOn )
+            ].forEach( ( [ key, velocity ] ) => {
                 const pitch = parseInt( key, 10 );
                 const x = ( pitch - LOWEST_PITCH ) * noteWidth;
 
@@ -82,28 +85,6 @@ export default function NoteList () {
 
                 bufferCtx.fillStyle = `hsl(${ hue }, 100%, ${ luminosity }%)`;
                 bufferCtx.fillRect( x, y, noteWidth, NOTE_HEIGHT );
-
-                if ( playingEvents[ key ] ) {
-                    // Draw outline for playing notes on left and right sides only
-                    const outlineWidth = 2;
-                    const leftX = x + ( outlineWidth / 2 );
-                    const rightX = x + ( noteWidth - outlineWidth / 2 );
-
-                    bufferCtx.strokeStyle = 'white';
-                    bufferCtx.lineWidth = outlineWidth;
-
-                    // Left side outline
-                    bufferCtx.beginPath();
-                    bufferCtx.moveTo( leftX, y );
-                    bufferCtx.lineTo( leftX, y + NOTE_HEIGHT );
-                    bufferCtx.stroke();
-
-                    // Right side outline
-                    bufferCtx.beginPath();
-                    bufferCtx.moveTo( rightX, y );
-                    bufferCtx.lineTo( rightX, y + NOTE_HEIGHT );
-                    bufferCtx.stroke();
-                }
             } );
 
             // Clear main canvas
@@ -125,7 +106,7 @@ export default function NoteList () {
                 cancelAnimationFrame( requestIdRef.current );
             }
         };
-    }, [ canvasHeight, notesOn, playingEvents ] );
+    }, [ canvasHeight, notesOn, playingExtraNotes ] );
 
     function mapRange ( value, minIn, maxIn, minOut, maxOut ) {
         return ( ( value - minIn ) * ( maxOut - minOut ) ) / ( maxIn - minIn ) + minOut;
@@ -134,14 +115,15 @@ export default function NoteList () {
     useEffect( () => {
         const handleNoteEvent = ( event ) => {
             if ( event.type === EVENT_NOTE_START ) {
-                setPlayingEvents( ( prevEvents ) => ( {
+                console.debug( 'received', event.detail.pitch )
+                setPlayingExtraNotes( ( prevEvents ) => ( {
                     ...prevEvents,
                     [ event.detail.pitch ]: event.detail.velocity,
                 } ) );
             }
 
             if ( event.type === EVENT_NOTE_STOP ) {
-                setPlayingEvents( ( prevEvents ) => {
+                setPlayingExtraNotes( ( prevEvents ) => {
                     const newEvents = { ...prevEvents };
                     delete newEvents[ event.detail.pitch ];
                     return newEvents;
