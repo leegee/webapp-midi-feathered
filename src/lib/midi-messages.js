@@ -1,5 +1,9 @@
 // midi-messages.js
-import { NOTE_OFF, NOTE_ON, EVENT_NOTE_START, EVENT_NOTE_STOP } from './constants';
+import { EVENT_NOTE_START, EVENT_NOTE_STOP } from './constants';
+
+export const NOTE_ON = 9;
+export const NOTE_OFF = 8;
+export const CC = 11;
 
 const timersForPitches = {};
 const DISPATCH_EVENTS_STD = false;
@@ -49,7 +53,7 @@ export function sendNoteWithDuration ( pitch, velocity, durationMs, selectedOutp
  * @fires EVENT_NOTE_START
  * @fires EVENT_NOTE_STOP
 */
-export function onMidiMessage ( event, midiInputChannel, setNotesOn ) {
+export function onMidiMessage ( event, midiInputChannel, setNotesOn, setCCsOn ) {
     const midiChannel = event.data[ 0 ] & 0x0F;
 
     if ( midiChannel !== midiInputChannel ) {
@@ -60,29 +64,40 @@ export function onMidiMessage ( event, midiInputChannel, setNotesOn ) {
     const pitch = event.data[ 1 ];
     const velocity = ( event.data.length > 2 ) ? event.data[ 2 ] : 1;
 
-    setNotesOn( ( prevNotesOn ) => {
-        const newNotesOn = { ...prevNotesOn };
-
-        if ( cmd === NOTE_ON && velocity > 0 && !newNotesOn[ pitch ] ) {
-            newNotesOn[ pitch ] = velocity;
-            if ( DISPATCH_EVENTS_STD ) {
-                window.dispatchEvent(
-                    new CustomEvent( EVENT_NOTE_START, { detail: { pitch, velocity, midiChannel } } )
-                );
+    if ( cmd === CC ) {
+        setCCsOn( ( prevCCsOn ) => {
+            return {
+                ...prevCCsOn,
+                [ pitch ]: velocity
             }
-        }
+        } );
+    }
 
-        else if ( cmd === NOTE_OFF || velocity === 0 ) {
-            if ( newNotesOn[ pitch ] ) {
-                delete newNotesOn[ pitch ];
+    else if ( cmd === NOTE_ON || cmd === NOTE_OFF ) {
+        setNotesOn( ( prevNotesOn ) => {
+            const newNotesOn = { ...prevNotesOn };
+
+            if ( cmd === NOTE_ON && velocity > 0 && !newNotesOn[ pitch ] ) {
+                newNotesOn[ pitch ] = velocity;
                 if ( DISPATCH_EVENTS_STD ) {
                     window.dispatchEvent(
-                        new CustomEvent( EVENT_NOTE_STOP, { detail: { pitch, midiChannel } } )
+                        new CustomEvent( EVENT_NOTE_START, { detail: { pitch, velocity, midiChannel } } )
                     );
                 }
             }
-        }
 
-        return newNotesOn;
-    } );
+            else if ( cmd === NOTE_OFF || velocity === 0 ) {
+                if ( newNotesOn[ pitch ] ) {
+                    delete newNotesOn[ pitch ];
+                    if ( DISPATCH_EVENTS_STD ) {
+                        window.dispatchEvent(
+                            new CustomEvent( EVENT_NOTE_STOP, { detail: { pitch, midiChannel } } )
+                        );
+                    }
+                }
+            }
+
+            return newNotesOn;
+        } );
+    }
 }

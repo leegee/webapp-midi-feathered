@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useAtom } from 'jotai';
 
 import {
+    CCsOnAtom,
     midiAccessAtom,
     midiOutputsAtom,
     selectedOutputAtom,
@@ -26,6 +27,7 @@ export default function MIDIComponent () {
     const [ selectedOutput, setSelectedOutput ] = useAtom( selectedOutputAtom );
     const [ midiInputChannel ] = useAtom( midiInputChannelAtom );
     const [ , setNotesOn ] = useAtom( notesOnAtom );
+    const [ , setCCsOn ] = useAtom( CCsOnAtom );
 
     const selectedOutputRef = useRef( null );
     const [ isDialogOpen, setIsDialogOpen ] = useState( false );
@@ -62,7 +64,7 @@ export default function MIDIComponent () {
 
                     midiAccess.inputs.forEach( ( inputPort ) => {
                         inputPort.onmidimessage = ( event ) =>
-                            onMidiMessage( event, midiInputChannel, setNotesOn );
+                            onMidiMessage( event, midiInputChannel, setNotesOn, setCCsOn );
                     } );
 
                     return firstOutputName;
