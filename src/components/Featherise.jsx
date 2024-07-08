@@ -9,8 +9,8 @@ import { loadJson, saveJson } from '../lib/settings-files';
 import styles from './Featherise.module.css';
 
 const playModeTypes = {
+    MONO: 0,
     POLY: 1,
-    MONO: 2,
 };
 
 const LOCAL_SAVE_FREQ_MS = 1000 * 10;
@@ -43,7 +43,8 @@ const DEFAULT_RANGES = {
 }
 
 const localStorageOr = ( fieldName, defaultValue ) => {
-    return Number( localStorage.getItem( fieldName ) ) || defaultValue;
+    const val = localStorage.getItem( fieldName );
+    return typeof val !== 'undefined' ? Number( val ) : defaultValue;
 }
 
 const ucfirst = str => str.charAt( 0 ).toUpperCase() + str.slice( 1 );
@@ -65,7 +66,7 @@ export default function Featherise ( { selectedOutput, vertical = false } ) {
 
     const rangeState = {};
 
-    [ rangeState.playMode, rangeState.setPlayMode ] = useState( localStorageOr( 'playMode', true ) );
+    [ rangeState.playMode, rangeState.setPlayMode ] = useState( localStorageOr( 'playMode', 1 ) );
 
     for ( let key in DEFAULT_RANGES ) {
         const setterName = 'set' + ucfirst( key );
