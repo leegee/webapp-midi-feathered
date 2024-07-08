@@ -174,19 +174,6 @@ export default function Featherise ( { selectedOutput, vertical = false } ) {
         }
     }
 
-    // Returns an adjusted velocity clamped to valid MIDI values
-    const generateVelocity = ( velocity ) => {
-        return Math.min(
-            Math.max(
-                ( velocity * ( 1 + Math.random() * (
-                    DEFAULT_RANGES.velocityRange.maxValue - DEFAULT_RANGES.velocityRange.minValue
-                ) + DEFAULT_RANGES.velocityRange.minValue / 100 ) ),
-                0
-            ),
-            127
-        );
-    }
-
     // @see localStorageOr
     useEffect( () => {
         const saveIntervalTimer = setInterval( () => {
@@ -201,6 +188,22 @@ export default function Featherise ( { selectedOutput, vertical = false } ) {
 
     useEffect( () => {
         let bpsTimer;
+
+        // Returns an velocity adjusted by percentage, clamped to valid MIDI values
+        const generateVelocity = ( velocity ) => {
+            const { maxValue, minValue } = rangeState.velocityRange;
+
+            const minPercentageFactor = 1 + ( minValue / 100 );
+            const maxPercentageFactor = 1 + ( maxValue / 100 );
+
+            // Generate a random factor between minPercentageFactor and maxPercentageFactor
+            const randomFactor = probabilityTriangular( minPercentageFactor, maxPercentageFactor );
+
+            const adjustedVelocity = velocity * randomFactor;
+
+            // Ensure the adjusted velocity is within valid MIDI velocity range
+            return Math.min( Math.max( adjustedVelocity, 0 ), 127 );
+        }
 
         // Was bpsListener
         const playNoteEveryBps = () => {
@@ -255,7 +258,7 @@ export default function Featherise ( { selectedOutput, vertical = false } ) {
         playNoteEveryBps();
 
         return () => clearTimeout( bpsTimer );
-    }, [ notesOn, rangeState.playMode, rangeState.probRange, rangeState.speedRange, selectedOutput, rangeState.bpsRange.minValue, rangeState.bpsRange.maxValue, midiOutputChannels, rangeState.octaveRange.minValue, rangeState.octaveRange.maxValue ] );
+    }, [ notesOn, rangeState.playMode, rangeState.probRange, rangeState.speedRange, selectedOutput, rangeState.bpsRange.minValue, rangeState.bpsRange.maxValue, midiOutputChannels, rangeState.octaveRange.minValue, rangeState.octaveRange.maxValue, rangeState.velocityRange ] );
 
     return (
         <fieldset className={ `padded ${ styles[ 'featherize-component' ] }` }>
