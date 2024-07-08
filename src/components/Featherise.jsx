@@ -262,7 +262,7 @@ export default function Featherise ( { selectedOutput, vertical = false } ) {
     }, [ notesOn, rangeState.playMode, rangeState.polyProbRange, rangeState.speedRange, selectedOutput, rangeState.bpsRange.minValue, rangeState.bpsRange.maxValue, midiOutputChannels, rangeState.octaveRange.minValue, rangeState.octaveRange.maxValue, rangeState.velocityRange ] );
 
     return (
-        <fieldset className={ `padded ${ styles[ 'featherize-component' ] }` }>
+        <fieldset className={ styles[ 'featherize-component' ] }>
             <legend className={ styles.legend }>
                 Feathered Chords
                 <span className={ styles.settings }>

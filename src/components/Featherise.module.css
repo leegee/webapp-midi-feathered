@@ -2,6 +2,7 @@
     border: var(--midi-app-border);
     border-radius: var(--midi-app-border-radius);
     height: 100%;
+    margin: 0 !important;
 }
 
 .legend {
