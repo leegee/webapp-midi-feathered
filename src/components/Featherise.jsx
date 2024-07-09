@@ -114,7 +114,7 @@ export default function Featherise ( { selectedOutput, vertical = false } ) {
     };
 
     const handlepolyProbRangeChange = ( newRange ) => {
-        rangeState.setpolyProbRange( {
+        rangeState.setPolyProbRange( {
             minValue: Number( newRange.minValue ),
             maxValue: Number( newRange.maxValue ),
         } );
@@ -167,7 +167,7 @@ export default function Featherise ( { selectedOutput, vertical = false } ) {
             rangeState.setVelocityRange( settings.velocityRange );
             rangeState.setSpeedRange( settings.speedRange );
             rangeState.setDurationRange( settings.durationRange );
-            rangeState.setpolyProbRange( settings.polyProbRange );
+            rangeState.setPolyProbRange( settings.polyProbRange );
         } catch ( e ) {
             console.error( e );
             alert( e );
@@ -304,12 +304,12 @@ export default function Featherise ( { selectedOutput, vertical = false } ) {
                 <div className={ styles[ 'play-control' ] }>
                     <label htmlFor="bps-input">
                         <span>
+                            Notes/sec
+                        </span>
+                        <span>
                             { rangeState.bpsRange.minValue }
                             <small>to</small>
                             { rangeState.bpsRange.maxValue }
-                        </span>
-                        <span>
-                            notes/sec
                         </span>
                     </label>
                     <RangeInput vertical={ vertical }
