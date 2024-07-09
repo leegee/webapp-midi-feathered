@@ -60,6 +60,7 @@
 }
 
 .vertical .bar {
+    background: var(--midi-app-brand-clr);
     background: var(--midi-app-striped-bg-vertical);
 }
 

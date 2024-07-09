@@ -11,10 +11,10 @@ const PianoKey = ( { pitch, isHighlighted } ) => {
     const isBlackKey = blackKeys.includes( pitch % 12 );
 
     return (
-        <div
+        <span
             alt={ `${ pitch }` }
-            className={ `${ styles[ 'piano-key' ] } ${ isHighlighted ? styles[ 'piano-key-highlighted' ] : '' } ${ isBlackKey ? styles[ 'piano-key-black' ] : 'piano-key-white' }` }>
-        </div>
+            className={ `${ styles[ 'piano-key' ] } ${ isHighlighted ? styles[ 'piano-key-highlighted' ] : '' } ${ isBlackKey ? styles[ 'piano-key-black' ] : 'piano-key-white' }` }
+        />
     );
 };
 

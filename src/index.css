@@ -13,14 +13,14 @@
   --midi-app-striped-bg-vertical: repeating-linear-gradient(0deg,
       hsl(39, 100%, 50%),
       hsl(39, 100%, 50%) 10px,
-      transparent 10px,
-      transparent 20px);
+      hsla(39, 100%, 50%, 60%) 10px,
+      hsla(39, 100%, 50%, 60%) 20px);
 
   --midi-app-striped-bg-horizontal: repeating-linear-gradient(90deg,
       hsl(39, 100%, 50%),
       hsl(39, 100%, 50%) 10px,
-      transparent 10px,
-      transparent 20px) color-scheme: dark;
+      hsla(39, 100%, 50% 50%) 10px,
+      hsla(39, 100%, 50% 50%) 20px) color-scheme: dark;
 
   color: var(--midi-app-fg);
   background-color: var(--midi-app-bg);
