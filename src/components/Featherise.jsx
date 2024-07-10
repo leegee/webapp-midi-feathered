@@ -201,15 +201,9 @@ export default function Featherise ( { selectedOutput, vertical = false } ) {
 
             // Returns an velocity adjusted by percentage, clamped to valid MIDI values
             const { maxValue, minValue } = rangeState.velocityRange;
-
             const minPercentageFactor = 1 + ( minValue / 100 );
             const maxPercentageFactor = 1 + ( maxValue / 100 );
-
-            // Generate a random factor between minPercentageFactor and maxPercentageFactor
-            const randomFactor = probabilityTriangular( minPercentageFactor, maxPercentageFactor );
-
-            const adjustedVelocity = playedNoteVvelocity * randomFactor;
-
+            const adjustedVelocity = playedNoteVvelocity * probabilityTriangular( minPercentageFactor, maxPercentageFactor );
             // Ensure the adjusted velocity is within valid MIDI velocity range
             return Math.min( Math.max( adjustedVelocity, 0 ), 127 );
         }
