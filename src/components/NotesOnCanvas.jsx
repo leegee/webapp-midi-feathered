@@ -7,6 +7,7 @@ import styles from './NotesOnCanvas.module.css';
 const LOWEST_PITCH = 21;
 const NUMBER_OF_NOTES = 88;
 const NOTE_HEIGHT = 1;
+const SCROLL_SPEED = 0.25;
 
 export default function NoteList () {
     const [ notesOn ] = useAtom( notesOnAtom );
@@ -17,6 +18,7 @@ export default function NoteList () {
 
     // State to keep track of playing events
     const [ playingExtraNotes, setPlayingExtraNotes ] = useState( {} );
+    const scrollOffsetRef = useRef( 0 );
 
     useEffect( () => {
         const handleResize = () => {
@@ -35,7 +37,7 @@ export default function NoteList () {
         };
     }, [] );
 
-    // Rendering loop for continious scrolling: new notes at drawn at the bottom of the canvas after the whole canvas has been moved up by a copy
+    // Rendering loop for continuous scrolling: new notes are drawn at the bottom of the canvas after the whole canvas has been moved up by a copy
     useEffect( () => {
         if ( !canvasHeight ) {
             return;
@@ -47,26 +49,32 @@ export default function NoteList () {
         const bufferCtx = bufferCanvas.getContext( '2d' );
         const canvasWidth = canvas.width;
         const noteWidth = canvasWidth / NUMBER_OF_NOTES;
-        const y = canvasHeight - NOTE_HEIGHT;
 
         bufferCanvas.width = canvasWidth;
         bufferCanvas.height = canvasHeight;
 
         const drawNotes = () => {
+            // Accumulate scroll offset
+            scrollOffsetRef.current += SCROLL_SPEED;
+
+            // Calculate integer scroll amount and update the offset
+            const intScrollAmount = Math.floor( scrollOffsetRef.current );
+            scrollOffsetRef.current -= intScrollAmount;
+
             // Clear buffer canvas
             bufferCtx.clearRect( 0, 0, canvasWidth, canvasHeight );
 
-            // Scrolling: draw previous frame shifted upwards by note height
+            // Scrolling: draw previous frame shifted upwards by intScrollAmount
             bufferCtx.drawImage(
                 canvas,
                 0,
-                NOTE_HEIGHT,
+                intScrollAmount,
                 canvasWidth,
-                canvasHeight - NOTE_HEIGHT,
+                canvasHeight - intScrollAmount,
                 0,
                 0,
                 canvasWidth,
-                canvasHeight - NOTE_HEIGHT
+                canvasHeight - intScrollAmount
             );
 
             // Draw new notes
@@ -84,7 +92,7 @@ export default function NoteList () {
                 const luminosity = Math.max( 30, Math.min( 110, ( velocity / 127 ) * 100 ) );
 
                 bufferCtx.fillStyle = `hsl(${ hue }, 100%, ${ luminosity }%)`;
-                bufferCtx.fillRect( x, y, noteWidth, NOTE_HEIGHT );
+                bufferCtx.fillRect( x, canvasHeight - NOTE_HEIGHT, noteWidth, NOTE_HEIGHT );
             } );
 
             // Clear main canvas
