@@ -297,9 +297,7 @@ export default function Featherise ( { selectedOutput, vertical = false } ) {
 
                 <div className={ styles[ 'play-control' ] }>
                     <label htmlFor="bps-input">
-                        <span>
-                            Notes/sec
-                        </span>
+                        <span>Notes/sec</span>
                         <span>
                             { rangeState.bpsRange.minValue }
                             <small>to</small>
@@ -319,9 +317,7 @@ export default function Featherise ( { selectedOutput, vertical = false } ) {
 
                 <div className={ styles[ 'play-control' ] }>
                     <label htmlFor="velocity-input">
-                        <span style={ { display: 'inline-flex', width: '100%' } }>
-                            Velocity:
-                        </span>
+                        <span>Velocity:</span>
                         <span>
                             { rangeState.velocityRange.minValue }
                             <small>to</small>
@@ -342,7 +338,7 @@ export default function Featherise ( { selectedOutput, vertical = false } ) {
 
                 <div className={ styles[ 'play-control' ] }>
                     <label htmlFor="speed-input">
-                        <span> Speed: </span>
+                        <span>Speed:</span>
                         <span>
                             { Math.floor( ( rangeState.speedRange.minValue ) ) }
                             <small>to</small>
@@ -394,7 +390,11 @@ export default function Featherise ( { selectedOutput, vertical = false } ) {
                             { rangeState.playMode === playModeTypes.POLY && ( <>Polyphony:</> ) }
                         </span>
                         { rangeState.playMode === playModeTypes.POLY && (
-                            <span>{ percentage( rangeState.polyProbRange.minValue ) } <small>to</small>{ percentage( rangeState.polyProbRange.maxValue ) }%</span>
+                            <span>
+                                { percentage( rangeState.polyProbRange.minValue ) }
+                                <small>to</small>
+                                { percentage( rangeState.polyProbRange.maxValue ) }%
+                            </span>
                         ) }
                     </label>
                     { rangeState.playMode === playModeTypes.POLY && (
