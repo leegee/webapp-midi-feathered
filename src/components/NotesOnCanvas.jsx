@@ -88,8 +88,8 @@ export default function NoteList () {
                 // Calculate hue based on pitch (lowest notes are red, highest are violet)
                 const hue = mapRange( pitch, LOWEST_PITCH, 108, 0, 300 );
 
-                // Calculate luminosity based on velocity and clamp to easily seen range
-                const luminosity = Math.max( 30, Math.min( 110, ( velocity / 127 ) * 100 ) );
+                // Calculate luminosity based on velocity and clamp to easily seen range (20-80)
+                const luminosity = Math.max( 20, Math.min( 80, ( velocity / 127 ) * 100 ) );
 
                 bufferCtx.fillStyle = `hsl(${ hue }, 100%, ${ luminosity }%)`;
                 bufferCtx.fillRect( x, canvasHeight - NOTE_HEIGHT, noteWidth, NOTE_HEIGHT );
