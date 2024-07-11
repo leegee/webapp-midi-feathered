@@ -39,8 +39,6 @@ export default function PianoKeyboard ( { midiInputChannel } ) {
         const clickY = event.clientY - rect.top;
         const velocity = Math.floor( ( clickY / rect.height ) * 126 ) + 1;
 
-        console.log( `Key with pitch ${ pitch } velocity ${ velocity } ${ command === NOTE_ON ? 'on' : 'off' }` );
-
         // Fake a MIDI input message
         const statusByte = ( command << 4 ) | midiInputChannel;
         onMidiMessage(
