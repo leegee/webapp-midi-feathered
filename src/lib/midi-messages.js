@@ -20,7 +20,7 @@ export function stopMidiNote ( pitch, selectedOutput, midiChannel ) {
 }
 
 export function sendNoteWithDuration ( pitch, velocity, durationMs, selectedOutput, midiChannel ) {
-    // If the note is playing already
+    // If the note is playing already, stop it
     if ( Object.hasOwn( timersForPitches, pitch ) ) {
         clearTimeout( timersForPitches[ pitch ] );
         stopMidiNote( pitch, selectedOutput, midiChannel );

@@ -33,12 +33,15 @@ export default function PianoKeyboard ( { midiInputChannel } ) {
 
     const keyHandler = ( event, command ) => {
         const pitch = event.target.dataset.pitch;
-        if ( pitch ) {
-            console.log( `Key with pitch ${ pitch } ${ command === NOTE_ON ? 'on' : 'off' }` );
-        }
+
+        // Velocity 1-127 from click position within the key
+        const rect = event.target.getBoundingClientRect();
+        const clickY = event.clientY - rect.top;
+        const velocity = Math.floor( ( clickY / rect.height ) * 126 ) + 1;
+
+        console.log( `Key with pitch ${ pitch } velocity ${ velocity } ${ command === NOTE_ON ? 'on' : 'off' }` );
 
         // Fake a MIDI input message
-        const velocity = 100;
         const statusByte = ( command << 4 ) | midiInputChannel;
         onMidiMessage(
             { data: new Uint8Array( [ statusByte, pitch, velocity ] ) },
