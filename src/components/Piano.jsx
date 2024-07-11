@@ -12,7 +12,7 @@ const PianoKey = ( { pitch, isHighlighted } ) => {
 
     return (
         <span
-            alt={ `${ pitch }` }
+            data-pitch={ `${ pitch }` }
             className={ `${ styles[ 'piano-key' ] } ${ isHighlighted ? styles[ 'piano-key-highlighted' ] : '' } ${ isBlackKey ? styles[ 'piano-key-black' ] : 'piano-key-white' }` }
         />
     );
@@ -29,14 +29,21 @@ export default function PianoKeyboard () {
     // 88 keys from A0 @ MIDI pitch 21
     const midiPitches = Array.from( { length: 88 }, ( _, index ) => index + 21 );
 
+    const handleKeyClick = ( event ) => {
+        const pitch = event.target.dataset.pitch;
+        if ( pitch ) {
+            console.log( `Key with pitch ${ pitch } clicked` );
+        }
+    };
+
     return (
-        <section className={ styles[ 'piano-keyboard' ] }>
+        <section className={ styles[ 'piano-keyboard' ] } onClick={ handleKeyClick }>
             <div>
                 { midiPitches.map( ( pitch ) => (
                     <PianoKey
                         key={ pitch }
                         pitch={ pitch }
-                        isHighlighted={ notesOn[ pitch ] ? true : false }
+                        isHighlighted={ !!notesOn[ pitch ] }
                     />
                 ) ) }
             </div>

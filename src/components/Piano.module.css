@@ -11,7 +11,7 @@
 }
 
 .piano-key {
-    cursor: not-allowed;
+    cursor: pointer;
     position: relative;
     flex: 1;
     display: inline-block;
