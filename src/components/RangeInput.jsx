@@ -146,7 +146,7 @@ RangeInput.propTypes = {
     onChange: PropTypes.func.isRequired,
     debounceMs: PropTypes.number,
     vertical: PropTypes.bool,
-    size: PropTypes.oneOf( [ 'normal', 'wide', 'narrow' ] ),
+    size: PropTypes.oneOf( [ 'normal', 'wide', 'narrow', 'narrowest' ] ),
     forceIntegers: PropTypes.bool,
     flipDisplay: PropTypes.bool,
 };

@@ -6,6 +6,7 @@
     --midi-app-range-size-normal: 4em;
     --midi-app-range-size-wide: 8em;
     --midi-app-range-size-narrow: 2em;
+    --midi-app-range-size-narrowest: 6pt;
 }
 
 .custom-range-input {
@@ -41,6 +42,12 @@
 
 .custom-range-input.vertical.narrow {
     width: var(--midi-app-range-size-narrow);
+}
+
+.custom-range-input.vertical.narrowest {
+    width: var(--midi-app-range-size-narrowest);
+    max-width: var(--midi-app-range-size-narrowest);
+    min-width: var(--midi-app-range-size-narrowest);
 }
 
 .custom-range-input.vertical.normal {
