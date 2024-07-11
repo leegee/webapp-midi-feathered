@@ -74,7 +74,6 @@ export function onMidiMessage ( event, midiInputChannel, setNotesOn, setCCsOn ) 
     }
 
     else if ( cmd === NOTE_ON || cmd === NOTE_OFF ) {
-        console.debug( 'note on' )
         setNotesOn( ( prevNotesOn ) => {
             const newNotesOn = { ...prevNotesOn };
 
