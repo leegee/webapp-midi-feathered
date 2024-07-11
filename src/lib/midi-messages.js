@@ -56,7 +56,7 @@ export function sendNoteWithDuration ( pitch, velocity, durationMs, selectedOutp
 export function onMidiMessage ( event, midiInputChannel, setNotesOn, setCCsOn ) {
     const midiChannel = event.data[ 0 ] & 0x0F;
 
-    if ( midiChannel !== midiInputChannel ) {
+    if ( midiInputChannel && midiChannel !== midiInputChannel ) {
         return;
     }
 
@@ -74,6 +74,7 @@ export function onMidiMessage ( event, midiInputChannel, setNotesOn, setCCsOn ) 
     }
 
     else if ( cmd === NOTE_ON || cmd === NOTE_OFF ) {
+        console.debug( 'note on' )
         setNotesOn( ( prevNotesOn ) => {
             const newNotesOn = { ...prevNotesOn };
 
@@ -99,5 +100,9 @@ export function onMidiMessage ( event, midiInputChannel, setNotesOn, setCCsOn ) 
 
             return newNotesOn;
         } );
+    }
+
+    else {
+        console.debug( `Unhandled MIDI event - cmd: ${ cmd }` )
     }
 }

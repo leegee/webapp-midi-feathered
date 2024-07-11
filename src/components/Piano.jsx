@@ -1,14 +1,15 @@
 import PropTypes from 'prop-types';
 import { useAtom } from 'jotai';
 
-import { notesOnAtom } from '../lib/store';
+import { notesOnAtom, CCsOnAtom } from '../lib/store';
+import { NOTE_ON, NOTE_OFF, onMidiMessage } from '../lib/midi-messages';
 
 import styles from './Piano.module.css';
 
-const blackKeys = [ 1, 3, 6, 8, 10 ];
+const BLACK_KEYS = [ 1, 3, 6, 8, 10 ];
 
 const PianoKey = ( { pitch, isHighlighted } ) => {
-    const isBlackKey = blackKeys.includes( pitch % 12 );
+    const isBlackKey = BLACK_KEYS.includes( pitch % 12 );
 
     return (
         <span
@@ -23,21 +24,30 @@ PianoKey.propTypes = {
     isHighlighted: PropTypes.bool.isRequired,
 };
 
-export default function PianoKeyboard () {
-    const [ notesOn ] = useAtom( notesOnAtom );
+export default function PianoKeyboard ( { midiInputChannel } ) {
+    const [ notesOn, setNotesOn ] = useAtom( notesOnAtom );
+    const [ , setCCsOn ] = useAtom( CCsOnAtom );
 
     // 88 keys from A0 @ MIDI pitch 21
     const midiPitches = Array.from( { length: 88 }, ( _, index ) => index + 21 );
 
-    const handleKeyClick = ( event ) => {
+    const keyHandler = ( event, command ) => {
         const pitch = event.target.dataset.pitch;
         if ( pitch ) {
-            console.log( `Key with pitch ${ pitch } clicked` );
+            console.log( `Key with pitch ${ pitch } ${ command === NOTE_ON ? 'on' : 'off' }` );
         }
+
+        // Fake a MIDI input message
+        const velocity = 100;
+        const statusByte = ( command << 4 ) | midiInputChannel;
+        onMidiMessage(
+            { data: new Uint8Array( [ statusByte, pitch, velocity ] ) },
+            null, setNotesOn, setCCsOn
+        );
     };
 
     return (
-        <section className={ styles[ 'piano-keyboard' ] } onClick={ handleKeyClick }>
+        <section className={ styles[ 'piano-keyboard' ] } onMouseDown={ ( e ) => keyHandler( e, NOTE_ON ) } onMouseUp={ ( e ) => keyHandler( e, NOTE_OFF ) }>
             <div>
                 { midiPitches.map( ( pitch ) => (
                     <PianoKey
@@ -49,4 +59,8 @@ export default function PianoKeyboard () {
             </div>
         </section>
     );
+}
+
+PianoKeyboard.propTypes = {
+    midiInputChannel: PropTypes.number.isRequired,
 }

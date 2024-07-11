@@ -102,7 +102,7 @@ export default function MIDIComponent () {
             { showExtras && (
                 <footer className={ styles.footer }>
                     <NotesOnCanvas />
-                    <PianoKeyboard />
+                    <PianoKeyboard midiInputChannel={ midiInputChannel } />
                 </footer>
             ) }
 
