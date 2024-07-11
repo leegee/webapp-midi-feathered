@@ -5,19 +5,25 @@
 }
 
 .piano-keyboard {
+    width: auto;
+    position: relative;
     display: flex;
     justify-content: center;
+    flex-wrap: nowrap;
     padding: var(--midi-app-padding);
 }
 
 .piano-key {
-    cursor: pointer;
     position: relative;
     flex: 1;
+    cursor: pointer;
     display: inline-block;
     border: 1px solid grey;
+    border-right: 0;
     background-color: #f6f6f6;
     width: var(--key-width);
+    max-width: var(--key-width);
+    min-width: var(--key-width);
     height: var(--key-white-height);
     z-index: 1;
 }
@@ -27,7 +33,7 @@
 }
 
 .piano-key-black {
-    position: absolute;
+    /* position: absolute; */
     z-index: 2;
     background-color: black;
     width: var(--key-width);

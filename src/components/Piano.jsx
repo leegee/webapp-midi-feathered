@@ -49,15 +49,13 @@ export default function PianoKeyboard ( { midiInputChannel } ) {
 
     return (
         <section className={ styles[ 'piano-keyboard' ] } onMouseDown={ ( e ) => keyHandler( e, NOTE_ON ) } onMouseUp={ ( e ) => keyHandler( e, NOTE_OFF ) }>
-            <div>
-                { midiPitches.map( ( pitch ) => (
-                    <PianoKey
-                        key={ pitch }
-                        pitch={ pitch }
-                        isHighlighted={ !!notesOn[ pitch ] }
-                    />
-                ) ) }
-            </div>
+            { midiPitches.map( ( pitch ) => (
+                <PianoKey
+                    key={ pitch }
+                    pitch={ pitch }
+                    isHighlighted={ !!notesOn[ pitch ] }
+                />
+            ) ) }
         </section>
     );
 }
