@@ -20,7 +20,8 @@
 }
 
 .play-control {
-    display: inline-flex;
+    position: relative;
+    display: flex;
     flex-direction: column;
     align-items: flex-start;
     margin-bottom: 0.5em;
@@ -65,8 +66,13 @@
     flex-direction: column;
 }
 
-.play-control.extensions .columns {
+.play-control.extensions .extcolumns {
     display: flex;
+    position: relative;
+}
+
+.play-control.extensions .labels {
+    margin-top: var(--midi-app-padding);
 }
 
 .play-control.extensions .labels label {
@@ -77,13 +83,14 @@
     padding: 0;
     margin: 0;
     font-size: xx-small;
+    margin-left: 1em;
 }
 
 .play-control.extensions .labels label:first-of-type {
     margin-top: var(--midi-app-padding);
 }
 
-play-control.extensions input[type="checkbox"] {
+.play-control.extensions input[type="checkbox"] {
     font-size: 10pt !important;
     margin: 0 !important;
     padding: 0 !important;

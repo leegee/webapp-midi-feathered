@@ -431,7 +431,7 @@ export default function Featherise ( { selectedOutput, vertical = false } ) {
                         </span>
                     </label>
 
-                    <div className={ styles.columns }>
+                    <div className={ styles.extcolumns }>
                         <RangeInput vertical={ vertical }
                             size='narrow'
                             id='extensions-input'
