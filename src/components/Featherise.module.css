@@ -59,3 +59,33 @@
     font-size: xx-small;
     margin: 0 0.6em;
 }
+
+.play-control.extensions {
+    display: flex;
+    flex-direction: column;
+}
+
+.play-control.extensions .columns {
+    display: flex;
+}
+
+.play-control.extensions .labels label {
+    display: flex;
+    justify-content: flex-start;
+    flex-direction: row;
+    align-items: center;
+    padding: 0;
+    margin: 0;
+    font-size: xx-small;
+}
+
+.play-control.extensions .labels label:first-of-type {
+    margin-top: var(--midi-app-padding);
+}
+
+play-control.extensions input[type="checkbox"] {
+    font-size: 10pt !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: none !important;
+}

@@ -2,7 +2,7 @@
 :root {
     --midi-app-thumb-width: 2em;
     --midi-app-thumb-width-half: calc(var(--midi-app-thumb-width) / 2);
-    --midi-app-range-height-input: 100%;
+    --midi-app-range-height-input: var(--midi-app-range-height-input, 100%);
     --midi-app-range-size-normal: 4em;
     --midi-app-range-size-wide: 8em;
     --midi-app-range-size-narrow: 2em;
