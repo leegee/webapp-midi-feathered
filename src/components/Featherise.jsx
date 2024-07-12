@@ -108,8 +108,8 @@ export default function Featherise ( { selectedOutput, vertical = false } ) {
 
     const handleRangeChange = ( newRange, setter ) => {
         setter( {
-            minValue: Math.floor( Number( newRange.minValue ) ),
-            maxValue: Math.floor( Number( newRange.maxValue ) ),
+            minValue: Number( newRange.minValue ),
+            maxValue: Number( newRange.maxValue ),
         } );
     };
 
