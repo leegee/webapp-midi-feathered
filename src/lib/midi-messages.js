@@ -1,13 +1,11 @@
 // midi-messages.js
-import { EVENT_NOTE_START, EVENT_NOTE_STOP } from './constants';
 
 export const NOTE_ON = 9;
 export const NOTE_OFF = 8;
 export const CC = 11;
-
-const timersForPitches = {};
-const DISPATCH_EVENTS_STD = false;
-const DISPATCH_EVENTS_FOR_EXTRAS = true;
+export const DISPATCH_EVENTS_STD = false;
+export const EVENT_NOTE_START = 'note-start';
+export const EVENT_NOTE_STOP = 'note-stop';
 
 export function startMidiNote ( pitch, velocity, selectedOutput, midiChannel ) {
     midiChannel = 2;
@@ -17,36 +15,6 @@ export function startMidiNote ( pitch, velocity, selectedOutput, midiChannel ) {
 export function stopMidiNote ( pitch, selectedOutput, midiChannel ) {
     midiChannel = 2;
     selectedOutput.send( [ 0x80 + midiChannel, pitch, 0 ] );
-}
-
-export function sendNoteWithDuration ( pitch, velocity, durationMs, selectedOutput, midiChannel ) {
-    // If the note is playing already, stop it
-    if ( Object.hasOwn( timersForPitches, pitch ) ) {
-        clearTimeout( timersForPitches[ pitch ] );
-        stopMidiNote( pitch, selectedOutput, midiChannel );
-    }
-
-    startMidiNote( pitch, velocity, selectedOutput, midiChannel );
-    if ( DISPATCH_EVENTS_FOR_EXTRAS ) {
-        window.dispatchEvent(
-            new CustomEvent( EVENT_NOTE_START, { detail: { pitch, velocity, midiChannel } } )
-        );
-    }
-
-    const timer = setTimeout(
-        () => {
-            stopMidiNote( pitch, selectedOutput, midiChannel );
-            if ( DISPATCH_EVENTS_FOR_EXTRAS ) {
-                window.dispatchEvent(
-                    new CustomEvent( EVENT_NOTE_STOP, { detail: { pitch, velocity, midiChannel } } )
-                );
-            }
-
-        },
-        durationMs
-    );
-
-    timersForPitches[ pitch ] = timer;
 }
 
 /**

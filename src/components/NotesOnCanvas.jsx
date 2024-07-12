@@ -1,4 +1,4 @@
-import { EVENT_NOTE_START, EVENT_NOTE_STOP } from '../lib/constants';
+import { EVENT_NOTE_START, EVENT_NOTE_STOP } from '../lib/midi-messages';
 import { useEffect, useRef, useState } from 'react';
 import { useAtom } from 'jotai';
 import { notesOnAtom } from '../lib/store';

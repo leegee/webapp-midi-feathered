@@ -64,11 +64,13 @@
 .play-control.extensions {
     display: flex;
     flex-direction: column;
+    height: 100%;
 }
 
 .play-control.extensions .extcolumns {
     display: flex;
     position: relative;
+    height: 100%;
 }
 
 .play-control.extensions .labels {

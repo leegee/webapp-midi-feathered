@@ -1,18 +1,15 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import PropTypes from 'prop-types';
 import { useAtom } from 'jotai';
 
-import { sendNoteWithDuration } from '../lib/midi-messages';
+import { probabilityTriangular, percentage } from '../lib/maths';
+import { playModeTypes, sendNotes } from '../lib/midi-funcs';
 import { notesOnAtom, midiOutputChannelsAtom, CCsOnAtom } from '../lib/store';
 import { localStorageOr, savePeriodically } from '../lib/local-storage';
-import RangeInput from './RangeInput';
 import { loadJson, saveJson } from '../lib/settings-files';
+import RangeInput from './RangeInput';
 import styles from './Featherise.module.css';
 
-const playModeTypes = {
-    MONO: 0,
-    POLY: 1,
-};
 
 const EXTENSIONS_SELECTED_DEFAULT = {
     1: false,
@@ -42,7 +39,7 @@ const EXTENSIONS_DISPLAY = {
     11: 'VII',
 };
 
-const RANGES_EXTENTS = {
+const RANGE_EXTENTS = {
     polyProbRange: {
         minValue: 0,
         maxValue: 1,
@@ -77,32 +74,36 @@ const RANGES_EXTENTS = {
 
 const ucfirst = str => str.charAt( 0 ).toUpperCase() + str.slice( 1 );
 
-function probabilityTriangular ( min, max, mode ) {
-    mode = mode || ( min + ( max - min ) / 2 );
-    const u = Math.random();
-
-    if ( u < ( mode - min ) / ( max - min ) ) {
-        return min + Math.sqrt( u * ( max - min ) * ( mode - min ) );
-    } else {
-        return max - Math.sqrt( ( 1 - u ) * ( max - min ) * ( max - mode ) );
-    }
-}
-
 export default function Featherise ( { selectedOutput, vertical = false } ) {
     const [ midiOutputChannels, setMidiOutputChannels ] = useAtom( midiOutputChannelsAtom );
     const [ notesOn ] = useAtom( notesOnAtom );
     const [ CCsOn ] = useAtom( CCsOnAtom );
     const [ extensions, setExtensions ] = useState( EXTENSIONS_SELECTED_DEFAULT );
 
-    const rangeState = {};
-    [ rangeState.playMode, rangeState.setPlayMode ] = useState( localStorageOr( 'playMode', 1 ) );
+    const [ playMode, setPlayMode ] = useState( localStorageOr( 'playMode', 1 ) );
 
-    for ( let key in RANGES_EXTENTS ) {
+    const rangeState = useMemo( () => {
+        const initialState = {};
+        for ( let key in RANGE_EXTENTS ) {
+            const setterName = 'set' + ucfirst( key );
+            initialState[ key ] = {
+                minValue: localStorageOr( key + "_minValue", RANGE_EXTENTS[ key ].minValue ),
+                maxValue: localStorageOr( key + "_maxValue", RANGE_EXTENTS[ key ].maxValue ),
+            };
+            initialState[ setterName ] = ( newValue ) => {
+                const newState = { ...initialState[ key ], ...newValue };
+                initialState[ key ] = newState;
+            };
+        }
+        return initialState;
+    }, [] );
+
+    for ( let key in RANGE_EXTENTS ) {
         const setterName = 'set' + ucfirst( key );
         // eslint-disable-next-line react-hooks/rules-of-hooks
         [ rangeState[ key ], rangeState[ setterName ] ] = useState( {
-            minValue: localStorageOr( key + "_minValue", RANGES_EXTENTS[ key ].minValue ),
-            maxValue: localStorageOr( key + "_maxValue", RANGES_EXTENTS[ key ].maxValue ),
+            minValue: localStorageOr( key + "_minValue", RANGE_EXTENTS[ key ].minValue ),
+            maxValue: localStorageOr( key + "_maxValue", RANGE_EXTENTS[ key ].maxValue ),
         } );
     }
 
@@ -120,12 +121,7 @@ export default function Featherise ( { selectedOutput, vertical = false } ) {
         } ) );
     };
 
-    const handlePlayModeChange = ( event ) => rangeState.setPlayMode( event.target.checked ? playModeTypes.POLY : playModeTypes.MONO );
-
-    const percentage = ( real ) => Math.floor( real * 100 );
-
-    // const ms2bpm = ( n ) => 60000 / Number( n );
-    // const ms2bps = ( n ) => 600 / Number( n );
+    const handlePlayModeChange = ( event ) => setPlayMode( event.target.checked ? playModeTypes.POLY : playModeTypes.MONO );
 
     const save = () => {
         saveJson( {
@@ -176,14 +172,14 @@ export default function Featherise ( { selectedOutput, vertical = false } ) {
 
     // @see localStorageOr
     useEffect( () => {
-        const saveValuesToLocalStorage = Object.entries( RANGES_EXTENTS ).reduce( ( acc, [ key ] ) => {
+        const saveValuesToLocalStorage = Object.entries( RANGE_EXTENTS ).reduce( ( acc, [ key ] ) => {
             acc[ `${ key }_minValue` ] = rangeState[ key ].minValue;
             acc[ `${ key }_maxValue` ] = rangeState[ key ].maxValue;
             return acc;
         }, {} );
 
         return savePeriodically( {
-            playMode: rangeState.playMode,
+            playMode: playMode,
             ...saveValuesToLocalStorage,
         } );
 
@@ -192,77 +188,9 @@ export default function Featherise ( { selectedOutput, vertical = false } ) {
     useEffect( () => {
         let bpsTimer;
 
-        // Either a CC value or based on teh note velocity adjusted by  the range
-        const generateVelocity = ( playedNoteVvelocity ) => {
-            // if ( CCsOn[ CCs.velocity ] ) {
-            //     console.log( CCsOnAtom[ CCs.velocity ] );
-            //     return CCsOnAtom[ CCs.velocity ];
-            // }
-
-            // Returns an velocity adjusted by percentage, clamped to valid MIDI values
-            const { maxValue, minValue } = rangeState.velocityRange;
-            const minPercentageFactor = 1 + ( minValue / 100 );
-            const maxPercentageFactor = 1 + ( maxValue / 100 );
-            const adjustedVelocity = playedNoteVvelocity * probabilityTriangular( minPercentageFactor, maxPercentageFactor );
-            // Ensure the adjusted velocity is within valid MIDI velocity range
-            return Math.min( Math.max( adjustedVelocity, 0 ), 127 );
-        }
-
         // Was bpsListener
         const playNoteEveryBps = () => {
-            const pitches = Object.keys( notesOn );
-            if ( !pitches.length ) {
-                return;
-            }
-
-            const usePitches = rangeState.playMode === playModeTypes.MONO
-                ? [ Number( pitches[ Math.floor( Math.random() * pitches.length ) ] ) ]
-                : Object.keys( notesOn ).filter( () => {
-                    const probability = probabilityTriangular( 0, 1 );
-                    return probability < rangeState.polyProbRange.maxValue && probability > rangeState.polyProbRange.minValue;
-                } ).map( usePitch => Number( usePitch ) );
-
-            usePitches.forEach( ( aPitch ) => {
-                const useDurationMs = rangeState.speedRange.minValue + Math.random() * ( rangeState.speedRange.maxValue - rangeState.speedRange.minValue );
-                const useVelocity = generateVelocity( notesOn[ [ aPitch ] ] );
-
-                const useOctave = ( Math.floor(
-                    rangeState.octaveRange.minValue == rangeState.octaveRange.maxValue
-                        ? rangeState.octaveRange.minValue
-                        : probabilityTriangular( rangeState.octaveRange.minValue, rangeState.octaveRange.maxValue )
-                ) - 1 ) * 12;
-
-                const shallUseExtensions = Math.random() > probabilityTriangular( rangeState.extensionsProbRange.minValue, rangeState.extensionsProbRange.maxValue );
-                let useExtenion = 0;
-                if ( shallUseExtensions ) {
-                    const activeExtensions = Object.keys( extensions ).filter( ext => extensions[ ext ] );
-                    useExtenion = Number( activeExtensions[ Math.floor( Math.random() * activeExtensions.length ) ] );
-                }
-
-                let usePitch = aPitch + useOctave + useExtenion;
-
-                // Reverse the octave if it puts the note out of range
-                if ( usePitch >= 127 || usePitch < 28 ) {
-                    usePitch -= useOctave;
-                    if ( usePitch >= 127 || usePitch < 28 ) {
-                        usePitch -= useExtenion;
-                    }
-                }
-
-
-                const midiOutputChannel = midiOutputChannels.length == 1
-                    ? midiOutputChannels[ 0 ]                                                        // Use the only output selected
-                    : midiOutputChannels[ Math.floor( Math.random() * midiOutputChannels.length ) ]; // Use a random output channel
-
-
-                try {
-                    sendNoteWithDuration( usePitch, useVelocity, useDurationMs, selectedOutput, midiOutputChannel );
-                }
-                catch ( e ) {
-                    console.error( `usePitch was ${ usePitch }` );
-                    throw e;
-                }
-            } );
+            sendNotes( notesOn, rangeState, extensions, midiOutputChannels, selectedOutput );
 
             // Set the next recursion:
             const recallTime = 1000 / probabilityTriangular( rangeState.bpsRange.minValue, rangeState.bpsRange.maxValue );
@@ -273,7 +201,7 @@ export default function Featherise ( { selectedOutput, vertical = false } ) {
         playNoteEveryBps();
 
         return () => clearTimeout( bpsTimer );
-    }, [ notesOn, rangeState.playMode, rangeState.polyProbRange, rangeState.speedRange, selectedOutput, rangeState.bpsRange.minValue, rangeState.bpsRange.maxValue, midiOutputChannels, rangeState.octaveRange.minValue, rangeState.octaveRange.maxValue, rangeState.velocityRange, CCsOn, rangeState.extensionsProbRange.minValue, rangeState.extensionsProbRange.maxValue, extensions ] );
+    }, [ notesOn, rangeState, selectedOutput, midiOutputChannels, CCsOn, extensions ] );
 
     return (
         <fieldset className={ styles[ 'featherize-component' ] }>
@@ -299,8 +227,8 @@ export default function Featherise ( { selectedOutput, vertical = false } ) {
                         id='octave-input'
                         flipDisplay={ true }
                         forceIntegers={ true }
-                        min={ RANGES_EXTENTS.octaveRange.minValue }
-                        max={ RANGES_EXTENTS.octaveRange.maxValue }
+                        min={ RANGE_EXTENTS.octaveRange.minValue }
+                        max={ RANGE_EXTENTS.octaveRange.maxValue }
                         minValue={ rangeState.octaveRange.minValue }
                         maxValue={ rangeState.octaveRange.maxValue }
                         onChange={ ( newRange ) => handleRangeChange( newRange, rangeState.setOctaveRange ) }
@@ -311,16 +239,16 @@ export default function Featherise ( { selectedOutput, vertical = false } ) {
                     <label htmlFor="bps-input">
                         <span>Notes/sec</span>
                         <span>
-                            { rangeState.bpsRange.minValue }
+                            { Math.floor( rangeState.bpsRange.minValue ) }
                             <small>to</small>
-                            { rangeState.bpsRange.maxValue }
+                            { Math.floor( rangeState.bpsRange.maxValue ) }
                         </span>
                     </label>
                     <RangeInput vertical={ vertical }
                         id='bps-input'
                         flipDisplay={ true }
-                        min={ RANGES_EXTENTS.bpsRange.minValue }
-                        max={ RANGES_EXTENTS.bpsRange.maxValue }
+                        min={ RANGE_EXTENTS.bpsRange.minValue }
+                        max={ RANGE_EXTENTS.bpsRange.maxValue }
                         minValue={ rangeState.bpsRange.minValue }
                         maxValue={ rangeState.bpsRange.maxValue }
                         onChange={ ( newRange ) => handleRangeChange( newRange, rangeState.setBpsRange ) }
@@ -340,8 +268,8 @@ export default function Featherise ( { selectedOutput, vertical = false } ) {
                         id='velocity-input'
                         flipDisplay={ false }
                         forceIntegers={ true }
-                        min={ RANGES_EXTENTS.velocityRange.minValue }
-                        max={ RANGES_EXTENTS.velocityRange.maxValue }
+                        min={ RANGE_EXTENTS.velocityRange.minValue }
+                        max={ RANGE_EXTENTS.velocityRange.maxValue }
                         minValue={ rangeState.velocityRange.minValue }
                         maxValue={ rangeState.velocityRange.maxValue }
                         onChange={ ( newRange ) => handleRangeChange( newRange, rangeState.setVelocityRange ) }
@@ -360,8 +288,8 @@ export default function Featherise ( { selectedOutput, vertical = false } ) {
                     <RangeInput vertical={ vertical }
                         id='speed-input'
                         flipDisplay={ true }
-                        min={ RANGES_EXTENTS.speedRange.minValue }
-                        max={ RANGES_EXTENTS.speedRange.maxValue }
+                        min={ RANGE_EXTENTS.speedRange.minValue }
+                        max={ RANGE_EXTENTS.speedRange.maxValue }
                         minValue={ rangeState.speedRange.minValue }
                         maxValue={ rangeState.speedRange.maxValue }
                         onChange={ ( newRange ) => handleRangeChange( newRange, rangeState.setSpeedRange ) }
@@ -382,8 +310,8 @@ export default function Featherise ( { selectedOutput, vertical = false } ) {
                         id='duration-input'
                         flipDisplay={ true }
                         forceIntegers={ true }
-                        min={ RANGES_EXTENTS.durationRange.minValue }
-                        max={ RANGES_EXTENTS.durationRange.maxValue }
+                        min={ RANGE_EXTENTS.durationRange.minValue }
+                        max={ RANGE_EXTENTS.durationRange.maxValue }
                         minValue={ rangeState.durationRange.minValue }
                         maxValue={ rangeState.durationRange.maxValue }
                         onChange={ ( newRange ) => handleRangeChange( newRange, rangeState.setDurationRange ) }
@@ -395,13 +323,13 @@ export default function Featherise ( { selectedOutput, vertical = false } ) {
                         <span>
                             <input
                                 type="checkbox"
-                                checked={ rangeState.playMode === playModeTypes.POLY }
+                                checked={ playMode === playModeTypes.POLY }
                                 onChange={ handlePlayModeChange }
                             />
-                            { rangeState.playMode !== playModeTypes.POLY && ( <>Polyphonic</> ) }
-                            { rangeState.playMode === playModeTypes.POLY && ( <>Polyphony:</> ) }
+                            { playMode !== playModeTypes.POLY && ( <>Polyphonic</> ) }
+                            { playMode === playModeTypes.POLY && ( <>Polyphony:</> ) }
                         </span>
-                        { rangeState.playMode === playModeTypes.POLY && (
+                        { playMode === playModeTypes.POLY && (
                             <span>
                                 { percentage( rangeState.polyProbRange.minValue ) }
                                 <small>to</small>
@@ -409,11 +337,11 @@ export default function Featherise ( { selectedOutput, vertical = false } ) {
                             </span>
                         ) }
                     </label>
-                    { rangeState.playMode === playModeTypes.POLY && (
+                    { playMode === playModeTypes.POLY && (
                         <RangeInput vertical={ vertical }
                             size='normal'
-                            min={ RANGES_EXTENTS.polyProbRange.minValue }
-                            max={ RANGES_EXTENTS.polyProbRange.maxValue }
+                            min={ RANGE_EXTENTS.polyProbRange.minValue }
+                            max={ RANGE_EXTENTS.polyProbRange.maxValue }
                             minValue={ rangeState.polyProbRange.minValue }
                             maxValue={ rangeState.polyProbRange.maxValue }
                             onChange={ ( newRange ) => handleRangeChange( newRange, rangeState.setPolyProbRange ) }
@@ -437,8 +365,8 @@ export default function Featherise ( { selectedOutput, vertical = false } ) {
                             id='extensions-input'
                             flipDisplay={ true }
                             forceIntegers={ true }
-                            min={ RANGES_EXTENTS.extensionsProbRange.minValue }
-                            max={ RANGES_EXTENTS.extensionsProbRange.maxValue }
+                            min={ RANGE_EXTENTS.extensionsProbRange.minValue }
+                            max={ RANGE_EXTENTS.extensionsProbRange.maxValue }
                             minValue={ rangeState.extensionsProbRange.minValue }
                             maxValue={ rangeState.extensionsProbRange.maxValue }
                             onChange={ ( newRange ) => handleRangeChange( newRange, rangeState.setExtensionsProbRange ) }
