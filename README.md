@@ -24,6 +24,27 @@ Similar to [the Seldon Black software Bear McCreary used for the Foundation soun
     
     bun run dev
 
+### To Do
+
+Touch a lamp above/below each range slider to toggle MIDI learn for that end of the range slider.
+
+#### States
+
+* Off 
+* * Mode: By-passed
+* * Meaning: No CC associated with that end of this range
+* * Action: activate to enter 'MIDI Learn' moder, restoring any previous value as default
+* Flashing
+* * Mode: MIDI Learn
+* * Meaning: the next used CC will be assigned to this end of this range and the mode will be set to 'Active'
+* * Action: de-activates 'MIDI Learn' mode
+* Solid, unblinking
+* * Mode: Active
+* * Meaning: the specified CC (displayed by the lit lamp) controls this range of this control
+* * Action: Enter 'By-passed' mode
+
+That is, to link a controller to the end of a range,  click to ilght a lamp and enter 'MIDI Learn' mode, then activate a controller to assign it. To deactive, click the same lamp again. To reactivate or relearn, click the lamp again.
+
 ### About
 
 A small application using Vite, React, Jotai, Web MIDI, mainly to compare React/Jotai to Vue3/Pinia. 

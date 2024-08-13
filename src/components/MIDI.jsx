@@ -14,6 +14,7 @@ import InputChannelSelect from './InputChannelSelect';
 import OutputChannelSelect from './OutputChannelSelect';
 import DeviceSelect from './DeviceSelect';
 import PianoKeyboard from './Piano';
+// import PianoKeyboard from './WebGL';
 import Featherise from './Featherise';
 import NotesOnCanvas from './NotesOnCanvas';
 import Dialog from './Dialog';

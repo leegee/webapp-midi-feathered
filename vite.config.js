@@ -11,6 +11,10 @@ export default defineConfig( {
     sourcemap: true,
   },
 
+  test: {
+    environment: 'jsdom', // or 'node'
+  },
+
   plugins: [
     react(),
     VitePWA( {

@@ -13,7 +13,7 @@
     "build": "vite build",
     "generate-pwa-assets": "pwa-assets-generator --preset minimal-2023 assets/logo.svg",
     "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
-    "test": "echo 'No test yet'",
+    "test": "vitest",
     "prepreview": "bun run build",
     "preview": "vite preview",
     "predeploy": "bun run build",
@@ -22,7 +22,8 @@
   "dependencies": {
     "jotai": "^2.6.4",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react-dom": "^18.2.0",
+    "vitest": "^2.0.2"
   },
   "devDependencies": {
     "@babel/core": "^7.23.9",
