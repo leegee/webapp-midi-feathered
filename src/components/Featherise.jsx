@@ -359,7 +359,7 @@ export default function Featherise ( { selectedOutput, vertical = false } ) {
                         </span>
                     </label>
 
-                    <div className={ styles.extcolumns }>
+                    <div className={ styles.sideBySide }>
                         <RangeInput vertical={ vertical }
                             size='narrow'
                             id='extensions-input'
@@ -371,7 +371,6 @@ export default function Featherise ( { selectedOutput, vertical = false } ) {
                             maxValue={ rangeState.extensionsProbRange.maxValue }
                             onChange={ ( newRange ) => handleRangeChange( newRange, rangeState.setExtensionsProbRange ) }
                         />
-
                         <div className={ styles.labels }>
                             { Object.keys( EXTENSIONS_DISPLAY ).map( key => (
                                 <label key={ key }>
@@ -385,6 +384,7 @@ export default function Featherise ( { selectedOutput, vertical = false } ) {
                             ) ) }
                         </div>
                     </div>
+
                 </div>
             </div>
 
