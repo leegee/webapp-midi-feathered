@@ -63,12 +63,12 @@
     top: 0;
     bottom: 0;
     background-color: var(--midi-app-brand-clr);
-    background: var(--midi-app-striped-bg-horizontal);
+    background: var(--midi-app-range-bg-horizontal);
 }
 
 .vertical .bar {
     background: var(--midi-app-brand-clr);
-    background: var(--midi-app-striped-bg-vertical);
+    background: var(--midi-app-range-bg-vertical);
 }
 
 .custom-range-input.vertical .bar {
