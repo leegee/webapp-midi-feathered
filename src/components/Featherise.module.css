@@ -49,7 +49,7 @@
 .vertical .play-control label {
     align-items: baseline;
     flex-direction: column;
-    ;
+    margin-bottom: 1em;
 }
 
 .play-control input {
