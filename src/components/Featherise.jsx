@@ -350,7 +350,7 @@ export default function Featherise ( { selectedOutput, vertical = false } ) {
                 </div>
 
                 <div className={ `${ styles[ 'play-control' ] } ${ styles.extensions }` } >
-                    <label htmlFor="Extensions-input">
+                    <label htmlFor="extensions-input">
                         <span>Extensions:</span>
                         <span>
                             { percentage( rangeState.extensionsProbRange.minValue ) }
