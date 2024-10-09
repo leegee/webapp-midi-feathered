@@ -32,7 +32,8 @@ export default function MIDIComponent () {
 
     const selectedOutputRef = useRef( null );
     const [ isDialogOpen, setIsDialogOpen ] = useState( false );
-    const [ showExtras, setShowExtras ] = useState( true );
+    const [ showKeys, setShowKeys ] = useState( true );
+    const [ showPianoRoll, setShowPianoRoll ] = useState( true );
     const [ showFeatherize, setShowFeatherize ] = useState( true );
 
     useEffect( () => {
@@ -93,7 +94,8 @@ export default function MIDIComponent () {
                 <h1>MIDI</h1>
                 <span>
                     <button onClick={ () => setShowFeatherize( prev => !prev ) }>Featherize</button>
-                    <button onClick={ () => setShowExtras( prev => !prev ) }>Note Display</button>
+                    <button onClick={ () => setShowKeys( prev => !prev ) }>Keys</button>
+                    <button onClick={ () => setShowPianoRoll( prev => !prev ) }>Piano Roll</button>
                     <button onClick={ () => setIsDialogOpen( true ) }>MIDI Settings</button>
                 </span>
             </header>
@@ -102,10 +104,10 @@ export default function MIDIComponent () {
                 <Featherise selectedOutput={ selectedOutputRef.current } vertical={ true } />
             ) }
 
-            { showExtras && (
+            { ( showKeys || showPianoRoll ) && (
                 <footer className={ styles.footer }>
-                    <NotesOnCanvas />
-                    <PianoKeyboard midiInputChannel={ midiInputChannel } />
+                    { showPianoRoll && <NotesOnCanvas /> }
+                    { showKeys && <PianoKeyboard midiInputChannel={ midiInputChannel } /> }
                 </footer>
             ) }
 
