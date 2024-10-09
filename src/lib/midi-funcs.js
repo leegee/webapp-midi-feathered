@@ -58,11 +58,9 @@ export const sendNotes = ( notesOn, rangeState, extensions, midiOutputChannels, 
             }
         }
 
-
         const midiOutputChannel = midiOutputChannels.length == 1
             ? midiOutputChannels[ 0 ]                                                        // Use the only output selected
             : midiOutputChannels[ Math.floor( Math.random() * midiOutputChannels.length ) ]; // Use a random output channel
-
 
         try {
             sendNoteWithDuration( usePitch, useVelocity, useDurationMs, selectedOutput, midiOutputChannel );
@@ -91,6 +89,7 @@ export function sendNoteWithDuration ( pitch, velocity, durationMs, selectedOutp
     const timer = setTimeout(
         () => {
             stopMidiNote( pitch, selectedOutput, midiChannel );
+            delete timersForPitches[ pitch ];
             if ( DISPATCH_EVENTS_FOR_EXTRAS ) {
                 window.dispatchEvent(
                     new CustomEvent( EVENT_NOTE_STOP, { detail: { pitch, velocity, midiChannel } } )
