@@ -33,6 +33,7 @@ export default function MIDIComponent () {
     const selectedOutputRef = useRef( null );
     const [ isDialogOpen, setIsDialogOpen ] = useState( false );
     const [ showExtras, setShowExtras ] = useState( true );
+    const [ showFeatherize, setShowFeatherize ] = useState( true );
 
     useEffect( () => {
         if ( !midiAccess ) {
@@ -91,12 +92,13 @@ export default function MIDIComponent () {
             <header className={ styles.header }>
                 <h1>MIDI</h1>
                 <span>
+                    <button onClick={ () => setShowFeatherize( prev => !prev ) }>Featherize</button>
                     <button onClick={ () => setShowExtras( prev => !prev ) }>Note Display</button>
                     <button onClick={ () => setIsDialogOpen( true ) }>MIDI Settings</button>
                 </span>
             </header>
 
-            { selectedOutputRef.current && (
+            { selectedOutputRef.current && showFeatherize && (
                 <Featherise selectedOutput={ selectedOutputRef.current } vertical={ true } />
             ) }
 
