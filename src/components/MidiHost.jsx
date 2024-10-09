@@ -100,16 +100,20 @@ export default function MIDIComponent () {
                 </span>
             </header>
 
-            { selectedOutputRef.current && showFeatherize && (
-                <Featherise selectedOutput={ selectedOutputRef.current } vertical={ true } />
-            ) }
+            {
+                selectedOutputRef.current && showFeatherize && (
+                    <Featherise selectedOutput={ selectedOutputRef.current } vertical={ true } height='50vh' />
+                )
+            }
 
-            { ( showKeys || showPianoRoll ) && (
-                <footer className={ styles.footer }>
-                    { showPianoRoll && <NotesOnCanvas /> }
-                    { showKeys && <PianoKeyboard midiInputChannel={ midiInputChannel } /> }
-                </footer>
-            ) }
+            {
+                ( showKeys || showPianoRoll ) && (
+                    <footer className={ styles.footer }>
+                        { showPianoRoll && <NotesOnCanvas /> }
+                        { showKeys && <PianoKeyboard midiInputChannel={ midiInputChannel } /> }
+                    </footer>
+                )
+            }
 
             <Dialog isOpen={ isDialogOpen } onClose={ () => setIsDialogOpen( false ) }>
                 <h2>MIDI Settings</h2>

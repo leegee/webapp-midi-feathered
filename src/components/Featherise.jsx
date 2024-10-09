@@ -74,7 +74,7 @@ const RANGE_EXTENTS = {
 
 const ucfirst = str => str.charAt( 0 ).toUpperCase() + str.slice( 1 );
 
-export default function Featherise ( { selectedOutput, vertical = false } ) {
+export default function Featherise ( { selectedOutput, vertical = false, height = '100%' } ) {
     const [ midiOutputChannels, setMidiOutputChannels ] = useAtom( midiOutputChannelsAtom );
     const [ notesOn ] = useAtom( notesOnAtom );
     const [ CCsOn ] = useAtom( CCsOnAtom );
@@ -204,7 +204,7 @@ export default function Featherise ( { selectedOutput, vertical = false } ) {
     }, [ notesOn, rangeState, selectedOutput, midiOutputChannels, CCsOn, extensions ] );
 
     return (
-        <fieldset className={ styles[ 'featherize-component' ] }>
+        <fieldset className={ styles[ 'featherize-component' ] } style={ { height } }>
             <legend className={ styles.legend }>
                 Feathered Chords
                 <span className={ styles.settings }>
@@ -395,4 +395,5 @@ export default function Featherise ( { selectedOutput, vertical = false } ) {
 Featherise.propTypes = {
     selectedOutput: PropTypes.object.isRequired,
     vertical: PropTypes.bool,
+    height: PropTypes.string,
 };
