@@ -1,8 +1,8 @@
 import { describe, it, expect, vi, afterEach } from 'vitest';
 
-import { probabilityTriangular } from '../maths';
-import { sendNotes, sendNoteWithDuration } from '../midi-funcs';
-import { startMidiNote, stopMidiNote } from '../midi-messages';
+import { probabilityTriangular } from './maths';
+import { sendNotes, sendNoteWithDuration } from './midi-funcs';
+import { startMidiNote, stopMidiNote } from './midi-messages';
 
 vi.mock( './maths', () => ( {
     probabilityTriangular: vi.fn(),

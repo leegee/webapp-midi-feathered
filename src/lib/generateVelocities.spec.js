@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
 
-import { probabilityTriangular } from '../maths';
-import { generateVelocity } from '../midi-funcs';
+import { probabilityTriangular } from './maths';
+import { generateVelocity } from './midi-funcs';
 
 vi.mock( './maths', () => ( {
     probabilityTriangular: vi.fn(),
