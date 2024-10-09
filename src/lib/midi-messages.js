@@ -24,7 +24,7 @@ export function stopMidiNote ( pitch, selectedOutput, midiChannel ) {
 export function onMidiMessage ( event, midiInputChannel, setNotesOn, setCCsOn ) {
     const midiChannel = event.data[ 0 ] & 0x0F;
 
-    if ( midiInputChannel && midiChannel !== midiInputChannel ) {
+    if ( midiChannel !== 0 && midiChannel !== midiInputChannel ) {
         return;
     }
 
