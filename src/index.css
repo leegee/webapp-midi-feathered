@@ -44,7 +44,9 @@ body {
   place-items: top;
   justify-content: space-between;
   min-height: 100vh;
+  max-height: 100vh;
   min-width: 100vw;
+  overflow: hidden;
 }
 
 #root {
