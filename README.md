@@ -24,6 +24,10 @@ Similar to [the Seldon Black software Bear McCreary used for the Foundation soun
     
     bun run dev
 
+### Dependencies Lock File
+
+GitHub Actions does not support a Bun lockfile, so an NPM lockfile is included. Ugh.
+
 ### To Do
 
 Touch a lamp above/below each range slider to toggle MIDI learn for that end of the range slider.
