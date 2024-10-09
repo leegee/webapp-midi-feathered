@@ -1,11 +1,11 @@
 import { Provider } from 'jotai';
 
-import MIDIApp from './components/MidiHost';
+import MidiHost from './components/MidiHost';
 
 function App () {
   return (
     <Provider>
-      <MIDIApp />
+      <MidiHost />
     </Provider>
   );
 }
