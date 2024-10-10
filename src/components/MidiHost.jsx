@@ -127,7 +127,7 @@ export default function MIDIComponent () {
             <Dialog isOpen={ isHelpDialogOpen } onClose={ () => setIsHelpDialogOpen( false ) }>
                 <h2>Help</h2>
                 <p>
-                    This is an experiment that coincidentally replicates Bear McCreary's<br />
+                    This is an experiment that coincidentally replicates Bear McCreary&apos;s<br />
                     custom plug-in used in the creation of The Foundation soundtrack.
                 </p>
                 <ol>
