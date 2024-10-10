@@ -31,7 +31,8 @@ export default function MIDIComponent () {
     const [ , setCCsOn ] = useAtom( CCsOnAtom );
 
     const selectedOutputRef = useRef( null );
-    const [ isDialogOpen, setIsDialogOpen ] = useState( false );
+    const [ isSettingsDialogOpen, setIsSettingsDialogOpen ] = useState( false );
+    const [ isHelpDialogOpen, setIsHelpDialogOpen ] = useState( false );
     const [ showKeys, setShowKeys ] = useState( true );
     const [ showPianoRoll, setShowPianoRoll ] = useState( true );
     const [ showFeatherize, setShowFeatherize ] = useState( true );
@@ -96,7 +97,8 @@ export default function MIDIComponent () {
                     <button onClick={ () => setShowFeatherize( prev => !prev ) }>Featherize</button>
                     <button onClick={ () => setShowKeys( prev => !prev ) }>Keys</button>
                     <button onClick={ () => setShowPianoRoll( prev => !prev ) }>Piano Roll</button>
-                    <button onClick={ () => setIsDialogOpen( true ) }>MIDI Settings</button>
+                    <button onClick={ () => setIsSettingsDialogOpen( true ) }>MIDI Settings</button>
+                    <button onClick={ () => setIsHelpDialogOpen( true ) }>?</button>
                 </span>
             </header>
 
@@ -115,11 +117,20 @@ export default function MIDIComponent () {
                 )
             }
 
-            <Dialog isOpen={ isDialogOpen } onClose={ () => setIsDialogOpen( false ) }>
+            <Dialog isOpen={ isSettingsDialogOpen } onClose={ () => setIsSettingsDialogOpen( false ) }>
                 <h2>MIDI Settings</h2>
                 <DeviceSelect />
                 <InputChannelSelect />
                 <OutputChannelSelect />
+            </Dialog>
+
+            <Dialog isOpen={ isHelpDialogOpen } onClose={ () => setIsHelpDialogOpen( false ) }>
+                <h2>Help</h2>
+                <ol>
+                    <li>Set the MIDI device and I/O channels</li>
+                    <li>The app will remember your settings</li>
+                    <li>Play a note or more and adjust the ranges of the featherise settings</li>
+                </ol>
             </Dialog>
         </main >
     );
