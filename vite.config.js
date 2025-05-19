@@ -3,7 +3,7 @@ import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
 
 // https://vitejs.dev/config/
-export default defineConfig( {
+export default defineConfig({
   base: './',
   publicDir: 'assets',
 
@@ -15,9 +15,15 @@ export default defineConfig( {
     environment: 'jsdom', // or 'node'
   },
 
+  css: {
+    modules: {
+      generateScopedName: '[name]__[local]__[hash:base64:5]'
+    }
+  },
+
   plugins: [
     react(),
-    VitePWA( {
+    VitePWA({
       registerType: 'autoUpdate',
       manifest: {
         "name": "Feathered MIDI",
@@ -67,6 +73,6 @@ export default defineConfig( {
           },
         ],
       },
-    } ),
+    }),
   ],
-} );
+});
