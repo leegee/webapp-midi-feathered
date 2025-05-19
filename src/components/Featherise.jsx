@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useReducer, useState } from 'react';
 import PropTypes from 'prop-types';
 import { useAtom } from 'jotai';
 
@@ -74,6 +74,15 @@ const RANGE_EXTENTS = {
 
 const ucfirst = str => str.charAt(0).toUpperCase() + str.slice(1);
 
+function reducer(state, action) {
+    switch (action.type) {
+        case "SET_RANGE":
+            return { ...state, [action.key]: action.payload };
+        default:
+            return state;
+    }
+}
+
 export default function Featherise({ selectedOutput, vertical = false, height = '100%' }) {
     const [midiOutputChannels, setMidiOutputChannels] = useAtom(midiOutputChannelsAtom);
     const [notesOn] = useAtom(notesOnAtom);
@@ -82,30 +91,33 @@ export default function Featherise({ selectedOutput, vertical = false, height = 
 
     const [playMode, setPlayMode] = useState(localStorageOr('playMode', 1));
 
-    const rangeState = useMemo(() => {
-        const initialState = {};
-        for (let key in RANGE_EXTENTS) {
-            const setterName = 'set' + ucfirst(key);
-            initialState[key] = {
+    const initialState = useMemo(() => {
+        const obj = {};
+        for (const key in RANGE_EXTENTS) {
+            obj[key] = {
                 minValue: localStorageOr(key + "_minValue", RANGE_EXTENTS[key].minValue),
                 maxValue: localStorageOr(key + "_maxValue", RANGE_EXTENTS[key].maxValue),
             };
-            initialState[setterName] = (newValue) => {
-                const newState = { ...initialState[key], ...newValue };
-                initialState[key] = newState;
-            };
         }
-        return initialState;
+        return obj;
     }, []);
 
-    for (let key in RANGE_EXTENTS) {
-        const setterName = 'set' + ucfirst(key);
-        // eslint-disable-next-line react-hooks/rules-of-hooks
-        [rangeState[key], rangeState[setterName]] = useState({
-            minValue: localStorageOr(key + "_minValue", RANGE_EXTENTS[key].minValue),
-            maxValue: localStorageOr(key + "_maxValue", RANGE_EXTENTS[key].maxValue),
-        });
+    const [state, dispatch] = useReducer(reducer, initialState);
+
+    function setRange(key, newValue) {
+        dispatch({ type: "SET_RANGE", key, payload: newValue });
+        localStorage.setItem(key + "_minValue", JSON.stringify(newValue.minValue));
+        localStorage.setItem(key + "_maxValue", JSON.stringify(newValue.maxValue));
     }
+
+    const rangeState = useMemo(() => {
+        const obj = {};
+        for (const key in RANGE_EXTENTS) {
+            obj[key] = state[key];
+            obj["set" + ucfirst(key)] = (newValue) => setRange(key, newValue);
+        }
+        return obj;
+    }, [state]);
 
     const handleRangeChange = (newRange, setter) => {
         setter({
