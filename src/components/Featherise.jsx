@@ -181,7 +181,7 @@ export default function Featherise({ selectedOutput, vertical = false, height = 
         return savePeriodically({
             playMode: playMode,
             ...saveValuesToLocalStorage,
-        });
+        }, [playMode, rangeState]);
 
     });
 
