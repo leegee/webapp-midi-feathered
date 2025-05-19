@@ -72,59 +72,59 @@ const RANGE_EXTENTS = {
 
 // const CCs = { velocity: 11 };
 
-const ucfirst = str => str.charAt( 0 ).toUpperCase() + str.slice( 1 );
+const ucfirst = str => str.charAt(0).toUpperCase() + str.slice(1);
 
-export default function Featherise ( { selectedOutput, vertical = false, height = '100%' } ) {
-    const [ midiOutputChannels, setMidiOutputChannels ] = useAtom( midiOutputChannelsAtom );
-    const [ notesOn ] = useAtom( notesOnAtom );
-    const [ CCsOn ] = useAtom( CCsOnAtom );
-    const [ extensions, setExtensions ] = useState( EXTENSIONS_SELECTED_DEFAULT );
+export default function Featherise({ selectedOutput, vertical = false, height = '100%' }) {
+    const [midiOutputChannels, setMidiOutputChannels] = useAtom(midiOutputChannelsAtom);
+    const [notesOn] = useAtom(notesOnAtom);
+    const [CCsOn] = useAtom(CCsOnAtom);
+    const [extensions, setExtensions] = useState(EXTENSIONS_SELECTED_DEFAULT);
 
-    const [ playMode, setPlayMode ] = useState( localStorageOr( 'playMode', 1 ) );
+    const [playMode, setPlayMode] = useState(localStorageOr('playMode', 1));
 
-    const rangeState = useMemo( () => {
+    const rangeState = useMemo(() => {
         const initialState = {};
-        for ( let key in RANGE_EXTENTS ) {
-            const setterName = 'set' + ucfirst( key );
-            initialState[ key ] = {
-                minValue: localStorageOr( key + "_minValue", RANGE_EXTENTS[ key ].minValue ),
-                maxValue: localStorageOr( key + "_maxValue", RANGE_EXTENTS[ key ].maxValue ),
+        for (let key in RANGE_EXTENTS) {
+            const setterName = 'set' + ucfirst(key);
+            initialState[key] = {
+                minValue: localStorageOr(key + "_minValue", RANGE_EXTENTS[key].minValue),
+                maxValue: localStorageOr(key + "_maxValue", RANGE_EXTENTS[key].maxValue),
             };
-            initialState[ setterName ] = ( newValue ) => {
-                const newState = { ...initialState[ key ], ...newValue };
-                initialState[ key ] = newState;
+            initialState[setterName] = (newValue) => {
+                const newState = { ...initialState[key], ...newValue };
+                initialState[key] = newState;
             };
         }
         return initialState;
-    }, [] );
+    }, []);
 
-    for ( let key in RANGE_EXTENTS ) {
-        const setterName = 'set' + ucfirst( key );
+    for (let key in RANGE_EXTENTS) {
+        const setterName = 'set' + ucfirst(key);
         // eslint-disable-next-line react-hooks/rules-of-hooks
-        [ rangeState[ key ], rangeState[ setterName ] ] = useState( {
-            minValue: localStorageOr( key + "_minValue", RANGE_EXTENTS[ key ].minValue ),
-            maxValue: localStorageOr( key + "_maxValue", RANGE_EXTENTS[ key ].maxValue ),
-        } );
+        [rangeState[key], rangeState[setterName]] = useState({
+            minValue: localStorageOr(key + "_minValue", RANGE_EXTENTS[key].minValue),
+            maxValue: localStorageOr(key + "_maxValue", RANGE_EXTENTS[key].maxValue),
+        });
     }
 
-    const handleRangeChange = ( newRange, setter ) => {
-        setter( {
-            minValue: Number( newRange.minValue ),
-            maxValue: Number( newRange.maxValue ),
-        } );
+    const handleRangeChange = (newRange, setter) => {
+        setter({
+            minValue: Number(newRange.minValue),
+            maxValue: Number(newRange.maxValue),
+        });
     };
 
-    const handleExtensionsChange = ( key ) => {
-        setExtensions( prevExtensions => ( {
+    const handleExtensionsChange = (key) => {
+        setExtensions(prevExtensions => ({
             ...prevExtensions,
-            [ key ]: !prevExtensions[ key ]
-        } ) );
+            [key]: !prevExtensions[key]
+        }));
     };
 
-    const handlePlayModeChange = ( event ) => setPlayMode( event.target.checked ? playModeTypes.POLY : playModeTypes.MONO );
+    const handlePlayModeChange = (event) => setPlayMode(event.target.checked ? playModeTypes.POLY : playModeTypes.MONO);
 
     const save = () => {
-        saveJson( {
+        saveJson({
             midiOutputChannels,
             bpsRange: {
                 minValue: rangeState.bpsRange.minValue,
@@ -148,240 +148,240 @@ export default function Featherise ( { selectedOutput, vertical = false, height 
             },
             extensionsProbRange: {
                 minValue: rangeState.extensionsProbRange.minValue,
-                miaxValue: rangeState.extensionsProbRange.maxValue,
+                maxValue: rangeState.extensionsProbRange.maxValue,
             }
-        } );
+        });
     }
 
     const load = async () => {
         try {
             const settings = await loadJson();
-            console.log( 'Loaeded', settings );
-            setMidiOutputChannels( settings.midiOutputChannels );
-            rangeState.setBpsRange( settings.bpsRange );
-            rangeState.setVelocityRange( settings.velocityRange );
-            rangeState.setSpeedRange( settings.speedRange );
-            rangeState.setDurationRange( settings.durationRange );
-            rangeState.setPolyProbRange( settings.polyProbRange );
-            rangeState.setExtensionsProbRange( settings.extensionsProbRange );
-        } catch ( e ) {
-            console.error( e );
-            alert( e );
+            console.log('Loaeded', settings);
+            setMidiOutputChannels(settings.midiOutputChannels);
+            rangeState.setBpsRange(settings.bpsRange);
+            rangeState.setVelocityRange(settings.velocityRange);
+            rangeState.setSpeedRange(settings.speedRange);
+            rangeState.setDurationRange(settings.durationRange);
+            rangeState.setPolyProbRange(settings.polyProbRange);
+            rangeState.setExtensionsProbRange(settings.extensionsProbRange);
+        } catch (e) {
+            console.error(e);
+            alert(e);
         }
     }
 
     // @see localStorageOr
-    useEffect( () => {
-        const saveValuesToLocalStorage = Object.entries( RANGE_EXTENTS ).reduce( ( acc, [ key ] ) => {
-            acc[ `${ key }_minValue` ] = rangeState[ key ].minValue;
-            acc[ `${ key }_maxValue` ] = rangeState[ key ].maxValue;
+    useEffect(() => {
+        const saveValuesToLocalStorage = Object.entries(RANGE_EXTENTS).reduce((acc, [key]) => {
+            acc[`${key}_minValue`] = rangeState[key].minValue;
+            acc[`${key}_maxValue`] = rangeState[key].maxValue;
             return acc;
-        }, {} );
+        }, {});
 
-        return savePeriodically( {
+        return savePeriodically({
             playMode: playMode,
             ...saveValuesToLocalStorage,
-        } );
+        });
 
-    } );
+    });
 
-    useEffect( () => {
+    useEffect(() => {
         let bpsTimer;
 
         // Was bpsListener
         const playNoteEveryBps = () => {
-            sendNotes( notesOn, rangeState, extensions, midiOutputChannels, selectedOutput );
+            sendNotes(notesOn, rangeState, extensions, midiOutputChannels, selectedOutput);
 
             // Set the next recursion:
-            const recallTime = 1000 / probabilityTriangular( rangeState.bpsRange.minValue, rangeState.bpsRange.maxValue );
-            bpsTimer = setTimeout( playNoteEveryBps, recallTime );
+            const recallTime = 1000 / probabilityTriangular(rangeState.bpsRange.minValue, rangeState.bpsRange.maxValue);
+            bpsTimer = setTimeout(playNoteEveryBps, recallTime);
         };
 
         // Begin the recursion:
         playNoteEveryBps();
 
-        return () => clearTimeout( bpsTimer );
-    }, [ notesOn, rangeState, selectedOutput, midiOutputChannels, CCsOn, extensions ] );
+        return () => clearTimeout(bpsTimer);
+    }, [notesOn, rangeState, selectedOutput, midiOutputChannels, CCsOn, extensions]);
 
     return (
-        <fieldset className={ styles[ 'featherize-component' ] } style={ { height } }>
-            <legend className={ styles.legend }>
+        <fieldset className={styles['featherize-component']} style={{ height }}>
+            <legend className={styles.legend}>
                 Feathered Chords
-                <span className={ styles.settings }>
-                    <button onClick={ load }>Load</button>
-                    <button onClick={ save }>Save</button>
+                <span className={styles.settings}>
+                    <button onClick={load}>Load</button>
+                    <button onClick={save}>Save</button>
                 </span>
             </legend>
 
-            <div className={ styles[ 'play-controls' ] + ' ' + ( vertical ? styles.vertical : styles.horiztonal ) }>
+            <div className={styles['play-controls'] + ' ' + (vertical ? styles.vertical : styles.horiztonal)}>
 
-                <div className={ styles[ 'play-control' ] }>
+                <div className={styles['play-control']}>
                     <label htmlFor="octave-input">
                         <span>Octaves:</span>
                         <span>
-                            { rangeState.octaveRange.minValue } <small>to</small> { rangeState.octaveRange.maxValue }
+                            {rangeState.octaveRange.minValue} <small>to</small> {rangeState.octaveRange.maxValue}
                         </span>
                     </label>
-                    <RangeInput vertical={ vertical }
+                    <RangeInput vertical={vertical}
                         size='normal'
                         id='octave-input'
-                        flipDisplay={ true }
-                        forceIntegers={ true }
-                        min={ RANGE_EXTENTS.octaveRange.minValue }
-                        max={ RANGE_EXTENTS.octaveRange.maxValue }
-                        minValue={ rangeState.octaveRange.minValue }
-                        maxValue={ rangeState.octaveRange.maxValue }
-                        onChange={ ( newRange ) => handleRangeChange( newRange, rangeState.setOctaveRange ) }
+                        flipDisplay={true}
+                        forceIntegers={true}
+                        min={RANGE_EXTENTS.octaveRange.minValue}
+                        max={RANGE_EXTENTS.octaveRange.maxValue}
+                        minValue={rangeState.octaveRange.minValue}
+                        maxValue={rangeState.octaveRange.maxValue}
+                        onChange={(newRange) => handleRangeChange(newRange, rangeState.setOctaveRange)}
                     />
                 </div>
 
-                <div className={ styles[ 'play-control' ] }>
+                <div className={styles['play-control']}>
                     <label htmlFor="bps-input">
                         <span>Notes/sec</span>
                         <span>
-                            { Math.floor( rangeState.bpsRange.minValue ) }
+                            {Math.floor(rangeState.bpsRange.minValue)}
                             <small>to</small>
-                            { Math.floor( rangeState.bpsRange.maxValue ) }
+                            {Math.floor(rangeState.bpsRange.maxValue)}
                         </span>
                     </label>
-                    <RangeInput vertical={ vertical }
+                    <RangeInput vertical={vertical}
                         id='bps-input'
-                        flipDisplay={ true }
-                        min={ RANGE_EXTENTS.bpsRange.minValue }
-                        max={ RANGE_EXTENTS.bpsRange.maxValue }
-                        minValue={ rangeState.bpsRange.minValue }
-                        maxValue={ rangeState.bpsRange.maxValue }
-                        onChange={ ( newRange ) => handleRangeChange( newRange, rangeState.setBpsRange ) }
+                        flipDisplay={true}
+                        min={RANGE_EXTENTS.bpsRange.minValue}
+                        max={RANGE_EXTENTS.bpsRange.maxValue}
+                        minValue={rangeState.bpsRange.minValue}
+                        maxValue={rangeState.bpsRange.maxValue}
+                        onChange={(newRange) => handleRangeChange(newRange, rangeState.setBpsRange)}
                     />
                 </div>
 
-                <div className={ styles[ 'play-control' ] }>
+                <div className={styles['play-control']}>
                     <label htmlFor="velocity-input">
                         <span>Velocity:</span>
                         <span>
-                            { rangeState.velocityRange.minValue }
+                            {rangeState.velocityRange.minValue}
                             <small>to</small>
-                            { rangeState.velocityRange.maxValue } %
+                            {rangeState.velocityRange.maxValue} %
                         </span>
                     </label>
-                    <RangeInput vertical={ vertical }
+                    <RangeInput vertical={vertical}
                         id='velocity-input'
-                        flipDisplay={ false }
-                        forceIntegers={ true }
-                        min={ RANGE_EXTENTS.velocityRange.minValue }
-                        max={ RANGE_EXTENTS.velocityRange.maxValue }
-                        minValue={ rangeState.velocityRange.minValue }
-                        maxValue={ rangeState.velocityRange.maxValue }
-                        onChange={ ( newRange ) => handleRangeChange( newRange, rangeState.setVelocityRange ) }
+                        flipDisplay={false}
+                        forceIntegers={true}
+                        min={RANGE_EXTENTS.velocityRange.minValue}
+                        max={RANGE_EXTENTS.velocityRange.maxValue}
+                        minValue={rangeState.velocityRange.minValue}
+                        maxValue={rangeState.velocityRange.maxValue}
+                        onChange={(newRange) => handleRangeChange(newRange, rangeState.setVelocityRange)}
                     />
                 </div>
 
-                <div className={ styles[ 'play-control' ] }>
+                <div className={styles['play-control']}>
                     <label htmlFor="speed-input">
                         <span>Speed:</span>
                         <span>
-                            { Math.floor( ( rangeState.speedRange.minValue ) ) }
+                            {Math.floor((rangeState.speedRange.minValue))}
                             <small>to</small>
-                            { Math.floor( ( rangeState.speedRange.maxValue ) ) } ms
+                            {Math.floor((rangeState.speedRange.maxValue))} ms
                         </span>
                     </label>
-                    <RangeInput vertical={ vertical }
+                    <RangeInput vertical={vertical}
                         id='speed-input'
-                        flipDisplay={ true }
-                        min={ RANGE_EXTENTS.speedRange.minValue }
-                        max={ RANGE_EXTENTS.speedRange.maxValue }
-                        minValue={ rangeState.speedRange.minValue }
-                        maxValue={ rangeState.speedRange.maxValue }
-                        onChange={ ( newRange ) => handleRangeChange( newRange, rangeState.setSpeedRange ) }
+                        flipDisplay={true}
+                        min={RANGE_EXTENTS.speedRange.minValue}
+                        max={RANGE_EXTENTS.speedRange.maxValue}
+                        minValue={rangeState.speedRange.minValue}
+                        maxValue={rangeState.speedRange.maxValue}
+                        onChange={(newRange) => handleRangeChange(newRange, rangeState.setSpeedRange)}
                     />
                 </div>
 
-                <div className={ styles[ 'play-control' ] }>
+                <div className={styles['play-control']}>
                     <label htmlFor="duration-input">
                         <span>Length:</span>
                         <span>
-                            { Math.floor( rangeState.durationRange.minValue ) }
+                            {Math.floor(rangeState.durationRange.minValue)}
                             <small>to</small>
-                            { Math.floor( rangeState.durationRange.maxValue ) } ms
+                            {Math.floor(rangeState.durationRange.maxValue)} ms
                         </span>
                     </label>
-                    <RangeInput vertical={ vertical }
+                    <RangeInput vertical={vertical}
                         size='normal'
                         id='duration-input'
-                        flipDisplay={ true }
-                        forceIntegers={ true }
-                        min={ RANGE_EXTENTS.durationRange.minValue }
-                        max={ RANGE_EXTENTS.durationRange.maxValue }
-                        minValue={ rangeState.durationRange.minValue }
-                        maxValue={ rangeState.durationRange.maxValue }
-                        onChange={ ( newRange ) => handleRangeChange( newRange, rangeState.setDurationRange ) }
+                        flipDisplay={true}
+                        forceIntegers={true}
+                        min={RANGE_EXTENTS.durationRange.minValue}
+                        max={RANGE_EXTENTS.durationRange.maxValue}
+                        minValue={rangeState.durationRange.minValue}
+                        maxValue={rangeState.durationRange.maxValue}
+                        onChange={(newRange) => handleRangeChange(newRange, rangeState.setDurationRange)}
                     />
                 </div>
 
-                <div className={ styles[ 'play-control' ] }>
+                <div className={styles['play-control']}>
                     <label htmlFor="probability-input" title="Probability of a note from a chord being triggered">
                         <span>
                             <input
                                 type="checkbox"
-                                checked={ playMode === playModeTypes.POLY }
-                                onChange={ handlePlayModeChange }
+                                checked={playMode === playModeTypes.POLY}
+                                onChange={handlePlayModeChange}
                             />
-                            { playMode !== playModeTypes.POLY && ( <>Polyphonic</> ) }
-                            { playMode === playModeTypes.POLY && ( <>Polyphony:</> ) }
+                            {playMode !== playModeTypes.POLY && (<>Polyphonic</>)}
+                            {playMode === playModeTypes.POLY && (<>Polyphony:</>)}
                         </span>
-                        { playMode === playModeTypes.POLY && (
+                        {playMode === playModeTypes.POLY && (
                             <span>
-                                { percentage( rangeState.polyProbRange.minValue ) }
+                                {percentage(rangeState.polyProbRange.minValue)}
                                 <small>to</small>
-                                { percentage( rangeState.polyProbRange.maxValue ) }%
+                                {percentage(rangeState.polyProbRange.maxValue)}%
                             </span>
-                        ) }
+                        )}
                     </label>
-                    { playMode === playModeTypes.POLY && (
-                        <RangeInput vertical={ vertical }
+                    {playMode === playModeTypes.POLY && (
+                        <RangeInput vertical={vertical}
                             size='normal'
-                            min={ RANGE_EXTENTS.polyProbRange.minValue }
-                            max={ RANGE_EXTENTS.polyProbRange.maxValue }
-                            minValue={ rangeState.polyProbRange.minValue }
-                            maxValue={ rangeState.polyProbRange.maxValue }
-                            onChange={ ( newRange ) => handleRangeChange( newRange, rangeState.setPolyProbRange ) }
+                            min={RANGE_EXTENTS.polyProbRange.minValue}
+                            max={RANGE_EXTENTS.polyProbRange.maxValue}
+                            minValue={rangeState.polyProbRange.minValue}
+                            maxValue={rangeState.polyProbRange.maxValue}
+                            onChange={(newRange) => handleRangeChange(newRange, rangeState.setPolyProbRange)}
                         />
-                    ) }
+                    )}
                 </div>
 
-                <div className={ `${ styles[ 'play-control' ] } ${ styles.extensions }` } >
+                <div className={`${styles['play-control']} ${styles.extensions}`} >
                     <label htmlFor="extensions-input">
                         <span>Extensions:</span>
                         <span>
-                            { percentage( rangeState.extensionsProbRange.minValue ) }
+                            {percentage(rangeState.extensionsProbRange.minValue)}
                             <small>to</small>
-                            { percentage( rangeState.extensionsProbRange.maxValue ) } %
+                            {percentage(rangeState.extensionsProbRange.maxValue)} %
                         </span>
                     </label>
 
-                    <div className={ styles.sideBySide }>
-                        <RangeInput vertical={ vertical }
+                    <div className={styles.sideBySide}>
+                        <RangeInput vertical={vertical}
                             size='narrow'
                             id='extensions-input'
-                            flipDisplay={ true }
-                            forceIntegers={ true }
-                            min={ RANGE_EXTENTS.extensionsProbRange.minValue }
-                            max={ RANGE_EXTENTS.extensionsProbRange.maxValue }
-                            minValue={ rangeState.extensionsProbRange.minValue }
-                            maxValue={ rangeState.extensionsProbRange.maxValue }
-                            onChange={ ( newRange ) => handleRangeChange( newRange, rangeState.setExtensionsProbRange ) }
+                            flipDisplay={true}
+                            forceIntegers={true}
+                            min={RANGE_EXTENTS.extensionsProbRange.minValue}
+                            max={RANGE_EXTENTS.extensionsProbRange.maxValue}
+                            minValue={rangeState.extensionsProbRange.minValue}
+                            maxValue={rangeState.extensionsProbRange.maxValue}
+                            onChange={(newRange) => handleRangeChange(newRange, rangeState.setExtensionsProbRange)}
                         />
-                        <div className={ styles.labels }>
-                            { Object.keys( EXTENSIONS_DISPLAY ).map( key => (
-                                <label key={ key }>
+                        <div className={styles.labels}>
+                            {Object.keys(EXTENSIONS_DISPLAY).map(key => (
+                                <label key={key}>
                                     <input
                                         type='checkbox'
-                                        value={ key }
-                                        onChange={ () => handleExtensionsChange( key ) }
-                                        checked={ extensions[ key ] }
-                                    /> { EXTENSIONS_DISPLAY[ key ] }
+                                        value={key}
+                                        onChange={() => handleExtensionsChange(key)}
+                                        checked={extensions[key]}
+                                    /> {EXTENSIONS_DISPLAY[key]}
                                 </label>
-                            ) ) }
+                            ))}
                         </div>
                     </div>
 
