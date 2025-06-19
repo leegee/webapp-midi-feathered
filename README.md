@@ -1,6 +1,6 @@
 # MIDI Feathered Chords
 
-A web app to feather notes played over any and all MIDI inputs, outputting to a device of your choice.
+A web app to feather notes played over any and all MIDI inputs, outputting to a device of your choice, and to try React and Jotai.
 
 Similar to [the Seldon Black software Bear McCreary used for the Foundation soundtrack](https://www.youtube.com/watch?v=x7jk0uAB9XY&t=95s), though developed independently and originally producing notes via L-systems. I do not watch a lot of television, and loved the Asmiov books when I read them 40-odd years ago, so it took me a while to even hear of the Foundation series, let alone watch it. Must do better.
 
@@ -30,9 +30,9 @@ GitHub Actions does not support a Bun lockfile, so an NPM lockfile is included. 
 
 ### To Do
 
-Touch a lamp above/below each range slider to toggle MIDI learn for that end of the range slider.
+Support sustain pedal?
 
-#### States
+Touch a lamp above/below each range slider to toggle MIDI learn for that end of the range slider.
 
 * Off 
 * * Mode: By-passed
@@ -52,8 +52,4 @@ That is, to link a controller to the end of a range,  click to ilght a lamp and 
 ### About
 
 A small application using Vite, React, Jotai, Web MIDI, mainly to compare React/Jotai to Vue3/Pinia. 
-
-### To Do
-
-* Support sustain pedal
 
