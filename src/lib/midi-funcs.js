@@ -91,8 +91,7 @@ export const sendNotes = (notesOn, rangeState, extensions, midiOutputChannels, s
             sendNoteWithDuration(usePitch, useVelocity, useDurationMs, selectedOutput, midiOutputChannel);
         }
         catch (e) {
-            console.error(`usePitch was ${usePitch}`);
-            throw e;
+            console.error(`usePitch was ${usePitch}`, e);
         }
     });
 }
