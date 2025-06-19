@@ -70,6 +70,9 @@ export const sendNotes = (notesOn, rangeState, extensions, midiOutputChannels, s
             }
         }
 
+        // Final catch
+        usePitch = Math.min(126, Math.max(28, usePitch));
+
         // Just in case
         if (!midiOutputChannels.length) {
             console.warn('No MIDI output channels specified');
