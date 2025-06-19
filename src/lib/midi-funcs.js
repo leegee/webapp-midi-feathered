@@ -24,16 +24,20 @@ export const sendNotes = (notesOn, rangeState, extensions, midiOutputChannels, s
     if (!pitches.length) {
         return;
     }
-    const usePitches = rangeState.playMode === playModeTypes.MONO
-        ? [Number(pitches[Math.floor(Math.random() * pitches.length)])]
-        : Object.keys(notesOn).filter(() => {
+    const usePitches = Object.keys(notesOn)
+        .filter(_pitch => {
             const probability = probabilityTriangular(0, 1);
-            return probability < rangeState.polyProbRange.maxValue && probability > rangeState.polyProbRange.minValue;
-        }).map(usePitch => Number(usePitch));
+            return (
+                probability < rangeState.polyProbRange.maxValue &&
+                probability > rangeState.polyProbRange.minValue
+            );
+        })
+        .map(Number); // Finally convert pitch strings to numbers
+
 
     usePitches.forEach((aPitch) => {
         const useDurationMs = rangeState.speedRange.minValue + Math.random() * (rangeState.speedRange.maxValue - rangeState.speedRange.minValue);
-        const useVelocity = generateVelocity(notesOn[[aPitch]], rangeState.velocityRange);
+        const useVelocity = generateVelocity(notesOn[aPitch], rangeState.velocityRange);
 
         const useOctave = (Math.floor(
             rangeState.octaveRange.minValue == rangeState.octaveRange.maxValue
@@ -60,8 +64,14 @@ export const sendNotes = (notesOn, rangeState, extensions, midiOutputChannels, s
             }
         }
 
+        // Just in case
+        if (!midiOutputChannels.length) {
+            console.warn('No MIDI output channels specified');
+            return;
+        }
+
         const midiOutputChannel = midiOutputChannels.length == 1
-            ? midiOutputChannels[0]                                                        // Use the only output selected
+            ? midiOutputChannels[0]                                                       // Use the only output selected
             : midiOutputChannels[Math.floor(Math.random() * midiOutputChannels.length)]; // Use a random output channel
 
         if (isNaN(usePitch)) {
