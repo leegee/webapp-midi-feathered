@@ -57,13 +57,17 @@ export const sendNotes = (notesOn, rangeState, extensions, midiOutputChannels, s
         let usePitch = aPitch + useOctave + useExtension;
 
         // Reverse the octave if it puts the note out of range
-        if (usePitch >= 127 || usePitch < 28) {
-            usePitch -= useOctave;
-            if (usePitch >= 127 || usePitch < 28) {
-                usePitch -= useExtension;
+        if (usePitch > 126) {
+            usePitch -= useOctave; // try removing octave
+            if (usePitch > 126) {
+                usePitch -= useExtension; // try removing extension
             }
-            // Finally, clamp just in case:
-            usePitch = Math.max(28, Math.min(126, usePitch));
+        }
+        if (usePitch < 28) {
+            usePitch += useOctave;
+            if (usePitch < 28) {
+                usePitch += useExtension;
+            }
         }
 
         // Just in case
