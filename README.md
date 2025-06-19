@@ -24,6 +24,10 @@ Similar to [the Seldon Black software Bear McCreary used for the Foundation soun
     
     bun run dev
 
+### Loopback
+
+For a minimal setup, try [midiLoop](https://www.tobias-erichsen.de/software/loopmidi.html).
+
 ### Dependencies Lock File
 
 GitHub Actions does not support a Bun lockfile, so an NPM lockfile is included. Ugh.
