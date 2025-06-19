@@ -28,6 +28,12 @@ Similar to [the Seldon Black software Bear McCreary used for the Foundation soun
 
 GitHub Actions does not support a Bun lockfile, so an NPM lockfile is included. Ugh.
 
+### About
+
+A small application using Vite, React, Jotai, Web MIDI, mainly to compare React/Jotai to Vue3/Pinia. 
+
+Were I to program this again I would use SolidJS - both much faster and more readable. 
+
 ### To Do
 
 Support sustain pedal?
@@ -48,8 +54,4 @@ Touch a lamp above/below each range slider to toggle MIDI learn for that end of 
 * * Action: Enter 'By-passed' mode
 
 That is, to link a controller to the end of a range,  click to ilght a lamp and enter 'MIDI Learn' mode, then activate a controller to assign it. To deactive, click the same lamp again. To reactivate or relearn, click the lamp again.
-
-### About
-
-A small application using Vite, React, Jotai, Web MIDI, mainly to compare React/Jotai to Vue3/Pinia. 
 
