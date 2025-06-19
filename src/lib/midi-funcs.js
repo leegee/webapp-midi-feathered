@@ -45,7 +45,9 @@ export const sendNotes = (notesOn, rangeState, extensions, midiOutputChannels, s
         let useExtension = 0;
         if (shallUseExtensions) {
             const activeExtensions = Object.keys(extensions).filter(ext => extensions[ext]);
-            useExtension = Number(activeExtensions[Math.floor(Math.random() * activeExtensions.length)]);
+            if (shallUseExtensions && activeExtensions.length > 0) {
+                useExtension = Number(activeExtensions[Math.floor(Math.random() * activeExtensions.length)]);
+            }
         }
 
         let usePitch = aPitch + useOctave + useExtension;
