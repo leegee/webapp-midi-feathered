@@ -62,6 +62,8 @@ export const sendNotes = (notesOn, rangeState, extensions, midiOutputChannels, s
             if (usePitch >= 127 || usePitch < 28) {
                 usePitch -= useExtension;
             }
+            // Finally, clamp just in case:
+            usePitch = Math.max(28, Math.min(126, usePitch));
         }
 
         // Just in case
