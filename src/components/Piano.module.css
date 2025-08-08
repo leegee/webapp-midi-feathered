@@ -18,7 +18,7 @@
     flex: 1;
     cursor: pointer;
     display: inline-block;
-    border:  var(--midi-app-border);
+    border: var(--midi-app-border);
     border-right: 0;
     background-color: #f6f6f6;
     width: var(--key-width);
@@ -40,4 +40,7 @@
     height: var(--key-black-height);
     margin-left: calc(var(--key-width) / -2);
     margin-right: calc(var(--key-width) / -2);
+    border: 2px solid white;
+    border-top: none;
+    border-bottom: none;
 }
