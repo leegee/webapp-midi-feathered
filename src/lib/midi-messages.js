@@ -6,6 +6,7 @@ export const CC = 11;
 export const DISPATCH_EVENTS_STD = false;
 export const EVENT_NOTE_START = 'note-start';
 export const EVENT_NOTE_STOP = 'note-stop';
+export const ON_SCREEN_KEYBOARD = 999;
 
 export function startMidiNote(pitch, velocity, selectedOutput, midiChannel = 0) {
     // console.log('start', selectedOutput.name, midiChannel, pitch, velocity);
@@ -24,7 +25,10 @@ export function stopMidiNote(pitch, selectedOutput, midiChannel = 0) {
 export function onMidiMessage(event, midiInputChannel, setNotesOn, setCCsOn) {
     const midiChannel = event.data[0] & 0x0F;
 
-    if (midiChannel !== 0 && midiChannel !== midiInputChannel) {
+    if (midiChannel !== 0 && midiChannel !== midiInputChannel
+        && midiInputChannel !== ON_SCREEN_KEYBOARD
+    ) {
+        console.log('midiChannel not zero or ', midiInputChannel, 'but', midiInputChannel)
         return;
     }
 
@@ -42,6 +46,8 @@ export function onMidiMessage(event, midiInputChannel, setNotesOn, setCCsOn) {
     }
 
     else if (cmd === NOTE_ON || cmd === NOTE_OFF) {
+        console.log(cmd, pitch, velocity)
+
         setNotesOn((prevNotesOn) => {
             const newNotesOn = { ...prevNotesOn };
 
