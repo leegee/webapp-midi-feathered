@@ -46,7 +46,7 @@ const RANGE_EXTENTS = {
     },
     durationRange: {
         minValue: 10,
-        maxValue: 6000,
+        maxValue: 1000,
     },
     velocityRange: {
         minValue: -100,
