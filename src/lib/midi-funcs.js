@@ -7,6 +7,9 @@ export const playModeTypes = {
     POLY: 1,
 };
 
+const minThreshold = 24;
+const maxThreshold = 95;
+
 const timersForPitches = {};
 const DISPATCH_EVENTS_FOR_EXTRAS = true;
 
@@ -32,8 +35,9 @@ export const sendNotes = (notesOn, rangeState, extensions, midiOutputChannels, s
                 probability > rangeState.polyProbRange.minValue
             );
         })
-        .map(Number); // Finally convert pitch strings to numbers
-
+        .map(Number)
+        // clamp to avoid keyswitches
+        .filter(pitch => pitch >= minThreshold && pitch <= maxThreshold);
 
     usePitches.forEach((aPitch) => {
         const useDurationMs = rangeState.speedRange.minValue + Math.random() * (rangeState.speedRange.maxValue - rangeState.speedRange.minValue);
