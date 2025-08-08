@@ -1,16 +1,12 @@
-import { useState, useEffect, useRef } from 'react';
+import { useCallback, useRef, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import styles from './RangeInput.module.css';
 
 function debounce(func, delay) {
     let timeoutId;
     return function (...args) {
-        if (timeoutId) {
-            clearTimeout(timeoutId);
-        }
-        timeoutId = setTimeout(() => {
-            func(...args);
-        }, delay);
+        if (timeoutId) clearTimeout(timeoutId);
+        timeoutId = setTimeout(() => func(...args), delay);
     };
 }
 
@@ -26,94 +22,82 @@ const RangeInput = ({
     flipDisplay = false,
     forceIntegers = false
 }) => {
-    const [minPercentage, setMinPercentage] = useState(((minValue - min) / (max - min)) * 100);
-    const [maxPercentage, setMaxPercentage] = useState(((maxValue - min) / (max - min)) * 100);
+    const rangeRef = useRef(null);
 
+    // Internal state for immediate UI update
+    const [internalMin, setInternalMin] = useState(minValue);
+    const [internalMax, setInternalMax] = useState(maxValue);
+
+    // Sync internal state when props change (e.g. external updates)
     useEffect(() => {
-        setMinPercentage(((minValue - min) / (max - min)) * 100);
-        setMaxPercentage(((maxValue - min) / (max - min)) * 100);
-    }, [minValue, maxValue, min, max]);
+        setInternalMin(minValue);
+        setInternalMax(maxValue);
+    }, [minValue, maxValue]);
 
-    // Debounce
-    const debounceTimeout = useRef(null);
-
+    // Debounced onChange callback to parent
     const debouncedOnChange = useRef(
-        debounce(newValues => {
-            onChange(newValues);
+        debounce((values) => {
+            if (forceIntegers) {
+                values.minValue = Math.round(values.minValue);
+                values.maxValue = Math.round(values.maxValue);
+            }
+            onChange(values);
         }, debounceMs)
     ).current;
 
-    function handleDebouncedChange(newValues) {
-        if (debounceTimeout.current) {
-            clearTimeout(debounceTimeout.current);
-        }
-        debounceTimeout.current = setTimeout(() => {
-            if (forceIntegers) {
-                newValues.minValue = Math.round(newValues.minValue);
-                newValues.maxValue = Math.round(newValues.maxValue);
-            }
-            debouncedOnChange(newValues);
-        }, debounceMs);
-    }
+    const getPercentage = useCallback((value) => ((value - min) / (max - min)) * 100, [min, max]);
 
-    const handleResize = (newPercentage, isMin) => {
-        newPercentage = Math.max(0, Math.min(100, newPercentage));
+    const handleResize = useCallback((newPercentage, isMin) => {
+        const clamped = Math.max(0, Math.min(100, newPercentage));
         if (isMin) {
-            setMinPercentage(Math.min(newPercentage, maxPercentage - 1));
-            const newValue = min + ((max - min) * Math.min(newPercentage, maxPercentage - 1)) / 100;
-            handleDebouncedChange({ minValue: newValue, maxValue });
+            const limited = Math.min(clamped, getPercentage(internalMax) - 1);
+            const newVal = min + ((max - min) * limited) / 100;
+            setInternalMin(newVal);
+            debouncedOnChange({ minValue: newVal, maxValue: internalMax });
         } else {
-            setMaxPercentage(Math.max(newPercentage, minPercentage + 1));
-            const newValue = min + ((max - min) * Math.max(newPercentage, minPercentage + 1)) / 100;
-            handleDebouncedChange({ minValue, maxValue: newValue });
+            const limited = Math.max(clamped, getPercentage(internalMin) + 1);
+            const newVal = min + ((max - min) * limited) / 100;
+            setInternalMax(newVal);
+            debouncedOnChange({ minValue: internalMin, maxValue: newVal });
         }
-    };
+    }, [min, max, internalMin, internalMax, debouncedOnChange, getPercentage]);
 
-    const handleMouseDown = (e, isMin) => {
-        e.preventDefault({ passive: false });
-        const rect = e.currentTarget.parentElement.getBoundingClientRect();
-        const clickPos = vertical ? e.clientY - rect.top : e.clientX - rect.left;
-        const newPercentage = (clickPos / (vertical ? rect.height : rect.width)) * 100;
-        handleResize(newPercentage, isMin);
+    const startDrag = useCallback((e, isMin, isTouch) => {
+        e.preventDefault();
 
-        const handleMouseMove = e => {
-            const movePos = vertical ? e.clientY - rect.top : e.clientX - rect.left;
-            const newPercentage = (movePos / (vertical ? rect.height : rect.width)) * 100;
+        const rect = rangeRef.current.getBoundingClientRect();
+        const getPos = (ev) => {
+            const clientX = isTouch ? ev.touches[0].clientX : ev.clientX;
+            const clientY = isTouch ? ev.touches[0].clientY : ev.clientY;
+            return vertical ? clientY - rect.top : clientX - rect.left;
+        };
+
+        const update = (ev) => {
+            ev.preventDefault();
+            const pos = getPos(ev);
+            const newPercentage = (pos / (vertical ? rect.height : rect.width)) * 100;
             handleResize(newPercentage, isMin);
         };
 
-        const handleMouseUp = () => {
-            document.removeEventListener('mousemove', handleMouseMove);
-            document.removeEventListener('mouseup', handleMouseUp);
+        const end = () => {
+            document.removeEventListener(isTouch ? 'touchmove' : 'mousemove', update);
+            document.removeEventListener(isTouch ? 'touchend' : 'mouseup', end);
         };
 
-        document.addEventListener('mousemove', handleMouseMove);
-        document.addEventListener('mouseup', handleMouseUp);
-    };
+        document.addEventListener(isTouch ? 'touchmove' : 'mousemove', update, { passive: false });
+        document.addEventListener(isTouch ? 'touchend' : 'mouseup', end, { passive: false });
 
-    const handleTouchStart = (e, isMin) => {
-        const rect = e.currentTarget.parentElement.getBoundingClientRect();
-        const touchPos = vertical ? e.touches[0].clientY - rect.top : e.touches[0].clientX - rect.left;
-        const newPercentage = (touchPos / (vertical ? rect.height : rect.width)) * 100;
-        handleResize(newPercentage, isMin);
+        update(e);
+    }, [vertical, handleResize]);
 
-        const handleTouchMove = e => {
-            const movePos = vertical ? e.touches[0].clientY - rect.top : e.touches[0].clientX - rect.left;
-            const newPercentage = (movePos / (vertical ? rect.height : rect.width)) * 100;
-            handleResize(newPercentage, isMin);
-        };
-
-        const handleTouchEnd = () => {
-            document.removeEventListener('touchmove', handleTouchMove);
-            document.removeEventListener('touchend', handleTouchEnd);
-        };
-
-        document.addEventListener('touchmove', handleTouchMove);
-        document.addEventListener('touchend', handleTouchEnd);
-    };
+    const minPercentage = getPercentage(internalMin);
+    const maxPercentage = getPercentage(internalMax);
 
     return (
-        <section className={`${styles['custom-range-input']} ${vertical ? styles.vertical : ''} ${flipDisplay ? styles.flipped : ''} ${styles[size]}`}>
+        <section
+            ref={rangeRef}
+            className={`${styles['custom-range-input']} ${vertical ? styles.vertical : ''} ${flipDisplay ? styles.flipped : ''} ${styles[size]}`}
+        >
             <div
                 className={styles.bar}
                 style={
@@ -121,18 +105,18 @@ const RangeInput = ({
                         ? { top: `${minPercentage}%`, bottom: `${100 - maxPercentage}%` }
                         : { left: `${minPercentage}%`, right: `${100 - maxPercentage}%` }
                 }
-            ></div>
+            />
             <div
                 className={styles.handle}
                 style={vertical ? { top: `${minPercentage}%`, width: '100%' } : { left: `${minPercentage}%` }}
-                onMouseDown={e => handleMouseDown(e, true)}
-                onTouchStart={e => handleTouchStart(e, true)}
+                onMouseDown={(e) => startDrag(e, true, false)}
+                onTouchStart={(e) => startDrag(e, true, true)}
             />
             <div
                 className={styles.handle}
                 style={vertical ? { top: `${maxPercentage}%`, width: '100%' } : { left: `${maxPercentage}%` }}
-                onMouseDown={e => handleMouseDown(e, false)}
-                onTouchStart={e => handleTouchStart(e, false)}
+                onMouseDown={(e) => startDrag(e, false, false)}
+                onTouchStart={(e) => startDrag(e, false, true)}
             />
         </section>
     );
