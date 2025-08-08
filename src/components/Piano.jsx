@@ -33,7 +33,6 @@ export default function PianoKeyboard({ midiInputChannel }) {
 
     const midiPitches = Array.from({ length: 88 }, (_, index) => index + 21);
 
-    // Recalculate key bounds
     const calculateKeyBounds = useCallback(() => {
         if (!containerRef.current) return;
         const keys = containerRef.current.querySelectorAll('[data-pitch]');
